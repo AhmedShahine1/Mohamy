@@ -1,0 +1,23 @@
+﻿@model IEnumerable<AuthDTO>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>الاسم الكامل</th>
+            <th>رقم الهاتف</th>
+            <th>صورة الملف الشخصي</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.PhoneNumber</td>
+                <td>
+                    <img src="@user.ProfileImage" alt="صورة الملف الشخصي" style="width: 50px; height: 50px;" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

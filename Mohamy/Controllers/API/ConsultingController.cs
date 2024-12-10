@@ -1,0 +1,170 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Mohamy.BusinessLayer.Interfaces;
+using Mohamy.Core.DTO;
+using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.Entity.ApplicationData;
+using Mohamy.Core.Helpers;
+
+namespace Mohamy.Controllers.API
+{
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Customer")]
+    public class ConsultingController : BaseController, IActionFilter
+    {
+        private readonly IConsultingService _consultingService;
+        private readonly IAccountService _accountService;
+
+        private ApplicationUser? CurrentUser;
+
+        public ConsultingController(IAccountService accountService, IConsultingService consultingService, IRequestConsultingService requestConsultingService)
+        {
+            _accountService = accountService;
+            _consultingService = consultingService;
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            var token = context.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                try
+                {
+                    var user = _accountService.GetUserFromToken(token).Result;
+                    CurrentUser = user; // Store the user in the context
+                }
+                catch (Exception)
+                {
+                    context.Result = new UnauthorizedResult(); // Early exit if user retrieval fails
+                    return;
+                }
+            }
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+        }
+
+
+        [HttpPost]
+        [Route("AddConsulting")]
+        public async Task<ActionResult<BaseResponse>> AddConsulting([FromForm] ConsultingDTO dto)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                dto.CustomerId = CurrentUser.Id;
+                var id = await _consultingService.AddConsultingAsync(dto);
+
+                response.status = true;
+                response.Data = new { ConsultingId = id };
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while adding consulting: {ex.InnerException}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpGet]
+        [Route("GetAllConsultingsCustomer")]
+        public async Task<ActionResult<BaseResponse>> GetAllConsultingsCustomer()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetConsultingsByCustomerIdAsync(CurrentUser.Id);
+
+                response.status = true;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpGet]
+        [Route("GetConsultingById")]
+        public async Task<ActionResult<BaseResponse>> GetConsultingById([FromQuery]string id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consulting = await _consultingService.GetConsultingByIdAsync(id);
+                if (consulting == null)
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Consulting not found.";
+                    return NotFound(response);
+                }
+
+                response.status = true;
+                response.Data = consulting;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving consulting: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpPost]
+        [Route("CancelConsulting")]
+        public async Task<ActionResult<BaseResponse>> CancelConsulting([FromQuery] string id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Cancelled);
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while canceling consulting: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpPost]
+        [Route("PaymentConsulting")]
+        public async Task<ActionResult<BaseResponse>> PaymentConsulting([FromQuery] string id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.InProgress);
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while payment consulting: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+    }
+}

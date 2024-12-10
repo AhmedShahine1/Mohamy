@@ -1,0 +1,49 @@
+﻿@model LoginModel
+@{
+    Layout = "_RegisterLayout";
+}
+
+<form asp-action="Login" method="post" style="direction:rtl;">
+    <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
+    <span class="text-danger">
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    </span>
+
+    <div class="row mb-3">
+        <div class="col-10">
+            <div class="form-group">
+                <input asp-for="PhoneNumber" class="form-control" placeholder="رقم الهاتف" style="direction:rtl;" />
+            </div>
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-10">
+            <div class="form-group">
+                <input asp-for="Password" class="form-control" placeholder="كلمه المرور" type="password" />
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-5">
+            <div class="icheck-primary">
+                <input asp-for="RememberMe" id="remember" />
+                <label for="remember">
+                    تذكرني
+                </label>
+            </div>
+        </div>
+        <div class="col-5">
+            <button type="submit" class="btn btn-primary btn-block">تسجيل دخول</button>
+        </div>
+    </div>
+</form>
+
+<p class="mb-1 text-center">
+    <a asp-area="Lawyer" asp-controller="Lawyer" asp-action="Register" class="link-primary">
+        انشاء حساب
+    </a>
+</p>

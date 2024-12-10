@@ -1,0 +1,31 @@
+﻿@model IEnumerable<ConsultingDTO>
+
+<table id="example1" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Order Number</th>
+            <th>Customer</th>
+            <th>Lawyer</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var consulting in Model)
+        {
+            <tr>
+                <td>@consulting.OrderNumber</td>
+                <td>@consulting.Customer?.FullName</td>
+                <td>@consulting.Lawyer?.FullName</td>
+                <td>@consulting.Description</td>
+                <td>@consulting.PriceService</td>
+                <td>@consulting.StatusConsulting</td>
+                <td>
+                    <a href="@Url.Action("ConsultingDetails", new { id = consulting.Id })" class="btn btn-info">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

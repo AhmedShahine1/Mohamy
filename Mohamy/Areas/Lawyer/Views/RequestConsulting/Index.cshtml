@@ -1,0 +1,30 @@
+﻿@model IEnumerable<RequestConsultingDTO>
+
+<table id="example1" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>رقم الاستشارة</th>
+            <th>اسم العميل</th>
+            <th>اسم المحامي</th>
+            <th>حاله طلب الاستشارة</th>
+            <th>الغاء الطلب</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Consulting.OrderNumber</td>
+                <td>@request.Consulting.Customer.FullName</td>
+                <td>@request.Lawyer.FullName</td>
+                <td>@request.StatusRequestConsulting</td>
+                <td>
+                    <form asp-action="CancelRequest" method="post">
+                        <input type="hidden" name="requestId" value="@request.Id" />
+                        <button type="submit" class="btn btn-danger">الغاء الطلب</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

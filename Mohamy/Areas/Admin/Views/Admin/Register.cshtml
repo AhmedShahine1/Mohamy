@@ -1,0 +1,65 @@
+﻿@model RegisterAdmin
+
+@{
+    Layout = "_RegisterLayout";
+}
+<form asp-action="Register" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group mb-3">
+                <input asp-for="FullName" class="form-control" placeholder="الاسم رباعي" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group mb-3">
+                <input asp-for="PhoneNumber" class="form-control" placeholder="رقم الهاتف" style="direction:rtl;" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group mb-3">
+                <input asp-for="Password" class="form-control" placeholder="كلمه المرور" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group mb-3">
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="تاكيد كلمه المرور" type="password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group mb-3">
+                <input asp-for="ImageProfile" type="file" class="form-control" />
+                <span asp-validation-for="ImageProfile" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group icheck-primary">
+                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                <label for="agreeTerms">
+                    اوافق علي سياسه الشروط و <a href="#">الخصوصيه</a>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-6 mb-3">
+            <button type="submit" class="btn btn-primary btn-block">انشاء حساب</button>
+        </div>
+        <div class="col-6">
+            <a asp-area="" asp-controller="Auth" asp-action="Login" class="btn btn-secondary btn-block">تسجيل دخول</a>
+        </div>
+    </div>
+</form>

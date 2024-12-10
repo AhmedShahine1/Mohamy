@@ -1,0 +1,68 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Zain", sans-serif;
+}
+
+body, html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerstyle {
+    width: 100%; /* Set to 100% for full responsiveness */
+    max-width: 500px; /* Max width for larger screens */
+    background-color: white;
+    padding: 20px; /* Add padding for mobile devices */
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 20px;
+}
+
+.logo img {
+    width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.center-text {
+    text-align: center;
+    font-size: 18px;
+    color: black;
+    word-wrap: break-word;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .containerstyle {
+        width: 90%; /* Adjust container width for tablets/smaller screens */
+    }
+
+    .center-text {
+        font-size: 16px; /* Decrease font size slightly for smaller screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .containerstyle {
+        width: 95%; /* Full width for mobile phones */
+        padding: 10px; /* Reduce padding for mobile devices */
+    }
+
+    .center-text {
+        font-size: 14px; /* Further decrease font size for mobile */
+    }
+}

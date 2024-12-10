@@ -1,0 +1,55 @@
+﻿@model IEnumerable<SubConsultingDTO>
+
+<table id="example1" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>
+                Icon
+            </th>
+            <th>
+                الاسم
+            </th>
+            <th>
+                الوصف
+            </th>
+            <th>
+                الاستشارة الرئيسيه
+            </th>
+            <th>
+                تعديل
+            </th>
+            <th>
+                حذف
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@item.IconUrl" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.mainConsulting.Name)
+                </td>
+                <td>
+                    <form class="p-2">
+                        <button type="submit" class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">تعديل</button>
+                    </form>
+                </td>
+                <td>
+                    <form class="p-2" asp-action="Delete" asp-route-id="@item.Id">
+                        <input type="submit" value="حذف" class="btn btn-danger" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
