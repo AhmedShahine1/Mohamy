@@ -19,7 +19,7 @@ public static class ContextServicesExtensions
             options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
         services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         services.AddControllersWithViews();
-        services.AddSingleton<IRequestResponseService, RequestResponseService>();
+        services.AddScoped<IRequestResponseService, RequestResponseService>();
         // IBaseRepository && IUnitOfWork Service
         //services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>)); // only Repository
         services.AddTransient<IUnitOfWork, UnitOfWork>(); // Repository and UnitOfWork

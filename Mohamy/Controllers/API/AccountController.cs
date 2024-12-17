@@ -13,8 +13,6 @@ namespace Mohamy.Controllers.API
     public class AccountController : BaseController
     {
         private readonly IAccountService _accountService;
-        //private readonly IConsultingService _consultingService;
-        //private readonly IExperienceService _experienceService;
         private readonly IMapper _mapper;
 
         public AccountController(IAccountService accountService, IMapper mapper)

@@ -4,10 +4,6 @@ using Mohamy.RepositoryLayer.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Mohamy.BusinessLayer.Services
 {
@@ -27,9 +23,11 @@ namespace Mohamy.BusinessLayer.Services
         public async Task<string> UploadFile(IFormFile file, Paths paths, string oldFilePath = null)
         {
             var uploads = Path.Combine(webHostEnvironment.WebRootPath, paths.Name);
+
+            // التحقق من وجود المجلد
             if (!Directory.Exists(uploads))
             {
-                Directory.CreateDirectory(uploads);
+                throw new DirectoryNotFoundException($"The directory does not exist: {uploads}");
             }
 
             var uniqueFileName = $"{RandomString(10)}_{file.FileName}";
@@ -61,13 +59,17 @@ namespace Mohamy.BusinessLayer.Services
         {
             var uploads = Path.Combine(webHostEnvironment.WebRootPath, paths.Name);
             var sourcePath = Path.Combine(webHostEnvironment.WebRootPath, "asset", "user.jpg");
+
+            // التحقق من وجود المجلد
             if (!Directory.Exists(uploads))
             {
-                Directory.CreateDirectory(uploads);
+                throw new DirectoryNotFoundException($"The directory does not exist: {uploads}");
             }
+
             var uniqueFileName = $"{RandomString(10)}_UserIcon.jpg";
             var destinationPath = Path.Combine(uploads, uniqueFileName);
             File.Copy(sourcePath, destinationPath, true);
+
             var image = new Images
             {
                 Name = uniqueFileName,
@@ -77,20 +79,6 @@ namespace Mohamy.BusinessLayer.Services
             await unitOfWork.ImagesRepository.AddAsync(image);
             await unitOfWork.SaveChangesAsync();
             return image.Id;
-        }
-
-        public async Task<string> GetFile(string imageId)
-        {
-            var image = await unitOfWork.ImagesRepository
-                .FindAsync(a => a.Id == imageId, include: query => 
-                query.Include(q => q.path));
-
-            if (image == null)
-            {
-                throw new FileNotFoundException("Image not found.");
-            }
-
-            return Path.Combine($"/{image.path.Name}/{image.Name}");
         }
 
         public async Task<string> UpdateFile(IFormFile file, Paths paths, string imageId)
@@ -105,9 +93,11 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             var uploads = Path.Combine(webHostEnvironment.WebRootPath, paths.Name);
+
+            // التحقق من وجود المجلد
             if (!Directory.Exists(uploads))
             {
-                Directory.CreateDirectory(uploads);
+                throw new DirectoryNotFoundException($"The directory does not exist: {uploads}");
             }
 
             var uniqueFileName = $"{RandomString(10)}_{file.FileName}";
@@ -132,6 +122,21 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             return image.Id;
+        }
+
+
+        public async Task<string> GetFile(string imageId)
+        {
+            var image = await unitOfWork.ImagesRepository
+                .FindAsync(a => a.Id == imageId, include: query => 
+                query.Include(q => q.path));
+
+            if (image == null)
+            {
+                throw new FileNotFoundException("Image not found.");
+            }
+
+            return Path.Combine($"/{image.path.Name}/{image.Name}");
         }
 
         private static string RandomString(int length)

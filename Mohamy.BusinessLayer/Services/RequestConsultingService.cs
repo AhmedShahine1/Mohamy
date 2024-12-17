@@ -19,14 +19,12 @@ namespace Mohamy.BusinessLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
-        private readonly IFileHandling _fileHandling;
 
-        public RequestConsultingService(IUnitOfWork unitOfWork, IMapper mapper, IAccountService accountService, IFileHandling fileHandling)
+        public RequestConsultingService(IUnitOfWork unitOfWork, IMapper mapper, IAccountService accountService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _accountService = accountService;
-            _fileHandling = fileHandling;
         }
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetAllRequestsAsync()
@@ -45,7 +43,8 @@ namespace Mohamy.BusinessLayer.Services
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetRequestsByConsultingAsync(string consultingId)
         {
-            var requests = await _unitOfWork.RequestConsultingRepository.FindAsync(r => r.ConsultingId == consultingId && r.statusRequestConsulting != statusRequestConsulting.Cancel);
+            var requests = (await _unitOfWork.RequestConsultingRepository
+                .FindAllAsync(r => r.ConsultingId == consultingId && r.statusRequestConsulting != statusRequestConsulting.Cancel));
             return _mapper.Map<IEnumerable<RequestConsultingDTO>>(requests);
         }
 
@@ -77,6 +76,7 @@ namespace Mohamy.BusinessLayer.Services
                     if (consulting != null)
                     {
                         consulting.LawyerId = request.LawyerId;
+                        consulting.PriceService = request.PriceService;
                         _unitOfWork.ConsultingRepository.Update(consulting);
                     }
                 }
@@ -104,7 +104,6 @@ namespace Mohamy.BusinessLayer.Services
             {
                 return _mapper.Map<RequestConsultingDTO>(check);
             }
-            requestConsultingDTO.Id = requestConsultingDTO.Id;
             var requestConsult = _mapper.Map<RequestConsulting>(requestConsultingDTO);
 
             await _unitOfWork.RequestConsultingRepository.AddAsync(requestConsult);

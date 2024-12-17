@@ -8,6 +8,7 @@ namespace Mohamy.Core.Entity.ConsultingData
 {
     public class Consulting : BaseEntity
     {
+        public string Title { get; set; }
         [Required(ErrorMessage = "يجب إدخال استشارة فرعية")]
         [ForeignKey(nameof(subConsulting))]
         public string subConsultingId { get; set; }
@@ -40,7 +41,7 @@ namespace Mohamy.Core.Entity.ConsultingData
 
         public ICollection<RequestConsulting>? RequestConsultings { get; set; }
 
-        public int timeConsulting { get; set; }
+        public bool voiceConsulting { get; set; }
 
         public DateTime? StartDate { get; set; } = DateTime.Now;
 

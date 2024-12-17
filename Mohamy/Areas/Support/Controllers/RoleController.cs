@@ -2,14 +2,10 @@
 using Mohamy.Core.DTO;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
 using Mohamy.Core.Entity.ApplicationData;
-using Mohamy.RepositoryLayer.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Mohamy.Areas.Support.Controllers

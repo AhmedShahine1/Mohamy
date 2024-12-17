@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Mohamy.Core.DTO.AuthViewModel.RequesrLog;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.ChatData;
 using Mohamy.Core.Entity.ConsultingData;
@@ -21,11 +22,13 @@ namespace Mohamy.Core
         public ApplicationDbContext()
         {
         }
+        public DbSet<RequestResponseLog> RequestResponseLogs { get; set; }
         //----------------------------------------------------------------------------------
         public virtual DbSet<Paths> Paths { get; set; }
         public virtual DbSet<Images> Images { get; set; }
         //----------------------------------------------------------------------------------
         public virtual DbSet<Specialties> Specialties { get; set; }
+        public virtual DbSet<Experience> Experiences { get; set; }
         public virtual DbSet<lawyerLicense> LawyerLicenses { get; set; }
         public virtual DbSet<graduationCertificate> graduationCertificate { get; set; }
         public virtual DbSet<mainConsulting> MainConsultings { get; set; }
@@ -59,7 +62,13 @@ namespace Mohamy.Core
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogin", "dbo");
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "dbo");
             modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "dbo");
-
+            modelBuilder.Entity<RequestResponseLog>(entity =>
+            {
+                entity.HasKey(e => e.id);
+                entity.Property(e => e.RequestUrl).IsRequired().HasMaxLength(2048);
+                entity.Property(e => e.HttpMethod).IsRequired().HasMaxLength(10);
+                entity.Property(e => e.Timestamp).IsRequired();
+            });
             // Configure ApplicationUser
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
@@ -67,62 +76,36 @@ namespace Mohamy.Core
                 entity.HasOne(u => u.Profile)
                     .WithMany() // No reverse navigation
                     .HasForeignKey(u => u.ProfileId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                // One-to-One relationship with lawyerLicense
-                entity.HasOne(u => u.lawyerLicense)
-                    .WithOne(l => l.Lawyer)
-                    .HasForeignKey<ApplicationUser>(u => u.lawyerLicenseId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                // One-to-Many relationship with graduationCertificates
-                entity.HasMany(u => u.graduationCertificates)
-                    .WithOne(gc => gc.Lawyer)
-                    .HasForeignKey(gc => gc.LawyerId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                // One-to-Many relationship with Experiences
-                entity.HasMany(u => u.Experiences)
-                    .WithOne(e => e.Lawyer)
-                    .HasForeignKey(e => e.LawyerId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Configure graduationCertificate
-            modelBuilder.Entity<graduationCertificate>(entity =>
-            {
-                entity.HasOne(gc => gc.Lawyer)
-                    .WithMany(l => l.graduationCertificates)
-                    .HasForeignKey(gc => gc.LawyerId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
+            // Experience to SubConsulting relationship
+            modelBuilder.Entity<Experience>()
+                .HasOne(e => e.subConsulting)
+                .WithMany()
+                .HasForeignKey(e => e.subConsultingId)
+                .OnDelete(DeleteBehavior.Restrict); // Use Restrict, Cascade, or SetNull as needed.
 
-            // Configure lawyerLicense
-            modelBuilder.Entity<lawyerLicense>(entity =>
-            {
-                entity.HasOne(l => l.Lawyer)
-                    .WithOne(lu => lu.lawyerLicense)
-                    .HasForeignKey<lawyerLicense>(l => l.LawyerId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-            
-            // Configure Specialties
+            // Specialties to SubConsulting relationship
             modelBuilder.Entity<Specialties>()
-            .HasKey(ur => new { ur.LawyerId, ur.subConsultingId });
+                .HasOne(s => s.subConsulting)
+                .WithMany()
+                .HasForeignKey(s => s.subConsultingId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Experience
-            modelBuilder.Entity<Experience>(entity =>
-            {
-                entity.HasOne(e => e.Lawyer)
-                    .WithMany(l => l.Experiences)
-                    .HasForeignKey(e => e.LawyerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+            // LawyerLicense to ApplicationUser relationship
+            modelBuilder.Entity<lawyerLicense>()
+                .HasOne(l => l.Lawyer)
+                .WithMany()
+                .HasForeignKey(l => l.LawyerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(e => e.subConsulting)
-                    .WithMany()
-                    .HasForeignKey(e => e.subConsultingId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
+            // GraduationCertificate to ApplicationUser relationship
+            modelBuilder.Entity<graduationCertificate>()
+                .HasOne(g => g.Lawyer)
+                .WithMany(a => a.graduationCertificates)
+                .HasForeignKey(g => g.LawyerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure mainConsulting
             modelBuilder.Entity<mainConsulting>(entity =>

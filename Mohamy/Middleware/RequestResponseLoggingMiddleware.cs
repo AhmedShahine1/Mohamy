@@ -4,12 +4,12 @@ using Mohamy.Core.DTO.AuthViewModel.RequesrLog;
 public class RequestResponseLoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IRequestResponseService _requestResponseService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public RequestResponseLoggingMiddleware(RequestDelegate next, IRequestResponseService requestResponseService)
+    public RequestResponseLoggingMiddleware(RequestDelegate next, IServiceProvider serviceProvider)
     {
         _next = next;
-        _requestResponseService = requestResponseService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task Invoke(HttpContext context)
@@ -33,21 +33,29 @@ public class RequestResponseLoggingMiddleware
         responseBodyStream.Seek(0, SeekOrigin.Begin);
         var responseBodyText = await new StreamReader(responseBodyStream).ReadToEndAsync();
         responseBodyStream.Seek(0, SeekOrigin.Begin);
+
         bool isApi = context.Request.Path.StartsWithSegments("/api");
         if (isApi)
         {
-            // Log the request and response
-            var log = new RequestResponseLog
+            // Use a scope to resolve the scoped service
+            using (var scope = _serviceProvider.CreateScope())
             {
-                Timestamp = DateTime.Now,
-                RequestUrl = context.Request.Path,
-                HttpMethod = context.Request.Method,
-                RequestBody = requestBodyText,
-                ResponseBody = responseBodyText
-            };
+                var requestResponseService = scope.ServiceProvider.GetRequiredService<IRequestResponseService>();
 
-            await _requestResponseService.AddLogAsync(log);
+                // Log the request and response
+                var log = new RequestResponseLog
+                {
+                    Timestamp = DateTime.Now,
+                    RequestUrl = context.Request.Path,
+                    HttpMethod = context.Request.Method,
+                    RequestBody = requestBodyText,
+                    ResponseBody = responseBodyText
+                };
+
+                await requestResponseService.AddLog(log);
+            }
         }
+
         // Reset the response body stream
         await responseBodyStream.CopyToAsync(originalResponseBodyStream);
     }

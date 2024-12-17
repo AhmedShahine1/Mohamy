@@ -16,8 +16,8 @@ namespace Mohamy.Core.Entity.LawyerData
         [Required(ErrorMessage = "يجب إدخال الاستشارة الفرعية")]
         [ForeignKey(nameof(subConsulting))]
         public string subConsultingId { get; set; }
-
         public subConsulting subConsulting { get; set; }
+
 
         [Required(ErrorMessage = "يجب إدخال المحامي")]
         [ForeignKey(nameof(Lawyer))]

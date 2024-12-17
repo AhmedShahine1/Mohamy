@@ -9,7 +9,7 @@ namespace Mohamy.BusinessLayer.Interfaces
 {
     public interface IRequestResponseService
     {
-        Task AddLogAsync(RequestResponseLog log);
+        Task<Task> AddLog(RequestResponseLog log);
         Task<List<RequestResponseLog>> GetAllLogsAsync();
     }
 }

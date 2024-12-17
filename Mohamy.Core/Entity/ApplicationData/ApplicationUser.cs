@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Others;
@@ -35,31 +33,22 @@ namespace Mohamy.Core.Entity.ApplicationData
         public string? BeneficiaryName { get; set; }
 
         public string? IBAN { get; set; }
-
-        [Range(0, double.MaxValue, ErrorMessage = "يجب أن تكون التكلفة رقمًا إيجابيًا")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal CostConsulting30 { get; set; }        
-
-        [Range(0, double.MaxValue, ErrorMessage = "يجب أن تكون التكلفة رقمًا إيجابيًا")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal CostConsulting60 { get; set; }    
-        
-        [Range(0, double.MaxValue, ErrorMessage = "يجب أن تكون التكلفة رقمًا إيجابيًا")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal CostConsulting90 { get; set; }
+        public double? PriceService { get; set; }
 
         [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }
 
         public Images Profile { get; set; } // صورة الملف الشخصي للمستخدم.
 
-        public ICollection<graduationCertificate> graduationCertificates { get; set; } = new List<graduationCertificate>();
+        public IEnumerable<graduationCertificate> graduationCertificates { get; set; } = new List<graduationCertificate>();
 
         [ForeignKey(nameof(lawyerLicense))]
-        public string lawyerLicenseId { get; set; }
+        public string? lawyerLicenseId { get; set; }
         public lawyerLicense? lawyerLicense { get; set; }
 
-        public ICollection<Experience> Experiences { get; set; } = new List<Experience>();
+        public ICollection<Experience>? Experiences { get; set; }
+
+        public ICollection<Specialties>? Specialties { get; set; }
 
         public bool professionalAccreditation { get; set; } = false;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Mohamy.Core.DTO.AuthViewModel.RequesrLog;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.ChatData;
 using Mohamy.Core.Entity.ConsultingData;
@@ -12,6 +13,7 @@ namespace Mohamy.RepositoryLayer.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
+    public IBaseRepository<RequestResponseLog> RequestResponseLogRepository { get; }
     public IBaseRepository<ApplicationUser> UserRepository { get; }
     public IBaseRepository<ApplicationRole> RoleRepository { get;}
     public IBaseRepository<IdentityUserRole<string>> UserRoleRepository { get;}
@@ -25,6 +27,9 @@ public interface IUnitOfWork : IDisposable
     public IBaseRepository<Notification> NotificationRepository { get; }
     public IBaseRepository<Chat> ChatRepository { get; }
     public IBaseRepository<Evaluation> EvaluationRepository { get; }
+    public IBaseRepository<lawyerLicense> lawyerLicenseRepository { get; }
+    public IBaseRepository<graduationCertificate> graduationCertificateRepository { get; }
+    public IBaseRepository<Specialties> SpecialtiesRepository { get; }
 
     //-----------------------------------------------------------------------------------
     int SaveChanges();

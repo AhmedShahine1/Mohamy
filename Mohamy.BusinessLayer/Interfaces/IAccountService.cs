@@ -16,7 +16,6 @@ public interface IAccountService
     Task<IdentityResult> UpdateAdmin(string adminId, RegisterAdmin model);
     Task<IdentityResult> RegisterSupportDeveloper(RegisterSupportDeveloper model);
     Task<IdentityResult> UpdateSupportDeveloper(string SupportDeveloperId, RegisterSupportDeveloper model);
-    Task<IdentityResult> RegisterLaywer(RegisterLawyer model);
     Task<IdentityResult> RegisterCustomer(RegisterCustomer model);
     Task<IdentityResult> UpdateCustomer(string adminId, UpdateCustomer model);
     Task<IdentityResult> UpdatePasswordAsync(string userId, UpdatePassword updatePasswordModel);

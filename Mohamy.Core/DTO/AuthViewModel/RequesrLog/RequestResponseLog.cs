@@ -2,6 +2,7 @@
 {
     public class RequestResponseLog
     {
+        public int id { get; set; }
         public string RequestUrl { get; set; }
         public string HttpMethod { get; set; }
         public string RequestBody { get; set; }

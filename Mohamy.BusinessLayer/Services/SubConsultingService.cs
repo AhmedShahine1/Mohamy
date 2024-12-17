@@ -96,16 +96,16 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             // Fetch experiences that match the given subConsultingId
-            var experiences = await _unitOfWork.ExperienceRepository
+            var Specialties = await _unitOfWork.SpecialtiesRepository
                 .FindAllAsync(e => e.subConsultingId == subConsultingId, isNoTracking: true);
 
-            if (!experiences.Any())
+            if (!Specialties.Any())
             {
                 return Enumerable.Empty<ApplicationUser>();
             }
 
             // Extract Lawyer IDs from the experiences
-            var LaywerIds = experiences.Select(e => e.LawyerId).Distinct().ToList();
+            var LaywerIds = Specialties.Select(e => e.LawyerId).Distinct().ToList();
 
             // Fetch users by Lawyer IDs
             var users = await _unitOfWork.UserRepository

@@ -7,6 +7,7 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string Id { get; set; }
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
         public string Token { get; set; }
         public string? Description { get; set; }
         public int? yearsExperience { get; set; }
@@ -20,9 +21,6 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string graduationCertificate { get; set; }
         public string graduationCertificateId { get; set; }
         public int numberConsulting { get; set; }
-        public decimal CostConsulting30 { get; set; }
-        public decimal CostConsulting60 { get; set; }
-        public decimal CostConsulting90 { get; set; }
         public string? BankName { get; set; }
         public string? AccountNumber { get; set; }
         public string? BeneficiaryName { get; set; }

@@ -3,6 +3,8 @@ using Mohamy.BusinessLayer.AutoMapper;
 using Mohamy.BusinessLayer.Hubs;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.BusinessLayer.Services;
+using Mohamy.RepositoryLayer.Interfaces;
+using Mohamy.RepositoryLayer.Repositories;
 
 namespace Mohamy.Extensions;
 
@@ -23,11 +25,12 @@ public static class ApplicationServicesExtensions
         });
         // Configure ChatService with Firebase JSON file path
         //services.AddScoped<IChatService,ChatService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IAccountService, AccountService>();
         services.AddScoped<IConsultingService, ConsultingService>();
         services.AddTransient<IMainConsultingService, MainConsultingService>();
         services.AddTransient<ISubConsultingService, SubConsultingService>();
-        services.AddScoped<IRequestConsultingService, RequestConsultingService>();
+        services.AddTransient<IRequestConsultingService, RequestConsultingService>();
         services.AddTransient<IFileHandling, FileHandling>();
         services.AddSignalR();
         services.AddHttpClient();

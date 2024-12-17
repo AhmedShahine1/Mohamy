@@ -1,20 +1,51 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Mohamy.BusinessLayer.Interfaces;
+using Mohamy.BusinessLayer.Services;
 using Mohamy.Core.DTO;
+using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Helpers;
 
 namespace Mohamy.Controllers.API
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class RequestConsultingController : BaseController
+    public class RequestConsultingController : BaseController, IActionFilter
     {
         private readonly IRequestConsultingService _requestConsultingService;
+        private readonly IAccountService _accountService;
 
-        public RequestConsultingController(IRequestConsultingService requestConsultingService)
+        private ApplicationUser? CurrentUser;
+
+        public RequestConsultingController(IRequestConsultingService requestConsultingService, IAccountService accountService)
         {
             _requestConsultingService = requestConsultingService;
+            _accountService = accountService;
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            var token = context.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                try
+                {
+                    var user = _accountService.GetUserFromToken(token).Result;
+                    CurrentUser = user; // Store the user in the context
+                }
+                catch (Exception)
+                {
+                    context.Result = new UnauthorizedResult(); // Early exit if user retrieval fails
+                    return;
+                }
+            }
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
         }
 
         [HttpGet("RequestConsulting")]
@@ -90,6 +121,5 @@ namespace Mohamy.Controllers.API
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
-
     }
 }

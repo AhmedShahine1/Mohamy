@@ -1,61 +1,42 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using Mohamy.Core.DTO.ConsultingViewModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Mohamy.Core.DTO.AuthViewModel.RegisterModel
 {
     public class RegisterLawyer
     {
-        [DisplayName("الاسم الكامل")]
-        [Required(ErrorMessage = "يجب إدخال الاسم الكامل"), StringLength(100, ErrorMessage = "يجب ألا يتجاوز الاسم الكامل 100 حرف")]
+        // Lawyer basic info
         public string FullName { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Description { get; set; }
+        public int? YearsExperience { get; set; }
+        public string? City { get; set; }
+        public string? Region { get; set; }
 
-        [DisplayName("رقم الهاتف")]
-        [DataType(DataType.PhoneNumber)]
-        [Required(ErrorMessage = "يجب إدخال رقم الهاتف"), StringLength(15, ErrorMessage = "يجب ألا يتجاوز رقم الهاتف 15 رقم")]
-        public string PhoneNumber { get; set; }
+        // Lawyer banking details
+        public string? BankName { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? BeneficiaryName { get; set; }
+        public string? IBAN { get; set; }
 
-        [DisplayName("كلمة المرور")]
-        [DataType(DataType.Password)]
-        [Required(ErrorMessage = "يجب إدخال كلمة المرور")]
-        public string Password { get; set; }
-
-        [DisplayName("تأكيد كلمة المرور")]
-        [DataType(DataType.Password)]
-        [Required(ErrorMessage = "يجب تأكيد كلمة المرور")]
-        [Compare("Password", ErrorMessage = "كلمة المرور والتأكيد غير متطابقين")]
-        public string ConfirmPassword { get; set; }
+        // Lawyer license
+        public string LicenseNumber { get; set; }
+        public DateTime LicenseStart { get; set; }
+        public DateTime LicenseEnd { get; set; }
+        public string State { get; set; }
 
         [DisplayName("الصورة الشخصية")]
         public IFormFile? ImageProfile { get; set; }
 
-        [DisplayName("شهاده التخرج")]
-        public IFormFile? graduationCertificate { get; set; }
+        // Graduation certificates
+        public List<GraduationCertificateDTO> GraduationCertificates { get; set; } = new List<GraduationCertificateDTO>();
 
-        [DisplayName("ترخيص المحاماه")]
-        public IFormFile? lawyerLicense { get; set; }
+        // Experiences
+        public List<ExperienceDTO> Experiences { get; set; } = new List<ExperienceDTO>();
 
-        [DisplayName("الوصف")]
-        [StringLength(500, ErrorMessage = "يجب ألا يتجاوز الوصف 500 حرف")]
-        public string? Description { get; set; }
-
-        [DisplayName("سنوات الخبرة")]
-        [Range(0, 100, ErrorMessage = "يجب أن تكون سنوات الخبرة بين 0 و 100")]
-        public int YearsExperience { get; set; }
-
-        [DisplayName("المدينة")]
-        [StringLength(50, ErrorMessage = "يجب ألا يتجاوز اسم المدينة 50 حرف")]
-        public string? City { get; set; }
-
-        [DisplayName("التخصص الأكاديمي")]
-        [StringLength(100, ErrorMessage = "يجب ألا يتجاوز التخصص الأكاديمي 100 حرف")]
-        public string? AcademicSpecialization { get; set; }
-
-        [DisplayName("تكلفة الاستشارة")]
-        public decimal CostConsulting { get; set; }
-
-        [DisplayName("التعليم")]
-        [StringLength(200, ErrorMessage = "يجب ألا يتجاوز التعليم 200 حرف")]
-        public string? Education { get; set; }
+        public List<SpecialtiesDTO> Specialties { get; set; } = new List<SpecialtiesDTO>();
     }
 }

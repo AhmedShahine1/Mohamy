@@ -5,13 +5,10 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
 {
     public class ExperienceDTO
     {
-        public string? Id { get; set; }
-        public string? LaywerId { get; set; }
-
-        // List of selected subConsulting IDs
-        public List<string>? subConsultingIds { get; set; } = new List<string>();
-
-        // List of available subConsultings for selection
-        public IEnumerable<SelectListItem>? SubConsultings { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime? End { get; set; }
+        public string Country { get; set; }
+        public string Description { get; set; }
+        public string SubConsultingId { get; set; }
     }
 }

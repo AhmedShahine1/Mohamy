@@ -129,6 +129,40 @@ namespace Mohamy.Core.Migrations
                     b.ToTable("UserTokens", "dbo");
                 });
 
+            modelBuilder.Entity("Mohamy.Core.DTO.AuthViewModel.RequesrLog.RequestResponseLog", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("HttpMethod")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("RequestBody")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("ResponseBody")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("id");
+
+                    b.ToTable("RequestResponseLogs", "dbo");
+                });
+
             modelBuilder.Entity("Mohamy.Core.Entity.ApplicationData.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
@@ -188,15 +222,6 @@ namespace Mohamy.Core.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("CostConsulting30")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CostConsulting60")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CostConsulting90")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -237,6 +262,9 @@ namespace Mohamy.Core.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<double?>("PriceService")
+                        .HasColumnType("float");
+
                     b.Property<string>("ProfileId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -261,7 +289,7 @@ namespace Mohamy.Core.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("lawyerLicenseId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("professionalAccreditation")
                         .HasColumnType("bit");
@@ -281,6 +309,8 @@ namespace Mohamy.Core.Migrations
 
                     b.HasIndex("ProfileId");
 
+                    b.HasIndex("lawyerLicenseId");
+
                     b.ToTable("Users", "dbo");
                 });
 
@@ -294,6 +324,10 @@ namespace Mohamy.Core.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ImagesId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -320,6 +354,8 @@ namespace Mohamy.Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImagesId");
 
                     b.HasIndex("ReceiverId");
 
@@ -368,6 +404,10 @@ namespace Mohamy.Core.Migrations
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -378,8 +418,8 @@ namespace Mohamy.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("timeConsulting")
-                        .HasColumnType("int");
+                    b.Property<bool>("voiceConsulting")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -604,21 +644,25 @@ namespace Mohamy.Core.Migrations
 
                     b.HasIndex("subConsultingId");
 
-                    b.ToTable("Experience", "dbo");
+                    b.ToTable("Experiences", "dbo");
                 });
 
             modelBuilder.Entity("Mohamy.Core.Entity.LawyerData.Specialties", b =>
                 {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("LawyerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("subConsultingId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("Id");
 
-                    b.HasKey("LawyerId", "subConsultingId");
+                    b.HasIndex("LawyerId");
 
                     b.HasIndex("subConsultingId");
 
@@ -688,8 +732,7 @@ namespace Mohamy.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LawyerId")
-                        .IsUnique();
+                    b.HasIndex("LawyerId");
 
                     b.ToTable("LawyerLicenses", "dbo");
                 });
@@ -833,14 +876,26 @@ namespace Mohamy.Core.Migrations
                     b.HasOne("Mohamy.Core.Entity.Files.Images", "Profile")
                         .WithMany()
                         .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Mohamy.Core.Entity.LawyerData.lawyerLicense", "lawyerLicense")
+                        .WithMany()
+                        .HasForeignKey("lawyerLicenseId");
+
                     b.Navigation("Profile");
+
+                    b.Navigation("lawyerLicense");
                 });
 
             modelBuilder.Entity("Mohamy.Core.Entity.ChatData.Chat", b =>
                 {
+                    b.HasOne("Mohamy.Core.Entity.Files.Images", "Images")
+                        .WithMany()
+                        .HasForeignKey("ImagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
@@ -852,6 +907,8 @@ namespace Mohamy.Core.Migrations
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Images");
 
                     b.Navigation("Receiver");
 
@@ -958,7 +1015,7 @@ namespace Mohamy.Core.Migrations
                     b.HasOne("Mohamy.Core.Entity.ConsultingData.subConsulting", "subConsulting")
                         .WithMany()
                         .HasForeignKey("subConsultingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lawyer");
@@ -969,7 +1026,7 @@ namespace Mohamy.Core.Migrations
             modelBuilder.Entity("Mohamy.Core.Entity.LawyerData.Specialties", b =>
                 {
                     b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", "Lawyer")
-                        .WithMany()
+                        .WithMany("Specialties")
                         .HasForeignKey("LawyerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -977,7 +1034,7 @@ namespace Mohamy.Core.Migrations
                     b.HasOne("Mohamy.Core.Entity.ConsultingData.subConsulting", "subConsulting")
                         .WithMany()
                         .HasForeignKey("subConsultingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lawyer");
@@ -999,8 +1056,8 @@ namespace Mohamy.Core.Migrations
             modelBuilder.Entity("Mohamy.Core.Entity.LawyerData.lawyerLicense", b =>
                 {
                     b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", "Lawyer")
-                        .WithOne("lawyerLicense")
-                        .HasForeignKey("Mohamy.Core.Entity.LawyerData.lawyerLicense", "LawyerId")
+                        .WithMany()
+                        .HasForeignKey("LawyerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1045,9 +1102,9 @@ namespace Mohamy.Core.Migrations
 
                     b.Navigation("RequestConsultings");
 
-                    b.Navigation("graduationCertificates");
+                    b.Navigation("Specialties");
 
-                    b.Navigation("lawyerLicense");
+                    b.Navigation("graduationCertificates");
                 });
 
             modelBuilder.Entity("Mohamy.Core.Entity.ConsultingData.Consulting", b =>

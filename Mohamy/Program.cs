@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Hubs;
 using Mohamy.Core;
 using Mohamy.Extensions;
 using Mohamy.Middleware;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,11 @@ builder.Services.AddMemoryCache();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 // Cookie configuration
 builder.Services.ConfigureApplicationCookie(options =>
@@ -30,7 +37,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Auth/Login";
     options.AccessDeniedPath = "/Auth/AccessDenied";
 });
-
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // 100 MB
+});
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -45,7 +55,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddSwaggerDocumentation();
 
 var app = builder.Build();
-
 // Exception page only for development mode
 if (app.Environment.IsDevelopment())
 {

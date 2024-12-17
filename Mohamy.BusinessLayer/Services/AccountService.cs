@@ -18,6 +18,7 @@ using Mohamy.Core.DTO.AuthViewModel.RoleModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using Mohamy.Core.Entity.LawyerData;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -141,33 +142,6 @@ public class AccountService : IAccountService
 
     return result;
 }
-
-    public async Task<IdentityResult> RegisterLaywer(RegisterLawyer model)
-    {
-        if (await IsPhoneExistAsync(model.PhoneNumber))
-        {
-            throw new ArgumentException("phone number already exists.");
-        }
-
-        var user = mapper.Map<ApplicationUser>(model);
-
-        await SetProfileImage(user, model.ImageProfile);
-        user.PhoneNumberConfirmed = true;
-        // Create the user
-        var result = await _userManager.CreateAsync(user, model.Password);
-
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(user, "Lawyer");
-        }
-        else
-        {
-            // Handle potential errors by throwing an exception or logging details
-            throw new InvalidOperationException("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-        }
-
-        return result;
-    }
 
     public async Task<IdentityResult> RegisterCustomer(RegisterCustomer model)
     {
