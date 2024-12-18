@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Mohamy.Core.Entity.Files;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using Mohamy.Core.Entity.LawyerData;
 
 namespace Mohamy.BusinessLayer.Interfaces;
 
@@ -21,6 +22,10 @@ public interface IAccountService
     Task<IdentityResult> UpdatePasswordAsync(string userId, UpdatePassword updatePasswordModel);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> Login(LoginModel model);
     Task<bool> Logout(ApplicationUser user);
+    Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId);
+    Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId);
+    Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
+    Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);
     Task<bool> SendOTP(string customerEmail);
     Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV);
     Task<ApplicationUser> GetUserFromToken(string token);

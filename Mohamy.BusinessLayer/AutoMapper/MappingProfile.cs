@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.FilesModel;
+using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
-using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.ConsultingData;
@@ -72,20 +72,6 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ForMember(dest => dest.Collage, opt => opt.MapFrom(src => src.Collage))
                 .ForMember(dest => dest.University, opt => opt.MapFrom(src => src.University))
                 .ForMember(dest => dest.LawyerId, opt => opt.Ignore()); // Set in the service
-
-            // Map ExperienceDTO to Experience
-            CreateMap<ExperienceDTO, Experience>()
-                .ForMember(dest => dest.Start, opt => opt.MapFrom(src => src.Start))
-                .ForMember(dest => dest.End, opt => opt.MapFrom(src => src.End))
-                .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Country))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
-                .ForMember(dest => dest.subConsultingId, opt => opt.MapFrom(src => src.SubConsultingId))
-                .ForMember(dest => dest.LawyerId, opt => opt.Ignore()); // Set in the service
-
-            // Map SpecialtiesDTO to Specialties
-            CreateMap<SpecialtiesDTO, Specialties>()
-                .ForMember(dest => dest.subConsultingId, opt => opt.MapFrom(src => src.SubConsultingId))
-                .ForMember(dest => dest.LawyerId, opt => opt.Ignore()); // Set in the service
             //--------------------------------------------------------------------------------------------------------
             // Mapping for ApplicationUser <-> RegisterCustomer
             CreateMap<ApplicationUser, RegisterCustomer>()
@@ -132,11 +118,6 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ForMember(dest => dest.MainConsultingId, opt => opt.MapFrom(src => src.MainConsultingId))
                 .ForMember(dest => dest.Icon, opt => opt.Ignore()) // Handle file uploads separately
                 .ReverseMap();
-            ////--------------------------------------------------------------------------------------------------------
-            //// Mapping for Experience <-> ExperienceDTO
-            //CreateMap<Experience, ExperienceDTO>()
-            //    .ForMember(dest => dest.SubConsultings, opt => opt.Ignore()) // Populate this separately if needed
-            //    .ReverseMap();
 
             //--------------------------------------------------------------------------------------------------------
             // Mapping for Consulting <-> ConsultingDTO
@@ -152,6 +133,29 @@ namespace Mohamy.BusinessLayer.AutoMapper
             CreateMap<RequestConsulting, RequestConsultingDTO>()
                 .ForMember(dest => dest.StatusRequestConsultingEnum, opt => opt.MapFrom(src => src.statusRequestConsulting))
                 .ReverseMap();
+            //--------------------------------------------------------------------------------------------------------
+            CreateMap<ApplicationUser, AuthDTO>()
+           .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+           .ForMember(dest => dest.ProfileImage, opt => opt.Ignore()) // Manually handle file uploads
+           .ForMember(dest => dest.ProfileImageId, opt => opt.MapFrom(src => src.ProfileId))
+           .ForMember(dest => dest.lawyerLicenseId, opt => opt.MapFrom(src => src.lawyerLicense.Id))
+           .ForMember(dest => dest.lawyerLicenseNumber, opt => opt.MapFrom(src => src.lawyerLicense.LicenseNumber))
+           .ForMember(dest => dest.lawyerLicenseState, opt => opt.MapFrom(src => src.lawyerLicense.State))
+           .ForMember(dest => dest.lawyerLicenseStart, opt => opt.MapFrom(src => src.lawyerLicense.Start))
+           .ForMember(dest => dest.lawyerLicenseEnd, opt => opt.MapFrom(src => src.lawyerLicense.End))
+           .ForMember(dest => dest.GraduationCertificates, opt => opt.MapFrom(src => src.graduationCertificates))
+           .ForMember(dest => dest.Specialties, opt => opt.MapFrom(src => src.Specialties))
+           .ForMember(dest => dest.Experiences, opt => opt.MapFrom(src => src.Experiences))
+           .ReverseMap();
+            //--------------------------------------------------------------------------------------------------------
+            CreateMap<graduationCertificate, GraduationCertificateDTO>();
+            //--------------------------------------------------------------------------------------------------------
+            CreateMap<Specialties, SpecialtiesDTO>()
+                .ForMember(dest => dest.subConsultingName, opt => opt.MapFrom(src => src.subConsulting.Name));
+            //--------------------------------------------------------------------------------------------------------
+            CreateMap<Experience, Core.DTO.AuthViewModel.LawyerDetailsModel.ExperienceDTO>()
+                .ForMember(dest => dest.subConsultingName, opt => opt.MapFrom(src => src.subConsulting.Name));
         }
     }
 }

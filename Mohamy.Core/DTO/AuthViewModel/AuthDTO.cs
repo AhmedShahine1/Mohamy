@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
+using System.Collections.Generic;
 
 namespace Mohamy.Core.DTO.AuthViewModel
 {
@@ -16,15 +17,29 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string? Education { get; set; }
         public string ProfileImage { get; set; }
         public string ProfileImageId { get; set; }
-        public string lawyerLicense { get; set; }
+
+        // Lawyer license details
         public string lawyerLicenseId { get; set; }
-        public string graduationCertificate { get; set; }
-        public string graduationCertificateId { get; set; }
+        public string lawyerLicenseNumber { get; set; }
+        public string lawyerLicenseState { get; set; }
+        public DateTime? lawyerLicenseStart { get; set; }
+        public DateTime? lawyerLicenseEnd { get; set; }
+
+        // Graduation certificates
+        public List<GraduationCertificateDTO> GraduationCertificates { get; set; } = new List<GraduationCertificateDTO>();
+
+        // Specialties
+        public List<SpecialtiesDTO> Specialties { get; set; } = new List<SpecialtiesDTO>();
+
+        // Experiences
+        public List<ExperienceDTO> Experiences { get; set; } = new List<ExperienceDTO>();
+
         public int numberConsulting { get; set; }
+
+        // Bank details
         public string? BankName { get; set; }
         public string? AccountNumber { get; set; }
         public string? BeneficiaryName { get; set; }
         public string? IBAN { get; set; }
-        public List<string> ExperienceNames { get; set; } // List of experience names, mapped from the Experience collection in ApplicationUser.
     }
 }

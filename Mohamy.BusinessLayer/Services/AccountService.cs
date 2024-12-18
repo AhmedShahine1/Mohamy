@@ -430,6 +430,26 @@ public class AccountService : IAccountService
         var profileImage = await _fileHandling.GetFile(profileId);
         return profileImage;
     }
+
+    public async Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId)
+    {
+        return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
+    }
+
+    public async Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId)
+    {
+        return await _unitOfWork.ExperienceRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
+    }
+
+    public async Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId)
+    {
+        return await _unitOfWork.lawyerLicenseRepository.FindAllAsync(q => q.LawyerId == userId);
+    }
+
+    public async Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId)
+    {
+        return await _unitOfWork.graduationCertificateRepository.FindAllAsync(q => q.LawyerId == userId);
+    }
     //------------------------------------------------------------------------------------------------------------
     #region create and validate JWT token
 

@@ -33,12 +33,6 @@
                 <td>@user.academicSpecialization</td>
                 <td>@user.Education</td>
                 <td>
-                    <a href="@user.graduationCertificate" target="_blank">شهاده التخرج</a>
-                </td>
-                <td>
-                    <a href="@user.lawyerLicense" target="_blank">رخصه المحاماه</a>
-                </td>
-                <td>
                     <img src="@user.ProfileImage" alt="صورة الملف الشخصي" style="width: 50px; height: 50px;" />
                 </td>
                 <td>@user.numberConsulting</td>
@@ -46,21 +40,6 @@
                 <td>@user.AccountNumber</td>
                 <td>@user.BeneficiaryName</td>
                 <td>@user.IBAN</td>
-                <td>
-                    @if (user.ExperienceNames != null && user.ExperienceNames.Any())
-                    {
-                        <ul>
-                            @foreach (var experience in user.ExperienceNames)
-                            {
-                                <li>@experience</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span>لا توجد خبرات</span>
-                    }
-                </td>
             </tr>
         }
     </tbody>

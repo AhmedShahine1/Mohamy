@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
-using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using System.ComponentModel;
 
 namespace Mohamy.Core.DTO.AuthViewModel.RegisterModel

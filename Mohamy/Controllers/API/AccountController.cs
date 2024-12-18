@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
 using Mohamy.Core.DTO.AuthViewModel;
+using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 
@@ -360,9 +361,9 @@ namespace Mohamy.Controllers.API
         {
             try
             {
-                var Laywer = await _accountService.GetUserById(LawyerId);
+                var lawyer = await _accountService.GetUserById(LawyerId);
 
-                if (Laywer == null)
+                if (lawyer == null)
                 {
                     return NotFound(new BaseResponse
                     {
@@ -371,12 +372,57 @@ namespace Mohamy.Controllers.API
                         ErrorMessage = "Lawyer not found"
                     });
                 }
-                var authDto = _mapper.Map<AuthDTO>(Laywer);
-                authDto.ProfileImage = await _accountService.GetUserProfileImage(Laywer.ProfileId);
-                //authDto.ExperienceNames = _experienceService.GetAllExperiencesByUserIdAsync(LawyerId)
-                //    .Result
-                //    .Select(s => s.subConsulting.Name)
-                //    .ToList();
+
+                // Map basic lawyer details to AuthDTO
+                var authDto = _mapper.Map<AuthDTO>(lawyer);
+
+                // Populate ProfileImage
+                authDto.ProfileImage = await _accountService.GetUserProfileImage(lawyer.ProfileId);
+
+                // Populate specialties
+                var specialties = await _accountService.GetAllSpecialtiesAsync(LawyerId);
+                authDto.Specialties = specialties.Select(s => new SpecialtiesDTO
+                {
+                    Id = s.Id,
+                    subConsultingName = s.subConsulting.Name
+                }).ToList();
+
+                // Populate experiences
+                var experiences = await _accountService.GetAllExperiencesAsync(LawyerId);
+                authDto.Experiences = experiences.Select(e => new ExperienceDTO
+                {
+                    Id = e.Id,
+                    Start = e.Start,
+                    End = e.End,
+                    Country = e.Country,
+                    Description = e.Description,
+                    subConsultingName = e.subConsulting.Name
+                }).ToList();
+
+                // Populate lawyer licenses
+                var licenses = await _accountService.GetAllLawyerLicensesAsync(LawyerId);
+                if (licenses.Any())
+                {
+                    var primaryLicense = licenses.FirstOrDefault(); // Assuming only one primary license
+                    authDto.lawyerLicenseId = primaryLicense.Id;
+                    authDto.lawyerLicenseNumber = primaryLicense.LicenseNumber;
+                    authDto.lawyerLicenseState = primaryLicense.State;
+                    authDto.lawyerLicenseStart = primaryLicense.Start;
+                    authDto.lawyerLicenseEnd = primaryLicense.End;
+                }
+
+                // Populate graduation certificates
+                var certificates = await _accountService.GetAllGraduationCertificatesAsync(LawyerId);
+                authDto.GraduationCertificates = certificates.Select(c => new GraduationCertificateDTO
+                {
+                    Id = c.Id,
+                    Start = c.Start,
+                    End = c.End,
+                    Country = c.Country,
+                    Collage = c.Collage,
+                    University = c.University,
+                    Description = c.Description
+                }).ToList();
 
                 return Ok(new BaseResponse
                 {
