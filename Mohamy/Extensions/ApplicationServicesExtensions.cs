@@ -31,6 +31,7 @@ public static class ApplicationServicesExtensions
         services.AddTransient<IMainConsultingService, MainConsultingService>();
         services.AddTransient<ISubConsultingService, SubConsultingService>();
         services.AddTransient<IRequestConsultingService, RequestConsultingService>();
+        services.AddTransient<IEvaluationService, EvaluationService>();
         services.AddTransient<IFileHandling, FileHandling>();
         services.AddSignalR();
         services.AddHttpClient();

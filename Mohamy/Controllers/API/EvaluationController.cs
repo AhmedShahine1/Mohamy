@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
@@ -7,6 +8,7 @@ using System.Security.Claims;
 
 namespace Mohamy.Controllers.API
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EvaluationController : BaseController
     {
         private readonly IEvaluationService _evaluationService;
@@ -17,7 +19,6 @@ namespace Mohamy.Controllers.API
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> AddEvaluation([FromBody] EvaluationDTO evaluation)
         {
             var evaluatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
