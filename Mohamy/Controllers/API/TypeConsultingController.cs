@@ -119,6 +119,9 @@ namespace Mohamy.Controllers.API
                     ProfileUrl = _accountService.GetUserProfileImage(u.Profile.Id).Result,
                     u.Description,
                     u.yearsExperience,
+                    u.City,
+                    u.Region,
+                    u.PriceService
                 });
 
                 response.status = true;
