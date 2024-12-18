@@ -24,8 +24,6 @@ namespace Mohamy.BusinessLayer.Services
         public async Task<Task> AddLog(RequestResponseLog log)
         {
             _logs.Add(log);
-            await _unitOfWork.RequestResponseLogRepository.AddAsync(log);
-            await _unitOfWork.SaveChangesAsync();
             return Task.CompletedTask;
         }
 

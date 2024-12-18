@@ -87,7 +87,8 @@ app.UseMiddleware<ExceptionMiddleware>();
 // Swagger and static files
 app.UseSwaggerDocumentation();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseDefaultFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 
