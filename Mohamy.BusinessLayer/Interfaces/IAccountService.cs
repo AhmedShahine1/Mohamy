@@ -26,7 +26,7 @@ public interface IAccountService
     Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId);
     Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
     Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);
-    Task<List<AuthDTO>> SearchLawyersAsync(string keyword, string city, string specialization, int? minYearsExperience, int? maxYearsExperience, string sortBy);
+    Task<List<LawyerDTO>> GetLawyersAsync(string? keyword, string? city, string? specialization, int? minYearsExperience, int? maxYearsExperience, string? sortBy);
     Task<bool> SendOTP(string customerEmail);
     Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV);
     Task<ApplicationUser> GetUserFromToken(string token);
