@@ -22,9 +22,6 @@ using Mohamy.Core.Entity.LawyerData;
 using Microsoft.EntityFrameworkCore.Query;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using System.Linq.Expressions;
-using Microsoft.Extensions.ObjectPool;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System.ComponentModel;
 
 namespace Mohamy.BusinessLayer.Services;
 

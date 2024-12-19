@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
-using Mohamy.BusinessLayer.Services;
 using Mohamy.Core.DTO;
 using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
