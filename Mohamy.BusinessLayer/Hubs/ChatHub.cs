@@ -17,37 +17,29 @@ namespace Mohamy.BusinessLayer.Hubs
         // Method to join a chat room and get old messages
         public async Task JoinChat(string senderId, string receiverId)
         {
-            string groupName = GetGroupName(senderId, receiverId);
+            string chatGroup = GetGroupName(senderId, receiverId);
 
-            // Add the user to the group
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, chatGroup);
 
-            // Retrieve chat history
-            IEnumerable<ChatDTO> oldMessages = await _chatService.GetChatsAsync(senderId, receiverId);
+            // Retrieve chat history between the sender and receiver
+            var chatHistory = await _chatService.GetChatsAsync(senderId, receiverId);
 
-            // Send old messages to the user who joined
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", oldMessages);
+            // Send chat history to the joining user
+            await Clients.Group(chatGroup).SendAsync("ChatHistory", chatHistory);
         }
 
         // Method to send a message
-        public async Task SendMessage(string senderId, string receiverId, string message)
+        public async Task SendMessage(string senderId, string receiverId, ChatDTO chatMessage)
         {
-            string groupName = GetGroupName(senderId, receiverId);
+            string chatGroup = GetGroupName(senderId, receiverId);
 
-            // Create a new chat message DTO
-            var chatMessage = new ChatDTO
-            {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                Message = message,
-                SentAt = DateTime.UtcNow
-            };
+            chatMessage.SentAt = DateTime.UtcNow;
 
-            // Save the message using the service
-            ChatDTO savedMessage = await _chatService.SendMessageAsync(chatMessage);
+            // Save the message to the database
+            await _chatService.SendMessageAsync(chatMessage);
 
-            // Broadcast the message to the group
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", savedMessage);
+            // Broadcast the message to all clients in the chat group
+            await Clients.Group(chatGroup).SendAsync("ReceiveMessage", chatMessage);
         }
 
         // Utility method to create a consistent group name

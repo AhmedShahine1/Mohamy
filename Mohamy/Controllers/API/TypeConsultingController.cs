@@ -121,7 +121,9 @@ namespace Mohamy.Controllers.API
                     u.yearsExperience,
                     u.City,
                     u.Region,
-                    u.PriceService
+                    u.PriceService,
+                    numberConsulting = 0,
+                    rating = 0,
                 });
 
                 response.status = true;
