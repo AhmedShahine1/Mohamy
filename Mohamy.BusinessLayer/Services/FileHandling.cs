@@ -139,6 +139,15 @@ namespace Mohamy.BusinessLayer.Services
             return Path.Combine($"/{image.path.Name}/{image.Name}");
         }
 
+        public async Task<Dictionary<string, string>> GetAllFiles(IEnumerable<string> imageIds)
+        {
+            var images = await unitOfWork.ImagesRepository
+                .FindAllAsync(i => imageIds.Contains(i.Id), include: query =>
+                query.Include(i => i.path));
+
+            return images.ToDictionary(image => image.Id, image => Path.Combine($"/{image.path.Name}/{image.Name}"));
+        }
+
         private static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

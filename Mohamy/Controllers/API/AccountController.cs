@@ -442,19 +442,19 @@ namespace Mohamy.Controllers.API
             }
         }
 
-        [HttpGet("Search")]
+        [HttpGet("GetLawyers")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Customer")]
         public async Task<IActionResult> SearchLawyers(
-       [FromQuery] string keyword,
-       [FromQuery] string city,
-       [FromQuery] string specialization,
+       [FromQuery] string? keyword,
+       [FromQuery] string? city,
+       [FromQuery] string? specialization,
        [FromQuery] int? minYearsExperience,
        [FromQuery] int? maxYearsExperience,
-       [FromQuery] string sortBy)
+       [FromQuery] string? sortBy)
         {
             try
             {
-                var lawyers = await _accountService.SearchLawyersAsync(
+                var lawyers = await _accountService.GetLawyersAsync(
                     keyword, city, specialization, minYearsExperience, maxYearsExperience, sortBy);
 
                 if (!lawyers.Any())

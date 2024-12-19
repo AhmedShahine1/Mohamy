@@ -107,6 +107,13 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ReverseMap();
 
             //--------------------------------------------------------------------------------------------------------
+            // Mapping for ApplicationUser <-> LawyerDTO
+            CreateMap<ApplicationUser, LawyerDTO>()
+                .ForMember(dest => dest.ConsultingPrice, opt => opt.MapFrom(src => src.PriceService))
+                .ForMember(dest => dest.ProfileImage, opt => opt.Ignore())
+                .ReverseMap();
+
+            //--------------------------------------------------------------------------------------------------------
             // Mapping for MainConsulting <-> MainConsultingDTO
             CreateMap<MainConsultingDTO, mainConsulting>()
                 .ForMember(dest => dest.Icon, opt => opt.Ignore()) // Handle file uploads separately

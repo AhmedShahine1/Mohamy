@@ -454,19 +454,19 @@ public class AccountService : IAccountService
         return await _unitOfWork.graduationCertificateRepository.FindAllAsync(q => q.LawyerId == userId);
     }
 
-    public async Task<List<AuthDTO>> SearchLawyersAsync(
-        string keyword,
-        string city,
-        string specialization,
+    public async Task<List<LawyerDTO>> GetLawyersAsync(
+        string? keyword,
+        string? city,
+        string? specialization,
         int? minYearsExperience,
         int? maxYearsExperience,
-        string sortBy)
+        string? sortBy)
     {
         // Get the "Lawyer" role
         var lawyerRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "Lawyer");
 
         if (lawyerRole == null)
-            return new List<AuthDTO>(); // No lawyer role found
+            return new List<LawyerDTO>(); // No lawyer role found
 
         // Get all user IDs with the "Lawyer" role
         var lawyerUserIds = (await _unitOfWork.UserRoleRepository
@@ -512,9 +512,9 @@ public class AccountService : IAccountService
         }
 
         // Sorting logic
-        Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> userOrderBy = null;
+        Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> userOrderBy = query => query.OrderBy(u => u.Id);
 
-        if (sortBy != null)
+        if (sortBy is not null)
         {
             userOrderBy = sortBy switch
             {
@@ -531,23 +531,34 @@ public class AccountService : IAccountService
             orderBy: userOrderBy
         );
 
-        var lawyerDtos = new List<AuthDTO>();
+        var lawyerDtos = new List<LawyerDTO>();
+
+        var evaluations = await _unitOfWork.EvaluationRepository
+        .FindAllAsync(e => lawyers.Select(l => l.Id).Contains(e.EvaluatedId));
+
+        var evaluationsGrouped = evaluations
+            .GroupBy(e => e.EvaluatedId)
+            .ToDictionary(g => g.Key, g => g.Average(e => e.Rating));
+
+        var profileImages = await _fileHandling.GetAllFiles(lawyers.Select(l => l.ProfileId).ToList());
 
         foreach (var lawyer in lawyers)
         {
-            var lawyerDto = mapper.Map<AuthDTO>(lawyer);
+            var lawyerDto = mapper.Map<LawyerDTO>(lawyer);
 
-            // Populate ProfileImage
-            lawyerDto.ProfileImage = await _fileHandling.GetFile(lawyer.ProfileId);
+            lawyerDto.ProfileImage = profileImages.TryGetValue(lawyer.ProfileId, out var imagePath)
+                ? imagePath : null;
 
-            // Populate specialties
-            lawyerDto.Specialties = mapper.Map<List<SpecialtiesDTO>>(await GetAllSpecialtiesAsync(lawyerDto.Id));
+            lawyerDto.Rating = evaluationsGrouped.TryGetValue(lawyer.Id, out var averageRating)
+                ? Math.Round(averageRating, 1)
+                : 0;
 
             lawyerDtos.Add(lawyerDto);
         }
 
         return lawyerDtos;
     }
+
     private Expression<Func<T, bool>> CombineExpressions<T>(
     Expression<Func<T, bool>> expr1,
     Expression<Func<T, bool>> expr2)
