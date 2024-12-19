@@ -19,6 +19,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
+using Microsoft.EntityFrameworkCore.Query;
+using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
+using System.Linq.Expressions;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -450,6 +453,115 @@ public class AccountService : IAccountService
     {
         return await _unitOfWork.graduationCertificateRepository.FindAllAsync(q => q.LawyerId == userId);
     }
+
+    public async Task<List<AuthDTO>> SearchLawyersAsync(
+        string keyword,
+        string city,
+        string specialization,
+        int? minYearsExperience,
+        int? maxYearsExperience,
+        string sortBy)
+    {
+        // Get the "Lawyer" role
+        var lawyerRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "Lawyer");
+
+        if (lawyerRole == null)
+            return new List<AuthDTO>(); // No lawyer role found
+
+        // Get all user IDs with the "Lawyer" role
+        var lawyerUserIds = (await _unitOfWork.UserRoleRepository
+            .FindAllAsync(ur => ur.RoleId == lawyerRole.Id))
+            .Select(ur => ur.UserId);
+
+        // Start building the filter expression
+        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id);
+
+        // Apply filters dynamically
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var keywordFilter = (Expression<Func<ApplicationUser, bool>>)(u =>
+                u.FullName.Contains(keyword) || u.Email.Contains(keyword) || u.Description.Contains(keyword));
+
+            filter = CombineExpressions(filter, keywordFilter);
+        }
+
+        if (!string.IsNullOrWhiteSpace(city))
+        {
+            var cityFilter = (Expression<Func<ApplicationUser, bool>>)(u => u.City == city);
+            filter = CombineExpressions(filter, cityFilter);
+        }
+
+        if (!string.IsNullOrWhiteSpace(specialization))
+        {
+            var specializationFilter = (Expression<Func<ApplicationUser, bool>>)(u =>
+                u.Specialties.Any(s => s.subConsulting.Name.Contains(specialization)));
+
+            filter = CombineExpressions(filter, specializationFilter);
+        }
+
+        if (minYearsExperience.HasValue)
+        {
+            var minExperienceFilter = (Expression<Func<ApplicationUser, bool>>)(u => u.yearsExperience >= minYearsExperience);
+            filter = CombineExpressions(filter, minExperienceFilter);
+        }
+
+        if (maxYearsExperience.HasValue)
+        {
+            var maxExperienceFilter = (Expression<Func<ApplicationUser, bool>>)(u => u.yearsExperience <= maxYearsExperience);
+            filter = CombineExpressions(filter, maxExperienceFilter);
+        }
+
+        // Sorting logic
+        Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> userOrderBy = null;
+
+        if (sortBy != null)
+        {
+            userOrderBy = sortBy switch
+            {
+                "name" => u => u.OrderBy(u => u.FullName),
+                "experience" => u => u.OrderByDescending(u => u.yearsExperience),
+                "city" => u => u.OrderBy(u => u.City),
+                _ => userOrderBy
+            };
+        }
+
+        // Retrieve filtered users from the repository
+        var lawyers = await _unitOfWork.UserRepository.FindAllAsync(
+            filter,
+            orderBy: userOrderBy
+        );
+
+        var lawyerDtos = new List<AuthDTO>();
+
+        foreach (var lawyer in lawyers)
+        {
+            var lawyerDto = mapper.Map<AuthDTO>(lawyer);
+
+            // Populate ProfileImage
+            lawyerDto.ProfileImage = await _fileHandling.GetFile(lawyer.ProfileId);
+
+            // Populate specialties
+            lawyerDto.Specialties = mapper.Map<List<SpecialtiesDTO>>(await GetAllSpecialtiesAsync(lawyerDto.Id));
+
+            lawyerDtos.Add(lawyerDto);
+        }
+
+        return lawyerDtos;
+    }
+    private Expression<Func<T, bool>> CombineExpressions<T>(
+    Expression<Func<T, bool>> expr1,
+    Expression<Func<T, bool>> expr2)
+    {
+        var parameter = Expression.Parameter(typeof(T));
+
+        var combinedBody = Expression.AndAlso(
+            Expression.Invoke(expr1, parameter),
+            Expression.Invoke(expr2, parameter)
+        );
+
+        return Expression.Lambda<Func<T, bool>>(combinedBody, parameter);
+    }
+
     //------------------------------------------------------------------------------------------------------------
     #region create and validate JWT token
 

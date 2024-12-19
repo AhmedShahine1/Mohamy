@@ -109,7 +109,7 @@ namespace Mohamy.Controllers.API
                 }
 
                 var authDto = _mapper.Map<AuthDTO>(customer);
-                authDto.ProfileImage= await _accountService.GetUserProfileImage(customer.ProfileId);
+                authDto.ProfileImage = await _accountService.GetUserProfileImage(customer.ProfileId);
                 return Ok(new BaseResponse
                 {
                     status = true,
@@ -239,7 +239,7 @@ namespace Mohamy.Controllers.API
 
             try
             {
-                var result = await _accountService.ValidateOTP(customerPhoneNumber,OTP);
+                var result = await _accountService.ValidateOTP(customerPhoneNumber, OTP);
 
                 if (result)
                 {
@@ -302,7 +302,7 @@ namespace Mohamy.Controllers.API
         }
 
         [HttpPost("SendOTP")]
-        public async Task<IActionResult> SendOTP([FromQuery]string PhoneNumber)
+        public async Task<IActionResult> SendOTP([FromQuery] string PhoneNumber)
         {
             if (string.IsNullOrEmpty(PhoneNumber))
             {
@@ -428,6 +428,47 @@ namespace Mohamy.Controllers.API
                 {
                     status = true,
                     Data = authDto
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("Search")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Customer")]
+        public async Task<IActionResult> SearchLawyers(
+       [FromQuery] string keyword,
+       [FromQuery] string city,
+       [FromQuery] string specialization,
+       [FromQuery] int? minYearsExperience,
+       [FromQuery] int? maxYearsExperience,
+       [FromQuery] string sortBy)
+        {
+            try
+            {
+                var lawyers = await _accountService.SearchLawyersAsync(
+                    keyword, city, specialization, minYearsExperience, maxYearsExperience, sortBy);
+
+                if (!lawyers.Any())
+                    return NotFound(new BaseResponse
+                    {
+                        status = false,
+                        ErrorCode = 404,
+                        ErrorMessage = "No lawyers found matching the criteria."
+                    });
+
+                return Ok(new BaseResponse
+                {
+                    status = true,
+                    Data = lawyers
                 });
             }
             catch (Exception ex)
