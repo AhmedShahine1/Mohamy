@@ -462,7 +462,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId ,
+                a => a.CustomerId == customerId && a.statusConsulting==statusConsulting.UserRequestedNotPaid,
                 include: q => q
                     .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                     .Include(c => c.Lawyer)
@@ -501,8 +501,8 @@ namespace Mohamy.BusinessLayer.Services
                         }
                     }
                 }
+                consulting.numberRequest = _unitOfWork.RequestConsultingRepository.Count(q => q.ConsultingId == consulting.Id);
             }
-
             return consultingDTOs;
         }
 

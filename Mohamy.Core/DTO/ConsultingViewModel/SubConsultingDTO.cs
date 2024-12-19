@@ -16,6 +16,6 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
         public string? IconUrl { get; set; }
         public IFormFile? Icon { get; set; }
         public string MainConsultingId { get; set; }
-        public MainConsultingDTO? mainConsulting { get; set; }
+        public string? mainConsultingname { get; set; }
     }
 }

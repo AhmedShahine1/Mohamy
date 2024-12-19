@@ -30,9 +30,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             try
             {
-                var entities = await _unitOfWork.SubConsultingRepository.GetAllAsync(include: q => q.Include(s => s.MainConsulting));
-                entities = entities.Where(e => !e.IsDeleted).ToList();
-
+                var entities = await _unitOfWork.SubConsultingRepository.FindAllAsync(e => !e.IsDeleted, include: q => q.Include(s => s.MainConsulting));
                 var dtos = new List<SubConsultingDTO>();
 
                 foreach (var entity in entities)
@@ -44,7 +42,7 @@ namespace Mohamy.BusinessLayer.Services
                         Description = entity.Description,
                         MainConsultingId = entity.MainConsultingId,
                         IconUrl = await _fileHandling.GetFile(entity.iconId),
-                        mainConsulting = await _mainConsultingService.GetByIdAsync(entity.MainConsultingId)
+                        mainConsultingname = entity.MainConsulting.Name
                     };
 
                     dtos.Add(dto);
@@ -74,7 +72,7 @@ namespace Mohamy.BusinessLayer.Services
                         Description = entity.Description,
                         MainConsultingId = entity.MainConsultingId,
                         IconUrl = await _fileHandling.GetFile(entity.iconId),
-                        mainConsulting = await _mainConsultingService.GetByIdAsync(entity.MainConsultingId)
+                        mainConsultingname = entity.MainConsulting.Name
                     };
 
                     dtos.Add(dto);
@@ -130,7 +128,7 @@ namespace Mohamy.BusinessLayer.Services
                     Description = entity.Description,
                     MainConsultingId = entity.MainConsultingId,
                     IconUrl = await _fileHandling.GetFile(entity.iconId),
-                    mainConsulting = await _mainConsultingService.GetByIdAsync(entity.MainConsultingId)
+                    mainConsultingname = entity.MainConsulting.Name
                 };
 
                 return dto;

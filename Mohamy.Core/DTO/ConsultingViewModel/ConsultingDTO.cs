@@ -24,7 +24,7 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
         public ICollection<string>? FilesUrl { get; set; }
         public statusConsulting StatusConsultingEnum { get; set; }
         public bool voiceConsulting { get; set; }
-
+        public int numberRequest { get; set; }
         // This property will return the Arabic translation of the status
         public string StatusConsulting => StatusConsultingHelper.GetArabicTranslation(StatusConsultingEnum);
     }
