@@ -33,6 +33,7 @@ public static class ApplicationServicesExtensions
         services.AddTransient<IRequestConsultingService, RequestConsultingService>();
         services.AddTransient<IEvaluationService, EvaluationService>();
         services.AddTransient<IFileHandling, FileHandling>();
+        services.AddTransient<IChatService, ChatService>();
         services.AddSignalR();
         services.AddHttpClient();
         services.AddAutoMapper(typeof(MappingProfile));
