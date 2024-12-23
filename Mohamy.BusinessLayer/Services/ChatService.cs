@@ -34,7 +34,7 @@ namespace Mohamy.BusinessLayer.Services
             {
                 SenderId = m.SenderId,
                 ReceiverId = m.ReceiverId,
-                FileUrl= _fileHandling.GetFile(m.ImagesId).Result,
+                FileUrl=  m.Images is not null ? _fileHandling.GetFile(m.ImagesId).Result:null,
                 Message = m.Message,
                 SentAt = m.CreatedAt
             });
@@ -61,7 +61,7 @@ namespace Mohamy.BusinessLayer.Services
             {
                 SenderId = message.SenderId,
                 ReceiverId = message.ReceiverId,
-                FileUrl = await _fileHandling.GetFile(message.ImagesId),
+                FileUrl = message.ImagesId is not null ? await _fileHandling.GetFile(message.ImagesId) : null,
                 Message = message.Message,
                 SentAt = message.CreatedAt
             };

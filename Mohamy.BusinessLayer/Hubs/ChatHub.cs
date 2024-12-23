@@ -29,9 +29,9 @@ namespace Mohamy.BusinessLayer.Hubs
         }
 
         // Method to send a message
-        public async Task SendMessage(string senderId, string receiverId, ChatDTO chatMessage)
+        public async Task SendMessage(ChatDTO chatMessage)
         {
-            string chatGroup = GetGroupName(senderId, receiverId);
+            string chatGroup = GetGroupName(chatMessage.SenderId, chatMessage.ReceiverId);
 
             chatMessage.SentAt = DateTime.UtcNow;
 
