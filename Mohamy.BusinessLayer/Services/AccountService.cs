@@ -16,11 +16,8 @@ using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
-using Microsoft.EntityFrameworkCore.Query;
-using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using System.Linq.Expressions;
 
 namespace Mohamy.BusinessLayer.Services;
@@ -33,12 +30,13 @@ public class AccountService : IAccountService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileHandling _fileHandling;
     private readonly Jwt _jwt;
+    private readonly SmsSettings _smsSettings;
     private readonly IMemoryCache memoryCache;
     private readonly IMapper mapper;
 
     public AccountService(UserManager<ApplicationUser> userManager, IFileHandling photoHandling,
         RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork,
-        IOptions<Jwt> jwt, IMemoryCache _memoryCache, IMapper _mapper, SignInManager<ApplicationUser> signInManager)
+        IOptions<Jwt> jwt, IMemoryCache _memoryCache, IMapper _mapper, SignInManager<ApplicationUser> signInManager, IOptions<SmsSettings> smsSettings)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -48,6 +46,7 @@ public class AccountService : IAccountService
         memoryCache = _memoryCache;
         mapper = _mapper;
         _signInManager = signInManager;
+        _smsSettings = smsSettings.Value;
     }
     //------------------------------------------------------------------------------------------------------------
     public async Task<ApplicationUser> GetUserById(string id)
@@ -345,16 +344,98 @@ public class AccountService : IAccountService
 
     public async Task<bool> SendOTP(string customerPhoneNumber)
     {
+        // Generate a random OTP
+        var OTP = RandomOTP(6);
+
+        // Set cache options
         var cacheEntryOptions = new MemoryCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), // Cache for 5 minutes
             SlidingExpiration = TimeSpan.FromMinutes(2) // Reset cache if accessed within 2 minutes
         };
-        var OTP = RandomOTP(6);
-        memoryCache.Set(customerPhoneNumber, OTP, cacheEntryOptions);
-        return true;
-    }
 
+        // Store OTP in memory cache
+        memoryCache.Set(customerPhoneNumber, OTP, cacheEntryOptions);
+
+        // Prepare API parameters for token generation
+        var tokenApiUrl = "https://www.dreams.sa/token/generate";
+        var tokenParameters = new Dictionary<string, string>
+    {
+        { "grant_type", "client_credentials" },
+        { "client_id", "3bd24b0c16b01841380d9d9cd77709ca992aaebfd4d7991f97ae8d38be614ba8" },
+        { "client_secret", _smsSettings.SecretKey }
+    };
+
+        try
+        {
+            string accessToken;
+
+            using (var httpClient = new HttpClient())
+            {
+                // Request token
+                var tokenContent = new FormUrlEncodedContent(tokenParameters);
+                var tokenResponse = await httpClient.PostAsync(tokenApiUrl, tokenContent);
+
+                if (tokenResponse.IsSuccessStatusCode)
+                {
+                    var tokenResponseContent = await tokenResponse.Content.ReadAsStringAsync();
+                    var tokenData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(tokenResponseContent);
+                    accessToken = tokenData?["access_token"];
+
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        Console.WriteLine("Failed to retrieve access token.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Token Request Failed: {tokenResponse.StatusCode}");
+                    return false;
+                }
+            }
+
+            // Prepare API parameters for sending SMS
+            var smsApiUrl = "https://www.dreams.sa/index.php/api/sendsms/";
+            var smsParameters = new Dictionary<string, string>
+        {
+            { "user", "Raied" },
+            { "to", customerPhoneNumber },
+            { "message", $"Your OTP is: {OTP}" },
+            { "sender", _smsSettings.sender }
+        };
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                var smsContent = new FormUrlEncodedContent(smsParameters);
+                var smsResponse = await httpClient.PostAsync(smsApiUrl, smsContent);
+
+                if (smsResponse.IsSuccessStatusCode)
+                {
+                    var smsResponseContent = await smsResponse.Content.ReadAsStringAsync();
+                    if (smsResponseContent.Contains("Result :1"))
+                    {
+                        return true; // SMS sent successfully
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to send SMS. Response: {smsResponseContent}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"SMS Request Failed: {smsResponse.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+        }
+
+        return false; // Return false if SMS sending fails
+    }
     public async Task<bool> ValidateOTP(string customerPhoneNumber , string OTPV)
     {
         memoryCache.TryGetValue(customerPhoneNumber, out string OTP);

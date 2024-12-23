@@ -45,7 +45,13 @@ namespace Mohamy.BusinessLayer.Services
         {
             var requests = (await _unitOfWork.RequestConsultingRepository
                 .FindAllAsync(r => r.ConsultingId == consultingId && r.statusRequestConsulting != statusRequestConsulting.Cancel));
-            return _mapper.Map<IEnumerable<RequestConsultingDTO>>(requests);
+            var requestDTO = _mapper.Map<IEnumerable<RequestConsultingDTO>>(requests);
+            foreach (var request in requestDTO)
+            {
+                request.Lawyer = _mapper.Map<AuthDTO>(await _accountService.GetUserById(request.LawyerId));
+                request.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(request.Lawyer.ProfileImageId);
+            }
+            return requestDTO;
         }
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetRequestsByUserAsync(string userId)

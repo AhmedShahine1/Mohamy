@@ -27,6 +27,7 @@ public static class ApplicationServicesExtensions
         //services.AddScoped<IChatService,ChatService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<IAdminService, AdminService>();
         services.AddScoped<IConsultingService, ConsultingService>();
         services.AddTransient<IMainConsultingService, MainConsultingService>();
         services.AddTransient<ISubConsultingService, SubConsultingService>();

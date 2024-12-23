@@ -58,39 +58,6 @@
                     </span>
                 </a>
                 <div class="nav_list">
-                    @* @if (User.IsInRole("Lawyer") || User.IsInRole("Support Developer")) *@
-                    @* { *@
-                    @*     <a href="@Url.Action("Manage", "Lawyer" , new { area="Lawyer" })" class="nav_link"> *@
-                    @*         <img src="~/asset/Certificate.svg" alt="icon" width="20" height="20" /> *@
-                    @*         <span class="nav_name"> *@
-                    @*             الخبرات والمؤهلات *@
-                    @*         </span> *@
-                    @*     </a> *@
-                    @*     <a href="@Url.Action("BankDetail", "Lawyer", new { area = "Lawyer" })" class="nav_link"> *@
-                    @*         <img src="~/asset/bank.svg" alt="icon" width="20" height="20" /> *@
-                    @*         <span class="nav_name"> *@
-                    @*             حساب البنكي *@
-                    @*         </span> *@
-                    @*     </a> *@
-                    @*     <a href="@Url.Action("Index", "RequestConsulting", new { area = "Lawyer" })" class="nav_link"> *@
-                    @*         <img src="~/asset/oui_app-discover.svg" alt="icon" width="20" height="20" /> *@
-                    @*         <span class="nav_name"> *@
-                    @*             طلبات *@
-                    @*         </span> *@
-                    @*     </a> *@
-                    @*     <a href="@Url.Action("ConsultingsWithoutLawyer", "Consulting", new { area = "Lawyer" })" class="nav_link"> *@
-                    @*         <img src="~/asset/iconoir_post-solid.svg" alt="icon" width="20" height="20" /> *@
-                    @*         <span class="nav_name"> *@
-                    @*             خدمات *@
-                    @*         </span> *@
-                    @*     </a> *@
-                    @*     <a href="@Url.Action("MyConsultings", "Consulting", new { area = "Lawyer" })" class="nav_link"> *@
-                    @*         <img src="~/asset/bxs_chat.svg" alt="icon" width="20" height="20" /> *@
-                    @*         <span class="nav_name"> *@
-                    @*             استشارات *@
-                    @*         </span> *@
-                    @*     </a> *@
-                    @* } *@
                     @if (User.IsInRole("Admin") || User.IsInRole("Support Developer"))
                     {
                         <a href='@Url.Action("Register", "Admin", new { area = "Admin" })' class="nav_link">
