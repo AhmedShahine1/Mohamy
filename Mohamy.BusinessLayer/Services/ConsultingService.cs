@@ -82,13 +82,13 @@ namespace Mohamy.BusinessLayer.Services
 
         public async Task<IEnumerable<ConsultingDTO>> GetAllConsultingsAsync()
         {
-            var consultings = await _unitOfWork.ConsultingRepository.GetAllAsync(include: q => q
+            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(q=>q.statusConsulting==statusConsulting.InProgress,include: q => q
                 .Include(c => c.subConsulting)
                 .Include(c => c.Lawyer)
                 .Include(c => c.Customer)
                 .Include(c => c.Files));
 
-            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings.Where(c => c.statusConsulting != statusConsulting.Cancelled));
+            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
@@ -126,7 +126,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting != statusConsulting.Cancelled,
+                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.InProgress,
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Lawyer)
