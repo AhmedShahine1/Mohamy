@@ -8,6 +8,8 @@ using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using System.Net.Sockets;
+using System.Net;
 
 namespace Mohamy.Controllers.API
 {
@@ -21,7 +23,6 @@ namespace Mohamy.Controllers.API
             _accountService = accountService;
             _mapper = mapper;
         }
-
         [HttpPost("RegisterCustomer")]
         public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomer model)
         {

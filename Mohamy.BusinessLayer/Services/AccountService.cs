@@ -347,80 +347,42 @@ public class AccountService : IAccountService
         // Generate a random OTP
         var OTP = RandomOTP(6);
 
-        // Set cache options
-        var cacheEntryOptions = new MemoryCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), // Cache for 5 minutes
-            SlidingExpiration = TimeSpan.FromMinutes(2) // Reset cache if accessed within 2 minutes
-        };
-
         // Store OTP in memory cache
-        memoryCache.Set(customerPhoneNumber, OTP, cacheEntryOptions);
+        memoryCache.Set(customerPhoneNumber, OTP);
 
-        // Prepare API parameters for token generation
-        var tokenApiUrl = "https://www.dreams.sa/token/generate";
-        var tokenParameters = new Dictionary<string, string>
+        // Prepare the API URL
+        var smsApiUrl = "https://www.dreams.sa/index.php/api/sendsms/";
+
+        // Prepare the parameters for the POST request
+        var smsParameters = new Dictionary<string, string>
     {
-        { "grant_type", "client_credentials" },
-        { "client_id", "3bd24b0c16b01841380d9d9cd77709ca992aaebfd4d7991f97ae8d38be614ba8" },
-        { "client_secret", _smsSettings.SecretKey }
+        { "user", _smsSettings.sender },
+        { "secret_key", _smsSettings.SecretKey },
+        { "to", customerPhoneNumber },
+        { "message", $"OTP :{OTP} \n محام | للاستشارات القانونية"
+         },
+        { "sender", "TASIA-IT" }
     };
 
         try
         {
-            string accessToken;
-
             using (var httpClient = new HttpClient())
             {
-                // Request token
-                var tokenContent = new FormUrlEncodedContent(tokenParameters);
-                var tokenResponse = await httpClient.PostAsync(tokenApiUrl, tokenContent);
-
-                if (tokenResponse.IsSuccessStatusCode)
-                {
-                    var tokenResponseContent = await tokenResponse.Content.ReadAsStringAsync();
-                    var tokenData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(tokenResponseContent);
-                    accessToken = tokenData?["access_token"];
-
-                    if (string.IsNullOrEmpty(accessToken))
-                    {
-                        Console.WriteLine("Failed to retrieve access token.");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Token Request Failed: {tokenResponse.StatusCode}");
-                    return false;
-                }
-            }
-
-            // Prepare API parameters for sending SMS
-            var smsApiUrl = "https://www.dreams.sa/index.php/api/sendsms/";
-            var smsParameters = new Dictionary<string, string>
-        {
-            { "user", "Raied" },
-            { "to", customerPhoneNumber },
-            { "message", $"Your OTP is: {OTP}" },
-            { "sender", _smsSettings.sender }
-        };
-
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                // Send the POST request to the SMS API
                 var smsContent = new FormUrlEncodedContent(smsParameters);
                 var smsResponse = await httpClient.PostAsync(smsApiUrl, smsContent);
 
                 if (smsResponse.IsSuccessStatusCode)
                 {
                     var smsResponseContent = await smsResponse.Content.ReadAsStringAsync();
-                    if (smsResponseContent.Contains("Result :1"))
+                    if (smsResponseContent.Contains("-124"))
                     {
-                        return true; // SMS sent successfully
+                        // Handle the response for failure cases based on the API response
+                        Console.WriteLine($"Failed to send SMS. Response: {smsResponseContent}");
                     }
                     else
                     {
-                        Console.WriteLine($"Failed to send SMS. Response: {smsResponseContent}");
+                        return true; // SMS sent successfully
                     }
                 }
                 else
@@ -436,12 +398,31 @@ public class AccountService : IAccountService
 
         return false; // Return false if SMS sending fails
     }
-    public async Task<bool> ValidateOTP(string customerPhoneNumber , string OTPV)
+
+    public async Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV)
     {
-        memoryCache.TryGetValue(customerPhoneNumber, out string OTP);
-        //if(OTP == null) return false;
-        //if(OTP != OTPV) return false;
-        return true;
+        try
+        {
+            // Check if the OTP exists in the memory cache
+            if (memoryCache.TryGetValue(customerPhoneNumber, out string cachedOTP))
+            {
+                // Compare the provided OTP with the cached OTP
+                if (cachedOTP == OTPV)
+                {
+                    // OTP is valid, remove it from the cache after successful validation
+                    memoryCache.Remove(customerPhoneNumber);
+                    return true;
+                }
+            }
+
+            // OTP is invalid or not found
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred during OTP validation: {ex.Message}");
+            return false;
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------
