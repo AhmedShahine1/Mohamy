@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
 using System.Linq.Expressions;
+using Mohamy.Core.DTO.CityViewModel;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -619,6 +620,13 @@ public class AccountService : IAccountService
         }
 
         return lawyerDtos;
+    }
+
+    public async Task<IEnumerable<CityDTO>> GetCitiesAsync()
+    {
+        var cities = await _unitOfWork.CityRepository.GetAllAsync();
+        return mapper.Map<IEnumerable<CityDTO>>(cities);
+        
     }
 
     private Expression<Func<T, bool>> CombineExpressions<T>(

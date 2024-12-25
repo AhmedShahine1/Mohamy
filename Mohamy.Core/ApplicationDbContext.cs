@@ -42,6 +42,8 @@ namespace Mohamy.Core
         //----------------------------------------------------------------------------------
         public virtual DbSet<Evaluation> Evaluations { get; set; }
 
+        public virtual DbSet<City> Cities { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

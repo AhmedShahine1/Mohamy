@@ -30,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     public IBaseRepository<Notification> NotificationRepository { get; set; }
     public IBaseRepository<Chat> ChatRepository { get; set; }
     public IBaseRepository<Evaluation> EvaluationRepository { get; set; }
+    public IBaseRepository<City> CityRepository { get; set; }
 
     public IBaseRepository<lawyerLicense> lawyerLicenseRepository { get; set; }
     public IBaseRepository<graduationCertificate> graduationCertificateRepository { get; set; }
@@ -52,6 +53,7 @@ public class UnitOfWork : IUnitOfWork
         NotificationRepository = new BaseRepository<Notification>(context);
         ChatRepository = new BaseRepository<Chat>(context);
         EvaluationRepository = new BaseRepository<Evaluation>(context);
+        CityRepository = new BaseRepository<City>(context);
         ExperienceRepository = new BaseRepository<Experience>(context);
         lawyerLicenseRepository = new BaseRepository<lawyerLicense>(context);
         graduationCertificateRepository = new BaseRepository<graduationCertificate>(context);
