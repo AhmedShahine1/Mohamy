@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,8 @@ using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using Mohamy.Core.Helpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Mohamy.Controllers.API
 {
@@ -520,6 +523,144 @@ namespace Mohamy.Controllers.API
                     ErrorMessage = "Failed to delete account",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+
+        [HttpPost("RegisterLawyer")]
+        public async Task<IActionResult> RegisterLawyer([FromForm] RegisterLawyer model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        status = false,
+                        ErrorCode = 400,
+                        ErrorMessage = "Invalid model"
+                    });
+                }
+
+                var result = await _accountService.RegisterLawyer(model);
+
+                if (result.result.Succeeded)
+                {
+                    var response = new BaseResponse();
+                    response.status = true;
+                    response.ErrorMessage = "";
+                    response.Data = result.userId;
+                    return Ok(response);
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer registration failed.",
+                    Data = result.result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("LawyerLogin")]
+        public async Task<IActionResult> LawyerLogin([FromBody] LoginModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        status = false,
+                        ErrorCode = 400,
+                        ErrorMessage = "Invalid model"
+                    });
+                }
+                
+                var loginModel = new LoginModel
+                {
+                    PhoneNumber = model.PhoneNumber,
+                    Password = model.Password
+                };
+                
+                var resultLogin = await _accountService.LawyerLogin(model);
+
+                if (resultLogin.IsSuccess)
+                {
+                    var user = await _accountService.GetUserFromToken(resultLogin.Token);
+                    var authDto = _mapper.Map<AuthDTO>(user);
+                    authDto.Token = resultLogin.Token;
+                    authDto.ProfileImage = await _accountService.GetUserProfileImage(user.ProfileId);
+
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = authDto
+                    });
+                }
+
+                    return BadRequest(new BaseResponse
+                    {
+                        status = false,
+                        ErrorCode = 401,
+                        ErrorMessage = resultLogin.ErrorMessage,
+                    });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("ChangeLawyerRegistrationStatus")]
+        public async Task<IActionResult> ChangeLawyerRegistrationStatus([FromQuery] string lawyerId)
+        {
+            try
+            {
+                var resultLogin = await _accountService.ChangeLawyerRegistrationStatus(lawyerId);
+
+                if (resultLogin.IsSuccess)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = resultLogin.Message
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                });
+
             }
             catch (Exception ex)
             {

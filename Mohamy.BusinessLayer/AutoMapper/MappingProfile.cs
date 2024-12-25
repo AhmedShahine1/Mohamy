@@ -46,14 +46,7 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.PhoneNumber))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
-                .ForMember(dest => dest.yearsExperience, opt => opt.MapFrom(src => src.YearsExperience))
                 .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City))
-                .ForMember(dest => dest.Region, opt => opt.MapFrom(src => src.Region))
-                .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName))
-                .ForMember(dest => dest.AccountNumber, opt => opt.MapFrom(src => src.AccountNumber))
-                .ForMember(dest => dest.BeneficiaryName, opt => opt.MapFrom(src => src.BeneficiaryName))
-                .ForMember(dest => dest.IBAN, opt => opt.MapFrom(src => src.IBAN))
                 .ForMember(dest => dest.RegistrationDate, opt => opt.Ignore()) // Set in the service
                 .ForMember(dest => dest.professionalAccreditation, opt => opt.Ignore()) // Set in the service
                 .ForMember(dest => dest.Profile, opt => opt.Ignore()) // Handle profile image separately

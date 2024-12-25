@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Mohamy.Core.Entity.Files;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
+using Mohamy.Core.Helpers;
 
 namespace Mohamy.BusinessLayer.Interfaces;
 
@@ -21,6 +22,8 @@ public interface IAccountService
     Task<IdentityResult> UpdateCustomer(string adminId, UpdateCustomer model);
     Task<IdentityResult> UpdatePasswordAsync(string userId, UpdatePassword updatePasswordModel);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> Login(LoginModel model);
+    Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model);
+    Task<(bool IsSuccess, string Message)> ChangeLawyerRegistrationStatus(string lawyerId);
     Task<bool> Logout(ApplicationUser user);
     Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId);
     Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId);
@@ -42,4 +45,6 @@ public interface IAccountService
     //string RandomString(int length);
     //Task<bool> DisActiveUserConnnection(string userId);
     //Task<bool> ActiveUserConnnection(string userId);
+
+    Task<(IdentityResult result, string userId)> RegisterLawyer(RegisterLawyer model);
 }
