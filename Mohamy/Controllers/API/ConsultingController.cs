@@ -335,5 +335,29 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        //For Lawyers
+        [HttpGet]
+        [Route("GetAvailableConsultations")]
+        public async Task<ActionResult<BaseResponse>> GetAvailableConsultations()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetAvailableConsultations();
+
+                response.status = true;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
     }
 }

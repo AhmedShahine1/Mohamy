@@ -609,10 +609,10 @@ namespace Mohamy.BusinessLayer.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsWithoutLawyerAsync()
+        public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations()
         {
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                c => c.LawyerId == null && !c.IsDeleted,
+                c => c.LawyerId == null && !c.IsDeleted && c.statusConsulting == statusConsulting.UserRequestedNotPaid,
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Customer)
@@ -624,11 +624,6 @@ namespace Mohamy.BusinessLayer.Services
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
-                if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
-                {
-                    consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);
-                }
-
                 if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
                 {
                     consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
