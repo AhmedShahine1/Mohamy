@@ -23,10 +23,11 @@ namespace Mohamy.BusinessLayer.Services
         {
             var messages = await _unitOfWork.ChatRepository.FindAllAsync(
                 m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
-                     (m.SenderId == receiverId && m.ReceiverId == senderId),
-                include: q=>q.Include(i=>i.Sender)
-                .Include(i=>i.Receiver)
-                .Include(i=>i.Images));
+                (m.SenderId == receiverId && m.ReceiverId == senderId),
+                include: q => q.Include(i => i.Sender)
+                   .Include(i => i.Receiver)
+                   .Include(i => i.Images),
+                orderBy: q => q.OrderByDescending(m => m.CreatedAt));
 
             return messages.Select(m => new ChatDTO
             {

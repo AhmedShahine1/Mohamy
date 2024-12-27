@@ -533,5 +533,30 @@ namespace Mohamy.Controllers.API
                 });
             }
         }
+
+        [HttpGet("GetCities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetCities()
+        {
+            try
+            {
+                var cities = await _accountService.GetCitiesAsync();
+                return Ok(new BaseResponse
+                {
+                    status = true,
+                    Data = cities
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
     }
 }

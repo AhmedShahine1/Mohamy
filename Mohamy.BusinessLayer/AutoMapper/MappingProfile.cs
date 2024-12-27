@@ -4,11 +4,13 @@ using Mohamy.Core.DTO.AuthViewModel.FilesModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
+using Mohamy.Core.DTO.CityViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Files;
 using Mohamy.Core.Entity.LawyerData;
+using Mohamy.Core.Entity.Others;
 
 namespace Mohamy.BusinessLayer.AutoMapper
 {
@@ -29,6 +31,13 @@ namespace Mohamy.BusinessLayer.AutoMapper
             CreateMap<Paths, PathsModel>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ReverseMap();
+
+            //--------------------------------------------------------------------------------------------------------
+            // Mapping for City <-> CityDTO
+            CreateMap<City, CityDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ReverseMap();
 
             //--------------------------------------------------------------------------------------------------------
