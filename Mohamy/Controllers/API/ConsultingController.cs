@@ -15,13 +15,15 @@ namespace Mohamy.Controllers.API
     {
         private readonly IConsultingService _consultingService;
         private readonly IAccountService _accountService;
+        private readonly IChatService _chatService;
 
         private ApplicationUser? CurrentUser;
 
-        public ConsultingController(IAccountService accountService, IConsultingService consultingService, IRequestConsultingService requestConsultingService)
+        public ConsultingController(IAccountService accountService, IConsultingService consultingService, IRequestConsultingService requestConsultingService, IChatService chatService)
         {
             _accountService = accountService;
             _consultingService = consultingService;
+            _chatService = chatService;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -282,6 +284,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Cancelled);
                 response.status = true;
+                response.Data = "تم الغاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -303,6 +306,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.InProgress);
                 response.status = true;
+                response.Data = "تم دفع الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -324,6 +328,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Completed);
                 response.status = true;
+                response.Data = "تم انتهاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -335,5 +340,64 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [HttpGet]
+        [Route("Files")]
+        public async Task<ActionResult<BaseResponse>> GetAllFiles([FromQuery] string senderId, [FromQuery] string receiveId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var Files = _chatService.GetAllFiles(senderId,receiveId);
+                if (Files == null)
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Files not found.";
+                    return NotFound(response);
+                }
+
+                response.status = true;
+                response.Data = Files;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpGet]
+        [Route("Images")]
+        public async Task<ActionResult<BaseResponse>> GetAllImages([FromQuery] string senderId, [FromQuery] string receiveId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var Files = _chatService.GetAllImages(senderId,receiveId);
+                if (Files == null)
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Files not found.";
+                    return NotFound(response);
+                }
+
+                response.status = true;
+                response.Data = Files;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
     }
 }

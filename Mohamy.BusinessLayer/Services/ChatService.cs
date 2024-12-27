@@ -2,8 +2,6 @@
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.Entity.ChatData;
-using Mohamy.Core.Entity.ConsultingData;
-using Mohamy.Core.Entity.Files;
 using Mohamy.RepositoryLayer.Interfaces;
 
 namespace Mohamy.BusinessLayer.Services
@@ -66,6 +64,41 @@ namespace Mohamy.BusinessLayer.Services
                 SentAt = message.CreatedAt
             };
         }
-    }
 
+        public async Task<List<string>> GetAllImages(string senderId, string receiverId)
+        {
+            var messages = await _unitOfWork.ChatRepository.FindAllAsync(
+                m => ((m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                      (m.SenderId == receiverId && m.ReceiverId == senderId)) && m.ImagesId != null,
+                include: q => q.Include(i => i.Images));
+
+            var imageFiles = messages
+                .Select(m => _fileHandling.GetFile(m.ImagesId).Result)
+                .Where(file => IsImageFile(file)) // Filter to include only image files
+                .ToList();
+
+            return imageFiles;
+        }
+
+        public async Task<List<string>> GetAllFiles(string senderId, string receiverId)
+        {
+            var messages = await _unitOfWork.ChatRepository.FindAllAsync(
+                m => ((m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                      (m.SenderId == receiverId && m.ReceiverId == senderId)) && m.ImagesId != null,
+                include: q => q.Include(i => i.Images));
+
+            var imageFiles = messages
+                .Select(m => _fileHandling.GetFile(m.ImagesId).Result)
+                .Where(file => !IsImageFile(file)) // Filter to include only image files
+                .ToList();
+
+            return imageFiles;
+        }
+
+        private bool IsImageFile(string filePath)
+        {
+            var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+            return imageExtensions.Any(ext => filePath.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 }
