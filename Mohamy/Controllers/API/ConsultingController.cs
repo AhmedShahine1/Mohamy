@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
+using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Helpers;
@@ -342,13 +343,13 @@ namespace Mohamy.Controllers.API
 
         [HttpGet]
         [Route("Files")]
-        public async Task<ActionResult<BaseResponse>> GetAllFiles([FromQuery] string senderId, [FromQuery] string receiveId)
+        public async Task<ActionResult<BaseResponse>> GetAllFiles([FromQuery] string senderId, [FromQuery] string receiverId)
         {
             var response = new BaseResponse();
 
             try
             {
-                var Files = _chatService.GetAllFiles(senderId,receiveId);
+                var Files =await _chatService.GetAllFiles(senderId, receiverId);
                 if (Files == null)
                 {
                     response.status = false;
@@ -372,13 +373,13 @@ namespace Mohamy.Controllers.API
 
         [HttpGet]
         [Route("Images")]
-        public async Task<ActionResult<BaseResponse>> GetAllImages([FromQuery] string senderId, [FromQuery] string receiveId)
+        public async Task<ActionResult<BaseResponse>> GetAllImages([FromQuery] string senderId, [FromQuery] string receiverId)
         {
             var response = new BaseResponse();
 
             try
             {
-                var Files = _chatService.GetAllImages(senderId,receiveId);
+                var Files = await _chatService.GetAllImages(senderId, receiverId);
                 if (Files == null)
                 {
                     response.status = false;
@@ -398,6 +399,24 @@ namespace Mohamy.Controllers.API
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpPost("SendMessage")]
+        public async Task<IActionResult> SendMessage([FromForm] ChatDTO chatDTO)
+        {
+            if (string.IsNullOrEmpty(chatDTO.SenderId) || string.IsNullOrEmpty(chatDTO.ReceiverId))
+                return BadRequest("SenderId and ReceiverId are required.");
+
+            try
+            {
+                var result = await _chatService.SendMessageAsync(chatDTO);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if a logging system is in place
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }

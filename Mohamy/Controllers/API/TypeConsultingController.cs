@@ -139,6 +139,43 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [HttpGet("subconsultingUser")]
+        public async Task<ActionResult<BaseResponse>> GetSubConsultingByUser([FromQuery] string UserId)
+        {
+            var response = new BaseResponse();
+
+            if (string.IsNullOrEmpty(UserId))
+            {
+                response.status = false;
+                response.ErrorCode = 400;
+                response.ErrorMessage = "UserId cannot be null or empty.";
+                return BadRequest(response);
+            }
+
+            try
+            {
+                var SubConsultings = await _subConsultingService.GetSubConsultingByUsersAsync(UserId);
+
+                if (SubConsultings == null || !SubConsultings.Any())
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Not found the specified subconsulting to User.";
+                    return NotFound(response);
+                }
+                response.status = true;
+                response.Data = SubConsultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving users: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
         [HttpGet("subconsultingByMainConsulting")]
         public async Task<ActionResult<BaseResponse>> subconsultingByMain([FromQuery] string mainConsultingId)
         {

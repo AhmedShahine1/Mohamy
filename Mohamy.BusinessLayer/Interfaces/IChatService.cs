@@ -9,5 +9,4 @@ namespace Mohamy.BusinessLayer.Interfaces
         Task<IEnumerable<ChatDTO>> GetChatsAsync(string senderId, string receiverId);
         Task<ChatDTO> SendMessageAsync(ChatDTO messageDTO);
     }
-
 }

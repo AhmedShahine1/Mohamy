@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Mohamy.BusinessLayer.Hubs;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.Entity.ChatData;
@@ -11,12 +13,14 @@ namespace Mohamy.BusinessLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileHandling _fileHandling;
         private readonly IAccountService _accountService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatService(IUnitOfWork unitOfWork, IFileHandling fileHandling, IAccountService accountService)
+        public ChatService(IUnitOfWork unitOfWork, IFileHandling fileHandling, IAccountService accountService, IHubContext<ChatHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _fileHandling = fileHandling;
             _accountService = accountService;
+            _hubContext = hubContext;
         }
 
         public async Task<IEnumerable<ChatDTO>> GetChatsAsync(string senderId, string receiverId)
@@ -41,29 +45,47 @@ namespace Mohamy.BusinessLayer.Services
 
         public async Task<ChatDTO> SendMessageAsync(ChatDTO messageDTO)
         {
+            // Create a new chat message
             var message = new Chat
             {
                 SenderId = messageDTO.SenderId,
                 ReceiverId = messageDTO.ReceiverId,
-                Message = messageDTO.Message
+                Message = messageDTO.Message,
+                CreatedAt = DateTime.UtcNow
             };
+            // Handle file if it exists
             if (messageDTO.File != null)
             {
                 var path = await _accountService.GetPathByName("ChatFiles");
+                message.ImagesId = await _fileHandling.UploadFile(messageDTO.File, path);
+                messageDTO.FileUrl = await _fileHandling.GetFile(message.ImagesId);
+                // Determine the group name
+                string chatGroup = GetGroupName(messageDTO.SenderId, messageDTO.ReceiverId);
 
-                    message.ImagesId = await _fileHandling.UploadFile(messageDTO.File, path);
+                // Broadcast the message to the SignalR group
+                await _hubContext.Clients.Group(chatGroup).SendAsync("ReceiveMessage", messageDTO);
             }
-            await _unitOfWork.ChatRepository.AddAsync(message);
-            await _unitOfWork.SaveChangesAsync();
-
-            return new ChatDTO
+            // Prepare the DTO for broadcasting
+            var chatDTO = new ChatDTO
             {
                 SenderId = message.SenderId,
                 ReceiverId = message.ReceiverId,
-                FileUrl = message.ImagesId is not null ? await _fileHandling.GetFile(message.ImagesId) : null,
+                FileUrl = messageDTO.FileUrl,
                 Message = message.Message,
                 SentAt = message.CreatedAt
             };
+
+            // Save the chat message in the repository
+            await _unitOfWork.ChatRepository.AddAsync(message);
+            await _unitOfWork.SaveChangesAsync();
+
+
+            return chatDTO;
+        }
+
+        private string GetGroupName(string user1, string user2)
+        {
+            return string.CompareOrdinal(user1, user2) < 0 ? $"{user1}-{user2}" : $"{user2}-{user1}";
         }
 
         public async Task<List<string>> GetAllImages(string senderId, string receiverId)
