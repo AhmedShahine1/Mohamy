@@ -59,5 +59,7 @@ namespace Mohamy.Core.Entity.ApplicationData
 
         public ICollection<Evaluation> EvaluationsReceived { get; set; } = new List<Evaluation>();
 
+        public ICollection<Images>? Documents { get; set; }
+
     }
 }

@@ -629,26 +629,27 @@ public class AccountService : IAccountService
         user.ProfileId = await _fileHandling.DefaultProfile(path);
 
         user.UserName = $"{user.UserName}_lawyer";
+
+        var documentsPath = await GetPathByName("lawyerLicense");
+        user.Documents = new List<Images>();
+        foreach (var file in model.Licenses)
+        {
+            string fileId = await _fileHandling.UploadFile(file, path);
+            user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
+        }
+
+        documentsPath = await GetPathByName("graduationCertificate");
+        foreach (var file in model.Certificates)
+        {
+            string fileId = await _fileHandling.UploadFile(file, path);
+            user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
+        }
+
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, "Lawyer");
-
-            // need to change
-            var documentsPath = await GetPathByName("ConsultingFiles");
-            foreach (var file in model.Licenses)
-            {
-                string fileId = await _fileHandling.UploadFile(file, path);
-               // save in database with type
-            }
-
-            foreach (var file in model.Certificates)
-            {
-                string fileId = await _fileHandling.UploadFile(file, path);
-                // save in database with type
-            }
-
         }
         else
         {

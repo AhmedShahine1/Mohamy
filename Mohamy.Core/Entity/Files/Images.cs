@@ -14,5 +14,7 @@ namespace Mohamy.Core.Entity.Files
         public string pathId { get; set; }
 
         public Paths path { get; set; }
+
+
     }
 }
