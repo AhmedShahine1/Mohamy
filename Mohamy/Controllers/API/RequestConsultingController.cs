@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
+using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Helpers;
 
@@ -46,6 +47,30 @@ namespace Mohamy.Controllers.API
         {
         }
 
+        [Authorize(Policy = "Lawyer")]
+        [HttpPost("RequestConsulting")]
+        public async Task<ActionResult<BaseResponse>> RequestConsulting([FromBody] RequestConsultingDTO consultingRquest)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var success = await _requestConsultingService.AddRequestAsync(consultingRquest);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = success;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Customer")]
         [HttpGet("RequestConsulting")]
         public async Task<ActionResult<BaseResponse>> RequestConsulting([FromQuery] string ConsultingId)
         {
@@ -68,6 +93,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpPost("Approved")]
         public async Task<ActionResult<BaseResponse>> ApprovedRequestStatus([FromQuery] string requestId)
         {
@@ -94,6 +120,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpPost("Rejected")]
         public async Task<ActionResult<BaseResponse>> RejectedRequestStatus([FromQuery] string requestId)
         {

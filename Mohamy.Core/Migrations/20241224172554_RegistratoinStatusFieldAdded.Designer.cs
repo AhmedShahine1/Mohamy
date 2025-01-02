@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mohamy.Core;
 
@@ -11,9 +12,11 @@ using Mohamy.Core;
 namespace Mohamy.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241224172554_RegistratoinStatusFieldAdded")]
+    partial class RegistratoinStatusFieldAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -554,9 +557,6 @@ namespace Mohamy.Core.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<bool>("NotKnow")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -578,9 +578,6 @@ namespace Mohamy.Core.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ConsultingId")
                         .HasColumnType("nvarchar(450)");
 
@@ -593,8 +590,6 @@ namespace Mohamy.Core.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("ConsultingId");
 
@@ -783,35 +778,6 @@ namespace Mohamy.Core.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications", "dbo");
-                });
-
-            modelBuilder.Entity("Mohamy.Core.Entity.Others.City", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUpdated")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities", "dbo");
                 });
 
             modelBuilder.Entity("Mohamy.Core.Entity.Others.Evaluation", b =>
@@ -1028,10 +994,6 @@ namespace Mohamy.Core.Migrations
 
             modelBuilder.Entity("Mohamy.Core.Entity.Files.Images", b =>
                 {
-                    b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Mohamy.Core.Entity.ConsultingData.Consulting", null)
                         .WithMany("Files")
                         .HasForeignKey("ConsultingId");
@@ -1137,8 +1099,6 @@ namespace Mohamy.Core.Migrations
 
             modelBuilder.Entity("Mohamy.Core.Entity.ApplicationData.ApplicationUser", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("EvaluationsReceived");
 
                     b.Navigation("Experiences");

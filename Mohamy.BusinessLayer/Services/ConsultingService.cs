@@ -170,17 +170,32 @@ namespace Mohamy.BusinessLayer.Services
             return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
         }
 
-        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsInprogress(string customerId)
+        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsInprogress(string id, bool isLawyer = false)
         {
-            // Retrieve consultings and related data from the database first
-            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.InProgress,
-                include: q => q
-                    .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
-                    .Include(c => c.Lawyer)
-                    .Include(c => c.Customer)
-                    .Include(c => c.Files)
-            );
+            IEnumerable<Consulting> consultings = new List<Consulting>();
+            if (isLawyer)
+            {
+                // Retrieve consultings and related data from the database first
+                consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.InProgress,
+                    include: q => q
+                        .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                        .Include(c => c.Lawyer)
+                        .Include(c => c.Customer)
+                        .Include(c => c.Files)
+                );
+            }
+            else {
+                // Retrieve consultings and related data from the database first
+                consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.InProgress,
+                    include: q => q
+                        .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                        .Include(c => c.Lawyer)
+                        .Include(c => c.Customer)
+                        .Include(c => c.Files)
+                );
+            }
 
             // Map consulting entities to DTOs
             var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && !c.subConsulting.MainConsulting.service));
@@ -203,7 +218,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
                 consulting.SubConsultingName = _unitOfWork.SubConsultingRepository.GetByIdAsync(consulting.SubConsultingId).Result.Name;
                 consulting.FilesUrl = new List<string>();
-                foreach (var consulting1 in consultings)
+                foreach (var consulting1 in consultings.ToList())
                 {
                     if (consulting1.Id == consulting.Id)
                     {
@@ -218,17 +233,31 @@ namespace Mohamy.BusinessLayer.Services
             return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
         }
 
-        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsCompleted(string customerId)
+        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsCompleted(string id, bool isLawyer = false)
         {
+            IEnumerable<Consulting> consultings = new List<Consulting>();
             // Retrieve consultings and related data from the database first
-            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Completed,
-                include: q => q
-                    .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
-                    .Include(c => c.Lawyer)
-                    .Include(c => c.Customer)
-                    .Include(c => c.Files)
-            );
+            if (isLawyer)
+            {
+                consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.Completed,
+                    include: q => q
+                        .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                        .Include(c => c.Lawyer)
+                        .Include(c => c.Customer)
+                        .Include(c => c.Files)
+                );
+            }
+            else {
+                consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.Completed,
+                    include: q => q
+                        .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                        .Include(c => c.Lawyer)
+                        .Include(c => c.Customer)
+                        .Include(c => c.Files)
+                );
+            }
 
             // Map consulting entities to DTOs
             var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && !c.subConsulting.MainConsulting.service));
@@ -251,7 +280,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
                 consulting.SubConsultingName = _unitOfWork.SubConsultingRepository.GetByIdAsync(consulting.SubConsultingId).Result.Name;
                 consulting.FilesUrl = new List<string>();
-                foreach (var consulting1 in consultings)
+                foreach (var consulting1 in consultings.ToList())
                 {
                     if (consulting1.Id == consulting.Id)
                     {
@@ -599,10 +628,10 @@ namespace Mohamy.BusinessLayer.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsWithoutLawyerAsync()
+        public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations()
         {
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                c => c.LawyerId == null && !c.IsDeleted,
+                c => c.LawyerId == null && !c.IsDeleted && !c.subConsulting.MainConsulting.service && c.LawyerId == null && c.statusConsulting == statusConsulting.UserRequestedNotPaid,
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Customer)
@@ -614,11 +643,6 @@ namespace Mohamy.BusinessLayer.Services
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
-                if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
-                {
-                    consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);
-                }
-
                 if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
                 {
                     consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
@@ -628,6 +652,51 @@ namespace Mohamy.BusinessLayer.Services
 
             return consultingDTOs.OrderByDescending(q=>q.OrderNumber).ToList();
         }
+
+        public async Task AcceptConsultation(string lawyerId, string consultationId)
+        {
+            var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(consultationId);
+            
+            if (consulting is null) throw new ArgumentException("Consulting not found");
+            if (consulting.LawyerId is not null) throw new ArgumentException("Consulting already accepted");
+
+            consulting.LawyerId = lawyerId;
+            consulting.Lawyer = await _accountService.GetUserById(lawyerId);
+            consulting.PriceService = consulting.Lawyer.PriceService is null ? 0 : (decimal)((consulting.voiceConsulting) ? 100 : consulting.Lawyer.PriceService);
+            consulting.StartDate = DateTime.UtcNow;
+            consulting.statusConsulting = statusConsulting.InProgress;
+            consulting.IsUpdated = true;
+            consulting.UpdatedAt = DateTime.Now;
+
+            _unitOfWork.ConsultingRepository.Update(consulting);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ConsultingDTO>> GetAvailableServices()
+        {
+            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                c => c.LawyerId == null && !c.IsDeleted && c.subConsulting.MainConsulting.service && c.LawyerId == null && c.statusConsulting == statusConsulting.UserRequestedNotPaid,
+                include: q => q
+                    .Include(c => c.subConsulting)
+                    .Include(c => c.Customer)
+                    .Include(c => c.Files)
+            );
+
+            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings.Where(c => c.statusConsulting != statusConsulting.Cancelled));
+
+            // After completing all database operations, fetch profile images asynchronously
+            foreach (var consulting in consultingDTOs)
+            {
+                if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
+                {
+                    consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
+                }
+            }
+
+
+            return consultingDTOs.ToList();
+        }
+
 
     }
 

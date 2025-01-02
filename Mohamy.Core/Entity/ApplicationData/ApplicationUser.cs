@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Others;
+using Mohamy.Core.Helpers;
 
 namespace Mohamy.Core.Entity.ApplicationData
 {
@@ -40,6 +41,8 @@ namespace Mohamy.Core.Entity.ApplicationData
 
         public Images Profile { get; set; } // صورة الملف الشخصي للمستخدم.
 
+        public LawyerRegistrationStatus RegistrationStatus { get; set; } = LawyerRegistrationStatus.NotLawyer;
+
         public IEnumerable<graduationCertificate> graduationCertificates { get; set; } = new List<graduationCertificate>();
 
         [ForeignKey(nameof(lawyerLicense))]
@@ -55,6 +58,8 @@ namespace Mohamy.Core.Entity.ApplicationData
         public ICollection<RequestConsulting>? RequestConsultings { get; set; }
 
         public ICollection<Evaluation> EvaluationsReceived { get; set; } = new List<Evaluation>();
+
+        public ICollection<Images>? Documents { get; set; }
 
     }
 }

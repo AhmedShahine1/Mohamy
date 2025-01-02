@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Http;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
 using System.Linq.Expressions;
+using System.IO;
+using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.DTO.CityViewModel;
 
 namespace Mohamy.BusinessLayer.Services;
@@ -60,10 +62,28 @@ public class AccountService : IAccountService
     }
     //------------------------------------------------------------------------------------------------------------
     // Check if email or phone number already exists before creating or updating the user
-    private async Task<bool> IsPhoneExistAsync(string phoneNumber, string userId = null)
+    private async Task<bool> IsPhoneExistAsync(string phoneNumber, string userId = null, bool isLawyer = false)
     {
-        return await _userManager.Users.AnyAsync(u =>
-            (u.PhoneNumber == phoneNumber) && u.Id != userId);
+        var usersWithPhone = await _userManager.Users
+        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId)
+        .ToListAsync();
+
+        // Check if any of the users have the specified role (lawyer) if required
+        foreach (var user in usersWithPhone)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            if (isLawyer && (roles.Contains("Lawyer") || roles.Contains("Notary")))
+            {
+                return true;
+            }
+
+            if (!isLawyer && !roles.Contains("Lawyer") && !roles.Contains("Notary"))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // Helper methods for handling profile images
@@ -164,6 +184,28 @@ public class AccountService : IAccountService
             await _userManager.AddToRoleAsync(user, "Customer");
         }
         else
+        {
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        await SetProfileImage(user, model.ImageProfile);
+        user.Description = model.Description;
+        user.PriceService = model.PriceService;
+        user.yearsExperience = model.YearsExperience;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
         {
             throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
@@ -323,7 +365,7 @@ public class AccountService : IAccountService
 
             // Proceed with login
             await _signInManager.SignInAsync(user, model.RememberMe);
-            var token = await GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user, true);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return (true, tokenString, null);
@@ -623,11 +665,157 @@ public class AccountService : IAccountService
         return lawyerDtos;
     }
 
+    public async Task<(IdentityResult result, string userId)> RegisterLawyer(RegisterLawyer model)
+    {
+        if (await IsPhoneExistAsync(model.PhoneNumber, null, true))
+        {
+            throw new ArgumentException("phone number already exists.");
+        }
+
+        if (model.Password != model.ConfirmPassword)
+        {
+            throw new ArgumentException("Password and confirm password should match.");
+        }
+
+        if (model.Licenses.Count() < 1 || model.Licenses.Count() > 5)
+        {
+            throw new ArgumentException("License files should be between 1-5.");
+        }
+
+        if (model.Certificates.Count() < 1 || model.Certificates.Count() > 5)
+        {
+            throw new ArgumentException("Certificates should be between 1-5.");
+        }
+
+        var user = mapper.Map<ApplicationUser>(model);
+        user.RegistrationStatus = LawyerRegistrationStatus.RequestReceived;
+        var path = await GetPathByName("ProfileImages");
+        user.ProfileId = await _fileHandling.DefaultProfile(path);
+
+        user.UserName = $"{user.UserName}_lawyer";
+
+        var documentsPath = await GetPathByName("lawyerLicense");
+        user.Documents = new List<Images>();
+        foreach (var file in model.Licenses)
+        {
+            string fileId = await _fileHandling.UploadFile(file, path);
+            user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
+        }
+
+        documentsPath = await GetPathByName("graduationCertificate");
+        foreach (var file in model.Certificates)
+        {
+            string fileId = await _fileHandling.UploadFile(file, path);
+            user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
+        }
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "Lawyer");
+        }
+        else
+        {
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return (result, user.Id);
+    }
+
+
+    public async Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model)
+    {
+        try
+        {
+            model.PhoneNumber = $"{model.PhoneNumber}_lawyer";
+            var user = await _userManager.FindByNameAsync(model.PhoneNumber);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                return (false, null, "Invalid login attempt.");
+            }
+
+            if (!user.Status)
+            {
+                return (false, null, "Your account is deactivated. Please contact support.");
+            }
+
+            if (user.RegistrationStatus == LawyerRegistrationStatus.RequestReceived || user.RegistrationStatus == LawyerRegistrationStatus.DetailSibmitted)
+            {
+                return (false, null, "Your account is not approved yet");
+            }
+
+            // Proceed with login
+            await _signInManager.SignInAsync(user, model.RememberMe);
+            var token = await GenerateJwtToken(user, false);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return (true, tokenString, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, null, ex.Message);
+        }
+    }
+
+
+    public async Task<(bool IsSuccess, string Message)> ChangeLawyerRegistrationStatus(string lawyerId)
+    {
+        try
+        {
+            var lawyer = await GetUserById(lawyerId);
+            if (lawyer is null)
+            {
+                return (false, "Lawyer not found");
+            }
+            else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.NotLawyer)
+            {
+                return (false, "Customer account status cann't be changed");
+            }
+            else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.RequestReceived)
+            {
+                lawyer.RegistrationStatus = LawyerRegistrationStatus.LicenseApproved;
+                await _userManager.UpdateAsync(lawyer);
+
+                //remove old user roles and add new one based on admin selection
+                //var currentRoles = await _userManager.GetRolesAsync(lawyer);
+                //var removeResult = await _userManager.RemoveFromRolesAsync(lawyer, currentRoles);
+                //await _userManager.AddToRoleAsync(lawyer, "Lawyer");
+                await _userManager.AddToRoleAsync(lawyer, "Notary");
+
+                return (true, "License approved.");
+            }
+            else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.LicenseApproved)
+            {
+                lawyer.RegistrationStatus = LawyerRegistrationStatus.DetailSibmitted;
+                await _userManager.UpdateAsync(lawyer);
+                return (true, "Detail submitted");
+            }
+            else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.DetailSibmitted)
+            {
+                lawyer.RegistrationStatus = LawyerRegistrationStatus.Approved;
+                await _userManager.UpdateAsync(lawyer);
+                return (true, "Account approved.");
+            }
+            else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.Approved)
+            {
+                return (true, "This lawyer account is already approved.");
+            }
+            else
+            {
+                return (false, "Invalid Status");
+            }
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
     public async Task<IEnumerable<CityDTO>> GetCitiesAsync()
     {
         var cities = await _unitOfWork.CityRepository.GetAllAsync();
         return mapper.Map<IEnumerable<CityDTO>>(cities);
-        
     }
 
     private Expression<Func<T, bool>> CombineExpressions<T>(
@@ -647,7 +835,7 @@ public class AccountService : IAccountService
     //------------------------------------------------------------------------------------------------------------
     #region create and validate JWT token
 
-    private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user)
+    private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user, bool isCustomer)
     {
         var claims = new List<Claim>
             {
@@ -655,7 +843,7 @@ public class AccountService : IAccountService
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim("uid", user.Id),
                 new Claim("name", user.FullName),
-                new Claim(ClaimTypes.Role, "Customer"),
+                new Claim(ClaimTypes.Role, isCustomer ? "Customer":"Lawyer"),
                 new Claim("profileImage", await _fileHandling.GetFile(user.ProfileId)),
                 new Claim(ClaimTypes.MobilePhone, user.PhoneNumber)
             };

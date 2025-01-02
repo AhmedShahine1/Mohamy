@@ -1,4 +1,5 @@
 ﻿using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
+using Mohamy.Core.Helpers;
 using System.Collections.Generic;
 
 namespace Mohamy.Core.DTO.AuthViewModel
@@ -17,7 +18,7 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string? Education { get; set; }
         public string ProfileImage { get; set; }
         public string ProfileImageId { get; set; }
-
+        public LawyerRegistrationStatus RegistrationStatus { get; set; }
         // Lawyer license details
         public string lawyerLicenseId { get; set; }
         public string lawyerLicenseNumber { get; set; }

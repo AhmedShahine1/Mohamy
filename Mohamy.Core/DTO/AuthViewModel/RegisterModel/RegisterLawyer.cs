@@ -1,41 +1,46 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mohamy.Core.DTO.AuthViewModel.RegisterModel
 {
     public class RegisterLawyer
     {
-        // Lawyer basic info
+        [DisplayName("Full Name")]
+        [Required(ErrorMessage = "Full Name field is required"), StringLength(100)]
         public string FullName { get; set; }
-        public string? Email { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? Description { get; set; }
-        public int? YearsExperience { get; set; }
-        public string? City { get; set; }
-        public string? Region { get; set; }
 
-        // Lawyer banking details
-        public string? BankName { get; set; }
-        public string? AccountNumber { get; set; }
-        public string? BeneficiaryName { get; set; }
-        public string? IBAN { get; set; }
+        [DisplayName("Phone Number")]
+        [DataType(DataType.PhoneNumber)]
+        [Required(ErrorMessage = "Phone Number field is required"), StringLength(15)]
+        public string PhoneNumber { get; set; }
 
-        // Lawyer license
+        [DisplayName("Email")]
+        [Required(ErrorMessage = "Email field is required")]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
+        [DisplayName("City")]
+        [Required(ErrorMessage = "City field is required"), StringLength(100)]
+        public string City { get; set; }
+
+        [DisplayName("Password")]
+        [Required(ErrorMessage = "Password field is required")]
+        public string Password { get; set; }
+
+        [DisplayName("Confirm Password")]
+        [Required(ErrorMessage = "Confirm Password field is required")]
+        public string ConfirmPassword { get; set; }
+
+
+        [DisplayName("License Number")]
+        [Required(ErrorMessage = "License Number field is required"), StringLength(100)]
         public string LicenseNumber { get; set; }
-        public DateTime LicenseStart { get; set; }
-        public DateTime LicenseEnd { get; set; }
-        public string State { get; set; }
 
-        [DisplayName("الصورة الشخصية")]
-        public IFormFile? ImageProfile { get; set; }
+        [DisplayName("Licenses")]
+        public List<IFormFile> Licenses { get; set; }
 
-        // Graduation certificates
-        public List<GraduationCertificateDTO> GraduationCertificates { get; set; } = new List<GraduationCertificateDTO>();
-
-        // Experiences
-        public List<ExperienceDTO> Experiences { get; set; } = new List<ExperienceDTO>();
-
-        public List<SpecialtiesDTO> Specialties { get; set; } = new List<SpecialtiesDTO>();
+        [DisplayName("Certificates")]
+        public List<IFormFile> Certificates { get; set; }
     }
 }
