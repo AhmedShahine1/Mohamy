@@ -25,6 +25,7 @@ public static class IdentityServicesExtensions
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
         services.Configure<Jwt>(config.GetSection("JWT"));
+        services.Configure<SmsSettings>(config.GetSection("SmsSettings"));
 
         services.AddAuthentication()
             .AddJwtBearer(options =>

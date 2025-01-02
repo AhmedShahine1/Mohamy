@@ -22,6 +22,5 @@ namespace Mohamy.Core.Helpers
 
         // The consultation has been cancelled
         Cancelled
-
     }
 }

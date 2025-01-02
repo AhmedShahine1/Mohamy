@@ -1,9 +1,4 @@
 ﻿using Mohamy.Core.DTO.NotificationViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mohamy.BusinessLayer.Interfaces
 {

@@ -9,6 +9,8 @@ using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using System.Net.Sockets;
+using System.Net;
 using Mohamy.Core.Helpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -24,7 +26,6 @@ namespace Mohamy.Controllers.API
             _accountService = accountService;
             _mapper = mapper;
         }
-
         [HttpPost("RegisterCustomer")]
         public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomer model)
         {
@@ -280,7 +281,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Failed to confirm phone number.",
+                    ErrorMessage = "الكود الذي ادخلته غير صحيح",
                 });
             }
             catch (ArgumentException ex)
@@ -718,6 +719,30 @@ namespace Mohamy.Controllers.API
                     status = false,
                     ErrorCode = 404,
                     ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+        [HttpGet("GetCities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetCities()
+        {
+            try
+            {
+                var cities = await _accountService.GetCitiesAsync();
+                return Ok(new BaseResponse
+                {
+                    status = true,
+                    Data = cities
                 });
             }
             catch (Exception ex)

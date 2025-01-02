@@ -12,5 +12,6 @@ namespace Mohamy.BusinessLayer.Interfaces
     {
         public Task<IEnumerable<ApplicationUser>> GetUsersBySubConsultingAsync(string subConsultingId);
         Task<List<SubConsultingDTO>> GetSubConsultingByMainAsync(string mainConsulting);
+        Task<IEnumerable<SubConsultingDTO>> GetSubConsultingByUsersAsync(string UserId);
     }
 }

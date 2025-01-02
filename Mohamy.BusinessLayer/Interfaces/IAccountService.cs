@@ -8,6 +8,7 @@ using Mohamy.Core.Entity.Files;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Helpers;
+using Mohamy.Core.DTO.CityViewModel;
 
 namespace Mohamy.BusinessLayer.Interfaces;
 
@@ -31,6 +32,7 @@ public interface IAccountService
     Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
     Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);
     Task<List<LawyerDTO>> GetLawyersAsync(string? keyword, string? city, string? specialization, int? minYearsExperience, int? maxYearsExperience, string? sortBy);
+    Task<IEnumerable<CityDTO>> GetCitiesAsync();
     Task<bool> SendOTP(string customerEmail);
     Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV);
     Task<ApplicationUser> GetUserFromToken(string token);

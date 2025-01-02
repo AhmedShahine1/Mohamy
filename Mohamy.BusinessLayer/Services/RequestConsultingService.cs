@@ -38,14 +38,20 @@ namespace Mohamy.BusinessLayer.Services
                 request.Consulting.Customer = _mapper.Map<AuthDTO>(await _accountService.GetUserById(request.Consulting.CustomerId));
                 request.Lawyer = _mapper.Map<AuthDTO>(await _accountService.GetUserById(request.LawyerId));
             }
-            return requestDTO;
+            return requestDTO.OrderByDescending(q=>q.CreatedAt);
         }
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetRequestsByConsultingAsync(string consultingId)
         {
             var requests = (await _unitOfWork.RequestConsultingRepository
                 .FindAllAsync(r => r.ConsultingId == consultingId && r.statusRequestConsulting != statusRequestConsulting.Cancel));
-            return _mapper.Map<IEnumerable<RequestConsultingDTO>>(requests);
+            var requestDTO = _mapper.Map<IEnumerable<RequestConsultingDTO>>(requests);
+            foreach (var request in requestDTO)
+            {
+                request.Lawyer = _mapper.Map<AuthDTO>(await _accountService.GetUserById(request.LawyerId));
+                request.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(request.Lawyer.ProfileImageId);
+            }
+            return requestDTO.OrderByDescending(q => q.CreatedAt);
         }
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetRequestsByUserAsync(string userId)
@@ -57,7 +63,7 @@ namespace Mohamy.BusinessLayer.Services
             {
                 request.Consulting.Customer = _mapper.Map<AuthDTO>(await _accountService.GetUserById(request.Consulting.CustomerId));
             }
-            return requestDTO;
+            return requestDTO.OrderByDescending(q => q.CreatedAt);
         }
 
         public async Task<bool> UpdateRequestStatusAsync(string requestId, statusRequestConsulting newStatus)

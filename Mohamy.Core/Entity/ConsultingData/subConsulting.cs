@@ -25,5 +25,7 @@ namespace Mohamy.Core.Entity.ConsultingData
         public string MainConsultingId { get; set; }
 
         public mainConsulting MainConsulting { get; set; }
+
+        public bool NotKnow { get; set; } = false;
     }
 }

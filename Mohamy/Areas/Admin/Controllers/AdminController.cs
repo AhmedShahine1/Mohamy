@@ -23,11 +23,9 @@ namespace Mohamy.Areas.Admin.Controllers
     public class AdminController : Controller
     {
         private readonly IAccountService accountService;
-        private readonly IMapper mapper;
-        public AdminController(IAccountService _accountService, IMapper _mapper)
+        public AdminController(IAccountService _accountService)
         {
             accountService = _accountService;
-            mapper = _mapper;
         }
         [HttpGet]
         public async Task<IActionResult> Register()

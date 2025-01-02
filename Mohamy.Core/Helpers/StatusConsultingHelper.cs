@@ -6,7 +6,7 @@ namespace Mohamy.Core.Helpers
     {
         public static readonly Dictionary<statusConsulting, string> StatusConsultingTranslations = new Dictionary<statusConsulting, string>
         {
-            { statusConsulting.UserRequestedNotPaid, "تم طلب الاستشارة ولم يتم الدفع بعد" },
+            { statusConsulting.UserRequestedNotPaid, "تم طلب الخدمة ولم يتم الدفع بعد" },
             { statusConsulting.InProgress, "قيد التنفيذ" },
             { statusConsulting.Completed, "تم الانتهاء" },
             { statusConsulting.Cancelled, "تم الإلغاء" }

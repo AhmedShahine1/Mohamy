@@ -72,7 +72,8 @@ namespace Mohamy.BusinessLayer.Services
                         Description = entity.Description,
                         MainConsultingId = entity.MainConsultingId,
                         IconUrl = await _fileHandling.GetFile(entity.iconId),
-                        mainConsultingname = entity.MainConsulting.Name
+                        mainConsultingname = entity.MainConsulting.Name,
+                        NotKnow = entity.NotKnow
                     };
 
                     dtos.Add(dto);
@@ -111,6 +112,49 @@ namespace Mohamy.BusinessLayer.Services
                 .Include(u => u.Profile));
 
             return users;
+        }
+
+        public async Task<IEnumerable<SubConsultingDTO>> GetSubConsultingByUsersAsync(string UserId)
+        {
+            if (string.IsNullOrEmpty(UserId))
+            {
+                throw new ArgumentException("UserId cannot be null or empty", nameof(UserId));
+            }
+
+            // Fetch experiences that match the given subConsultingId
+            var Specialties = await _unitOfWork.SpecialtiesRepository
+                .FindAllAsync(e => e.LawyerId == UserId, isNoTracking: true);
+
+            if (!Specialties.Any())
+            {
+                return Enumerable.Empty<SubConsultingDTO>();
+            }
+
+            // Extract Lawyer IDs from the experiences
+            var SubConsultingIds = Specialties.Select(e => e.subConsultingId).Distinct().ToList();
+
+            // Fetch users by Lawyer IDs
+            var entities = await _unitOfWork.SubConsultingRepository
+                .FindAllAsync(u => SubConsultingIds.Contains(u.Id), include: q => q.Include(s => s.MainConsulting));
+
+            var dtos = new List<SubConsultingDTO>();
+
+            foreach (var entity in entities)
+            {
+                var dto = new SubConsultingDTO
+                {
+                    Id = entity.Id,
+                    Name = entity.Name,
+                    Description = entity.Description,
+                    MainConsultingId = entity.MainConsultingId,
+                    IconUrl = await _fileHandling.GetFile(entity.iconId),
+                    mainConsultingname = entity.MainConsulting.Name
+                };
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
         }
 
         // Get SubConsulting by ID

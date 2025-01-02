@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
+using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Helpers;
@@ -15,13 +16,15 @@ namespace Mohamy.Controllers.API
     {
         private readonly IConsultingService _consultingService;
         private readonly IAccountService _accountService;
+        private readonly IChatService _chatService;
 
         private ApplicationUser? CurrentUser;
 
-        public ConsultingController(IAccountService accountService, IConsultingService consultingService, IRequestConsultingService requestConsultingService)
+        public ConsultingController(IAccountService accountService, IConsultingService consultingService, IRequestConsultingService requestConsultingService, IChatService chatService)
         {
             _accountService = accountService;
             _consultingService = consultingService;
+            _chatService = chatService;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -291,6 +294,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Cancelled);
                 response.status = true;
+                response.Data = "تم الغاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -313,6 +317,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.InProgress);
                 response.status = true;
+                response.Data = "تم دفع الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -335,6 +340,7 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Completed);
                 response.status = true;
+                response.Data = "تم انتهاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
@@ -344,6 +350,84 @@ namespace Mohamy.Controllers.API
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpGet]
+        [Route("Files")]
+        public async Task<ActionResult<BaseResponse>> GetAllFiles([FromQuery] string senderId, [FromQuery] string receiverId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var Files =await _chatService.GetAllFiles(senderId, receiverId);
+                if (Files == null)
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Files not found.";
+                    return NotFound(response);
+                }
+
+                response.status = true;
+                response.Data = Files;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpGet]
+        [Route("Images")]
+        public async Task<ActionResult<BaseResponse>> GetAllImages([FromQuery] string senderId, [FromQuery] string receiverId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var Files = await _chatService.GetAllImages(senderId, receiverId);
+                if (Files == null)
+                {
+                    response.status = false;
+                    response.ErrorCode = 404;
+                    response.ErrorMessage = "Files not found.";
+                    return NotFound(response);
+                }
+
+                response.status = true;
+                response.Data = Files;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [HttpPost("SendMessage")]
+        public async Task<IActionResult> SendMessage([FromForm] ChatDTO chatDTO)
+        {
+            if (string.IsNullOrEmpty(chatDTO.SenderId) || string.IsNullOrEmpty(chatDTO.ReceiverId))
+                return BadRequest("SenderId and ReceiverId are required.");
+
+            try
+            {
+                var result = await _chatService.SendMessageAsync(chatDTO);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if a logging system is in place
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
         [Authorize(Policy = "Lawyer")]
@@ -464,6 +548,5 @@ namespace Mohamy.Controllers.API
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
-
     }
 }

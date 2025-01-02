@@ -16,14 +16,12 @@ using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
-using Microsoft.EntityFrameworkCore.Query;
-using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using System.Linq.Expressions;
 using System.IO;
 using Mohamy.Core.Entity.ConsultingData;
+using Mohamy.Core.DTO.CityViewModel;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -35,12 +33,13 @@ public class AccountService : IAccountService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileHandling _fileHandling;
     private readonly Jwt _jwt;
+    private readonly SmsSettings _smsSettings;
     private readonly IMemoryCache memoryCache;
     private readonly IMapper mapper;
 
     public AccountService(UserManager<ApplicationUser> userManager, IFileHandling photoHandling,
         RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork,
-        IOptions<Jwt> jwt, IMemoryCache _memoryCache, IMapper _mapper, SignInManager<ApplicationUser> signInManager)
+        IOptions<Jwt> jwt, IMemoryCache _memoryCache, IMapper _mapper, SignInManager<ApplicationUser> signInManager, IOptions<SmsSettings> smsSettings)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -50,6 +49,7 @@ public class AccountService : IAccountService
         memoryCache = _memoryCache;
         mapper = _mapper;
         _signInManager = signInManager;
+        _smsSettings = smsSettings.Value;
     }
     //------------------------------------------------------------------------------------------------------------
     public async Task<ApplicationUser> GetUserById(string id)
@@ -387,22 +387,86 @@ public class AccountService : IAccountService
 
     public async Task<bool> SendOTP(string customerPhoneNumber)
     {
-        var cacheEntryOptions = new MemoryCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), // Cache for 5 minutes
-            SlidingExpiration = TimeSpan.FromMinutes(2) // Reset cache if accessed within 2 minutes
-        };
+        // Generate a random OTP
         var OTP = RandomOTP(6);
-        memoryCache.Set(customerPhoneNumber, OTP, cacheEntryOptions);
-        return true;
+
+        // Store OTP in memory cache
+        memoryCache.Set(customerPhoneNumber, OTP);
+
+        // Prepare the API URL
+        var smsApiUrl = "https://www.dreams.sa/index.php/api/sendsms/";
+
+        // Prepare the parameters for the POST request
+        var smsParameters = new Dictionary<string, string>
+    {
+        { "user", _smsSettings.sender },
+        { "secret_key", _smsSettings.SecretKey },
+        { "to", customerPhoneNumber },
+        { "message", $"OTP :{OTP} \n محام | للاستشارات القانونية"
+         },
+        { "sender", "TASIA-IT" }
+    };
+
+        try
+        {
+            using (var httpClient = new HttpClient())
+            {
+                // Send the POST request to the SMS API
+                var smsContent = new FormUrlEncodedContent(smsParameters);
+                var smsResponse = await httpClient.PostAsync(smsApiUrl, smsContent);
+
+                if (smsResponse.IsSuccessStatusCode)
+                {
+                    var smsResponseContent = await smsResponse.Content.ReadAsStringAsync();
+                    if (smsResponseContent.Contains("-124"))
+                    {
+                        // Handle the response for failure cases based on the API response
+                        Console.WriteLine($"Failed to send SMS. Response: {smsResponseContent}");
+                    }
+                    else
+                    {
+                        return true; // SMS sent successfully
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"SMS Request Failed: {smsResponse.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+        }
+
+        return false; // Return false if SMS sending fails
     }
 
-    public async Task<bool> ValidateOTP(string customerPhoneNumber , string OTPV)
+    public async Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV)
     {
-        memoryCache.TryGetValue(customerPhoneNumber, out string OTP);
-        //if(OTP == null) return false;
-        //if(OTP != OTPV) return false;
-        return true;
+        try
+        {
+            return true;
+            // Check if the OTP exists in the memory cache
+            if (memoryCache.TryGetValue(customerPhoneNumber, out string cachedOTP))
+            {
+                // Compare the provided OTP with the cached OTP
+                if (cachedOTP == OTPV)
+                {
+                    // OTP is valid, remove it from the cache after successful validation
+                    memoryCache.Remove(customerPhoneNumber);
+                    return true;
+                }
+            }
+
+            // OTP is invalid or not found
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred during OTP validation: {ex.Message}");
+            return false;
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------
@@ -748,6 +812,12 @@ public class AccountService : IAccountService
         }
     }
 
+    public async Task<IEnumerable<CityDTO>> GetCitiesAsync()
+    {
+        var cities = await _unitOfWork.CityRepository.GetAllAsync();
+        return mapper.Map<IEnumerable<CityDTO>>(cities);
+    }
+
     private Expression<Func<T, bool>> CombineExpressions<T>(
     Expression<Func<T, bool>> expr1,
     Expression<Func<T, bool>> expr2)
@@ -785,7 +855,7 @@ public class AccountService : IAccountService
             _jwt.Issuer,
             _jwt.Audience,
             claims,
-            expires: DateTime.Now.AddDays(Convert.ToDouble(_jwt.DurationInDays)),
+            expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_jwt.DurationInDays)),
             signingCredentials: creds);
         return token;
     }

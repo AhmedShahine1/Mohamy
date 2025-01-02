@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mohamy.Core;
 
@@ -11,9 +12,11 @@ using Mohamy.Core;
 namespace Mohamy.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241225174658_CityTableAdded")]
+    partial class CityTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,9 +277,6 @@ namespace Mohamy.Core.Migrations
 
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationStatus")
-                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -554,9 +554,6 @@ namespace Mohamy.Core.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<bool>("NotKnow")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -578,9 +575,6 @@ namespace Mohamy.Core.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ConsultingId")
                         .HasColumnType("nvarchar(450)");
 
@@ -593,8 +587,6 @@ namespace Mohamy.Core.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("ConsultingId");
 
@@ -1028,10 +1020,6 @@ namespace Mohamy.Core.Migrations
 
             modelBuilder.Entity("Mohamy.Core.Entity.Files.Images", b =>
                 {
-                    b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Mohamy.Core.Entity.ConsultingData.Consulting", null)
                         .WithMany("Files")
                         .HasForeignKey("ConsultingId");
@@ -1137,8 +1125,6 @@ namespace Mohamy.Core.Migrations
 
             modelBuilder.Entity("Mohamy.Core.Entity.ApplicationData.ApplicationUser", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("EvaluationsReceived");
 
                     b.Navigation("Experiences");
