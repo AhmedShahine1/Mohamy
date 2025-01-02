@@ -10,7 +10,7 @@ using Mohamy.Core.Helpers;
 
 namespace Mohamy.Controllers.API
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Customer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ConsultingController : BaseController, IActionFilter
     {
         private readonly IConsultingService _consultingService;
@@ -47,7 +47,7 @@ namespace Mohamy.Controllers.API
         {
         }
 
-
+        [Authorize(Policy = "Customer")]
         [Route("AddConsulting")]
         [HttpPost]
         public async Task<ActionResult<BaseResponse>> AddConsulting([FromForm] ConsultingDTO dto)
@@ -81,6 +81,7 @@ namespace Mohamy.Controllers.API
             }
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllConsultingsCustomer")]
         public async Task<ActionResult<BaseResponse>> GetAllConsultingsCustomer()
@@ -104,6 +105,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllConsultingsInProgress")]
         public async Task<ActionResult<BaseResponse>> GetAllConsultingsInProgress()
@@ -127,6 +129,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllConsultingsCompleted")]
         public async Task<ActionResult<BaseResponse>> GetAllConsultingsCompleted()
@@ -150,6 +153,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllConsultingsCancelled")]
         public async Task<ActionResult<BaseResponse>> GetAllConsultingsCancelled()
@@ -173,6 +177,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllServicesInProgress")]
         public async Task<ActionResult<BaseResponse>> GetAllServicesInProgress()
@@ -196,6 +201,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllServicesCompleted")]
         public async Task<ActionResult<BaseResponse>> GetAllServicesCompleted()
@@ -219,6 +225,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetAllServices")]
         public async Task<ActionResult<BaseResponse>> GetAllServices()
@@ -242,6 +249,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetConsultingById")]
         public async Task<ActionResult<BaseResponse>> GetConsultingById([FromQuery]string id)
@@ -272,6 +280,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpPost]
         [Route("CancelConsulting")]
         public async Task<ActionResult<BaseResponse>> CancelConsulting([FromQuery] string id)
@@ -293,6 +302,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpPost]
         [Route("PaymentConsulting")]
         public async Task<ActionResult<BaseResponse>> PaymentConsulting([FromQuery] string id)
@@ -314,6 +324,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpPost]
         [Route("FinishConsulting")]
         public async Task<ActionResult<BaseResponse>> FinishConsulting([FromQuery] string id)
@@ -335,7 +346,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
-        //For Lawyers
+        [Authorize(Policy = "Lawyer")]
         [HttpGet]
         [Route("GetAvailableConsultations")]
         public async Task<ActionResult<BaseResponse>> GetAvailableConsultations()
@@ -345,6 +356,101 @@ namespace Mohamy.Controllers.API
             try
             {
                 var consultings = await _consultingService.GetAvailableConsultations();
+
+                response.status = true;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpPost]
+        [Route("AcceptConsultation")]
+        public async Task<ActionResult<BaseResponse>> AcceptConsultation([FromQuery] string id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                await _consultingService.AcceptConsultation(CurrentUser.Id, id);
+
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while accepting consultation: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet]
+        [Route("GetAvailableServices")]
+        public async Task<ActionResult<BaseResponse>> GetAvailableServices()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetAvailableServices();
+
+                response.status = true;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving services: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet]
+        [Route("GetLawyerConsultingsCompleted")]
+        public async Task<ActionResult<BaseResponse>> GetLawyerConsultingsCompleted()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetConsultingsCompleted(CurrentUser.Id, true);
+
+                response.status = true;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet]
+        [Route("GetLawyerConsultingsInProgress")]
+        public async Task<ActionResult<BaseResponse>> GetLawyerConsultingsInProgress()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetConsultingsInprogress(CurrentUser.Id, true);
 
                 response.status = true;
                 response.Data = consultings;

@@ -20,6 +20,7 @@ public interface IAccountService
     Task<IdentityResult> UpdateSupportDeveloper(string SupportDeveloperId, RegisterSupportDeveloper model);
     Task<IdentityResult> RegisterCustomer(RegisterCustomer model);
     Task<IdentityResult> UpdateCustomer(string adminId, UpdateCustomer model);
+    Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model);
     Task<IdentityResult> UpdatePasswordAsync(string userId, UpdatePassword updatePasswordModel);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> Login(LoginModel model);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model);

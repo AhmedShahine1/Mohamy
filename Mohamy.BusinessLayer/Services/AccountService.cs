@@ -191,6 +191,28 @@ public class AccountService : IAccountService
         return result;
     }
 
+    public async Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        await SetProfileImage(user, model.ImageProfile);
+        user.Description = model.Description;
+        user.PriceService = model.PriceService;
+        user.yearsExperience = model.YearsExperience;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
     public async Task<IdentityResult> RegisterAdmin(RegisterAdmin model)
     {
         if (await IsPhoneExistAsync(model.PhoneNumber))
@@ -343,7 +365,7 @@ public class AccountService : IAccountService
 
             // Proceed with login
             await _signInManager.SignInAsync(user, model.RememberMe);
-            var token = await GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user, true);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return (true, tokenString, null);
@@ -660,7 +682,7 @@ public class AccountService : IAccountService
 
             // Proceed with login
             await _signInManager.SignInAsync(user, model.RememberMe);
-            var token = await GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user, false);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return (true, tokenString, null);
@@ -742,7 +764,7 @@ public class AccountService : IAccountService
     //------------------------------------------------------------------------------------------------------------
     #region create and validate JWT token
 
-    private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user)
+    private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user, bool isCustomer)
     {
         var claims = new List<Claim>
             {
@@ -750,7 +772,7 @@ public class AccountService : IAccountService
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim("uid", user.Id),
                 new Claim("name", user.FullName),
-                new Claim(ClaimTypes.Role, "Customer"),
+                new Claim(ClaimTypes.Role, isCustomer ? "Customer":"Lawyer"),
                 new Claim("profileImage", await _fileHandling.GetFile(user.ProfileId)),
                 new Claim(ClaimTypes.MobilePhone, user.PhoneNumber)
             };
