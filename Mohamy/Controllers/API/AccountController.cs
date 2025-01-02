@@ -278,7 +278,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Failed to confirm phone number.",
+                    ErrorMessage = "الكود الذي ادخلته غير صحيح",
                 });
             }
             catch (ArgumentException ex)

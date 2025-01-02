@@ -72,7 +72,8 @@ namespace Mohamy.BusinessLayer.Services
                         Description = entity.Description,
                         MainConsultingId = entity.MainConsultingId,
                         IconUrl = await _fileHandling.GetFile(entity.iconId),
-                        mainConsultingname = entity.MainConsulting.Name
+                        mainConsultingname = entity.MainConsulting.Name,
+                        NotKnow = entity.NotKnow
                     };
 
                     dtos.Add(dto);

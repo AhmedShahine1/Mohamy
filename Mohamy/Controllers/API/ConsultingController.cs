@@ -50,7 +50,6 @@ namespace Mohamy.Controllers.API
         {
         }
 
-
         [Route("AddConsulting")]
         [HttpPost]
         public async Task<ActionResult<BaseResponse>> AddConsulting([FromForm] ConsultingDTO dto)

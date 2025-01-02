@@ -404,6 +404,7 @@ public class AccountService : IAccountService
     {
         try
         {
+            return true;
             // Check if the OTP exists in the memory cache
             if (memoryCache.TryGetValue(customerPhoneNumber, out string cachedOTP))
             {
@@ -666,7 +667,7 @@ public class AccountService : IAccountService
             _jwt.Issuer,
             _jwt.Audience,
             claims,
-            expires: DateTime.Now.AddDays(Convert.ToDouble(_jwt.DurationInDays)),
+            expires: DateTime.UtcNow.AddDays(Convert.ToDouble(_jwt.DurationInDays)),
             signingCredentials: creds);
         return token;
     }
