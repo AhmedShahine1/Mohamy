@@ -1,47 +1,36 @@
 ﻿@model IEnumerable<ConsultingDTO>
-
-<table id ="example1" class="table table-bordered table-striped">
+@{
+    ViewData["Title"] = "جميع الاستشارات الإدارية";
+}
+<table id ="example1" class="table">
     <thead>
-        <tr>
+        <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>رقم الطلب</th>
             <th>اسم العميل</th>
             <th>اسم المحامي</th>
             <th>وصف الاستشارة</th>
             <th>سعر الاستشارة</th>
             <th>حاله الاستشارة</th>
-            <th>التفاصيل</th>
-            <th>الرسايل</th>
+            <th>الإجراءات</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var consulting in Model)
         {
-            <tr>
+            <tr >
                 <td>@consulting.OrderNumber</td>
                 <td>@consulting.Customer?.FullName</td>
                 <td>@consulting.Lawyer?.FullName</td>
                 <td>@consulting.Description</td>
                 <td>@consulting.PriceService</td>
-                <td>@consulting.StatusConsulting</td>
                 <td>
-                    <a href="@Url.Action("ConsultingDetails", new { id = consulting.Id })" class="btn btn-info">التفاصيل</a>
+                    <p class="badge @(consulting.StatusConsultingEnum == statusConsulting.InProgress ? "text-bg-primary" : "text-bg-success")">@consulting.StatusConsulting</p>
                 </td>
-                @if (!string.IsNullOrEmpty(consulting.Lawyer?.PhoneNumber))
-                {
-                    <td>
-                        <form asp-area="Admin" asp-controller="Chat" asp-action="GetMessages" method="get">
-                            <input type="hidden" name="CustomerID" value="@consulting.Customer.Id" />
-                            <input type="hidden" name="LawyerID" value="@consulting.Lawyer.Id" />
-                        <button type="submit" class="btn btn-primary">الرسايل</button>
-                    </form>
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        لا توجد رسائل
-                    </td>
-                }
+                <td>
+                    <a href="@Url.Action("ConsultingDetails", new { id = consulting.Id })">
+                        <img src="~/asset/Hide.png" alt="icon" class="icon" />
+                    </a>
+                </td>
             </tr>
         }
     </tbody>

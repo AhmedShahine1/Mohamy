@@ -1,45 +1,60 @@
 ﻿@model IEnumerable<AuthDTO>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>الاسم الكامل</th>
-            <th>رقم الهاتف</th>
-            <th>الوصف</th>
-            <th>سنوات الخبرة</th>
-            <th>المدينة</th>
-            <th>التخصص الأكاديمي</th>
-            <th>التعليم</th>
-            <th>شهاده التخرج</th>
-            <th> رخصه المحاماه</th>
+@{
+    ViewData["Title"] = "إدارة كافة المحامين";
+}
+<table class="table">
+    <thead >
+        <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>صورة الملف الشخصي</th>
+            <th>الاسم الكامل</th>
+            <th>رقم التليفون</th>
+            <th>الوصف</th>
+            <th>سنوات من الخبرة</th>
+            <th>مدينة</th>
+            <th>التخصص الأكاديمي</th>
+            <th>تعليم</th>
             <th>عدد الاستشارات</th>
             <th>اسم البنك</th>
             <th>رقم الحساب</th>
             <th>اسم المستفيد</th>
-            <th>رقم الآيبان</th>
-            <th>أسماء الخبرات</th>
+            <th>رقم IBAN</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var user in Model)
+        @if (Model != null && Model.Any())
+        {
+            foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(user.ProfileImage))
+                        {
+                            <img src="@user.ProfileImage" alt="صورة الملف الشخصي" style="width: 50px; height: 50px; border-radius: 50px;" />
+                        }
+                        else
+                        {
+                            <span>---</span>
+                        }
+                    </td>
+                    <td>@(string.IsNullOrEmpty(user.FullName) ? "---" : user.FullName)</td>
+                    <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "---" : user.PhoneNumber)</td>
+                    <td>@(string.IsNullOrEmpty(user.Description) ? "---" : user.Description)</td>
+                    <td>@(user.yearsExperience.HasValue ? user.yearsExperience.Value.ToString() : "---")</td>
+                    <td>@(string.IsNullOrEmpty(user.City) ? "---" : user.City)</td>
+                    <td>@(string.IsNullOrEmpty(user.academicSpecialization) ? "---" : user.academicSpecialization)</td>
+                    <td>@(string.IsNullOrEmpty(user.Education) ? "---" : user.Education)</td>
+                    <td>@user.numberConsulting</td>
+                    <td>@(string.IsNullOrEmpty(user.BankName) ? "---" : user.BankName)</td>
+                    <td>@(string.IsNullOrEmpty(user.AccountNumber) ? "---" : user.AccountNumber)</td>
+                    <td>@(string.IsNullOrEmpty(user.BeneficiaryName) ? "---" : user.BeneficiaryName)</td>
+                    <td>@(string.IsNullOrEmpty(user.IBAN) ? "---" : user.IBAN)</td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@user.FullName</td>
-                <td>@user.PhoneNumber</td>
-                <td>@user.Description</td>
-                <td>@user.yearsExperience</td> <!-- Nullable field handling -->
-                <td>@user.City</td>
-                <td>@user.academicSpecialization</td>
-                <td>@user.Education</td>
-                <td>
-                    <img src="@user.ProfileImage" alt="صورة الملف الشخصي" style="width: 50px; height: 50px;" />
-                </td>
-                <td>@user.numberConsulting</td>
-                <td>@user.BankName</td>
-                <td>@user.AccountNumber</td>
-                <td>@user.BeneficiaryName</td>
-                <td>@user.IBAN</td>
+                <td colspan="15" class="text-center">لا توجد بيانات لعرضها</td>
             </tr>
         }
     </tbody>

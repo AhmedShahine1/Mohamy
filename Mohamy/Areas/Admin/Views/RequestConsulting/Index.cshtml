@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<RequestConsultingDTO>
-
-<table id="example1" class="table table-bordered table-striped">
+@{
+    ViewData["Title"] = "إدارة طلبات الاستشارة";
+}
+<table id="example1" class="table">
     <thead>
-        <tr>
+        <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>رقم الاستشارة</th>
             <th>اسم العميل</th>
             <th>اسم المحامي</th>
@@ -21,7 +23,9 @@
                 <td>
                     <form asp-action="CancelRequest" method="post">
                         <input type="hidden" name="requestId" value="@request.Id" />
-                        <button type="submit" class="btn btn-danger">الغاء الطلب</button>
+                        <button type="submit" style="    border: none;">
+                            <img src="~/asset/Delete.png" alt="icon" class="icon" />
+                        </button>
                     </form>
                 </td>
             </tr>

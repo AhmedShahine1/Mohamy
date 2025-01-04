@@ -1,18 +1,22 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
-
+﻿@import url("https://fonts.googleapis.com/css?family=Poppins:500,400,600");
 :root {
     --header-height: 3rem;
     --nav-width: 80px;
     --first-color: #4055a8;
+    --second-color: #06080fff;
     --first-color-light: #ffffff;
     --white-color: #ffffff;
-    --body-font: 'Zain', sans-serif;
-    --normal-font-size: 1rem;
+    --body-font: "Poppins", Helvetica;
+    --normal-font-size: 14px;
     --z-fixed: 100
 }
 
 * {
-    font-family: var(--body-font);
+    font-family: "Poppins", Helvetica;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: normal;
     direction: rtl;
     text-align: right;
 }
@@ -20,18 +24,50 @@
 *, ::before, ::after {
     box-sizing: border-box;
 }
-
+.hidden{
+    display:none;
+}
+.pagination {
+    --bs-pagination-padding-x: 0.75rem;
+    --bs-pagination-padding-y: 0.375rem;
+    --bs-pagination-font-size: 1rem;
+    --bs-pagination-color: #000000;
+    --bs-pagination-bg: var(--bs-body-bg);
+    --bs-pagination-border-width: var(--bs-border-width);
+    --bs-pagination-border-color: var(--bs-border-color);
+    --bs-pagination-border-radius: var(--bs-border-radius);
+    --bs-pagination-hover-color: var(--bs-link-hover-color);
+    --bs-pagination-hover-bg: var(--bs-tertiary-bg);
+    --bs-pagination-hover-border-color: var(--bs-border-color);
+    --bs-pagination-focus-color: var(--bs-link-hover-color);
+    --bs-pagination-focus-bg: var(--bs-secondary-bg);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    --bs-pagination-active-color: #fff;
+    --bs-pagination-active-bg: #4155a6ff;
+    --bs-pagination-active-border-color: #0d6efd;
+    --bs-pagination-disabled-color: var(--bs-secondary-color);
+    --bs-pagination-disabled-bg: var(--bs-secondary-bg);
+    --bs-pagination-disabled-border-color: var(--bs-border-color);
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+}
 body {
     position: relative;
     margin: var(--header-height) 0 0 0;
     padding: 0 1rem;
-    font-size: var(--normal-font-size);
     transition: .5s;
+    font-family: "Poppins", Helvetica;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: normal;
+    background-color: #f2f4ffff;
 }
 
     body::-webkit-scrollbar {
         width: 1px; /* Make sure the scrollbar width is visible */
-    }
+}
 
     body::-webkit-scrollbar-thumb {
         background-color: rgba(0, 0, 0, 0.2); /* Lighter color to ensure visibility */
@@ -40,6 +76,14 @@ body {
 
 a {
     text-decoration: none
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button .active {
+    background-color: #4155a6ff;
 }
 
 .header {
@@ -95,7 +139,7 @@ a {
     right: -30%;
     width: var(--nav-width);
     height: 100vh;
-    background-color: var(--first-color);
+    background: linear-gradient(to bottom, var(--first-color), var(--second-color));
     padding: .5rem 1rem 0 0;
     transition: .5s;
     z-index: var(--z-fixed);
@@ -142,6 +186,7 @@ a {
 }
 
 .nav_link {
+    padding-right: 1.5rem;
     position: relative;
     color: var(--first-color-light);
     margin-bottom: 1.5rem;
@@ -149,7 +194,7 @@ a {
 }
 
     .nav_link:hover {
-        color: var(--white-color)
+        background-color: #0D1121
     }
 
 .nav_icon {
@@ -203,7 +248,7 @@ a {
 
     .l-navbar {
         right: 0;
-        padding: 1rem 1rem 0 0
+        padding: 1rem .5rem 0 0
     }
 
     .show {
@@ -213,7 +258,9 @@ a {
     .body-pd {
         padding-right: calc(var(--nav-width) + 188px)
     }
-
+    .smallIcon {
+        width: 70px;
+    }
     .logo {
         width: 150px;
     }
@@ -255,7 +302,9 @@ a {
     .body-pd {
         padding-right: calc(var(--nav-width) + 10rem)
     }
-
+    .smallIcon {
+        width: 70px;
+    }
     .logo {
         width: 100px;
     }

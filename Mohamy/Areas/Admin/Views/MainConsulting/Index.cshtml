@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<MainConsultingDTO>
-
-<table id="example1" class="table table-bordered table-striped">
+@{
+    ViewData["Title"] = "جميع الاستشارات الرئيسية";
+}
+<table id="example1" class="table">
     <thead>
-        <tr>
+        <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>
                 Icon
             </th>
@@ -28,7 +30,7 @@
         {
             <tr>
                 <td>
-                    <img src="@item.IconUrl" />
+                    <img src="@item.IconUrl" style="height:50px; width:50px;"/>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
@@ -46,7 +48,9 @@
                 </td>
                 <td>
                     <form class="p-2" asp-action="Delete" asp-route-id="@item.Id">
-                        <input type="submit" value="حذف" class="btn btn-danger" />
+                        <button type="submit" style="    border: none;">
+                            <img src="~/asset/Delete.png" alt="icon" class="icon" />
+                        </button>
                     </form>
                 </td>
             </tr>
