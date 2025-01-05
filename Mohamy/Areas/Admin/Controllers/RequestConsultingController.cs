@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
+using Mohamy.Core.Helpers;
 
 namespace Mohamy.Areas.Admin.Controllers
 {
@@ -17,5 +18,13 @@ namespace Mohamy.Areas.Admin.Controllers
         {
             return View(await _requestConsultingService.GetAllRequestsAsync());
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelRequest(string requestId)
+        {
+            await _requestConsultingService.UpdateRequestStatusAsync(requestId, statusRequestConsulting.Cancel);
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

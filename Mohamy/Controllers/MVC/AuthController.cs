@@ -62,7 +62,7 @@ namespace Mohamy.Controllers.MVC
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("AllConsultings", "Manage", new { area = "Admin" });
                 }
             }
 

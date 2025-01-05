@@ -3,7 +3,8 @@
     Layout = "_RegisterLayout";
 }
 
-<form asp-action="Login" method="post" style="direction:rtl;">
+<form asp-action="Login" method="post" style="direction:rtl;     width: 70%;
+">
     <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
     <span class="text-danger">
         @Html.ValidationSummary(false, "", new { @class = "text-danger" })

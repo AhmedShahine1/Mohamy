@@ -72,8 +72,6 @@ namespace Mohamy.BusinessLayer.Services
             if (request == null)
                 throw new ArgumentException("Request not found");
 
-            if (request.statusRequestConsulting == statusRequestConsulting.Waiting)
-            {
                 request.statusRequestConsulting = newStatus;
 
                 if (newStatus == statusRequestConsulting.Approved)
@@ -98,9 +96,6 @@ namespace Mohamy.BusinessLayer.Services
                 {
                     throw new Exception("An error occurred while updating request status: " + ex.InnerException?.Message, ex);
                 }
-            }
-
-            return false;
         }
 
         public async Task<RequestConsultingDTO> AddRequestAsync(RequestConsultingDTO requestConsultingDTO)
