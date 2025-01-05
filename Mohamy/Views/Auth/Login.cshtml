@@ -9,41 +9,32 @@
         @Html.ValidationSummary(false, "", new { @class = "text-danger" })
     </span>
 
-    <div class="row mb-3">
-        <div class="col-10">
-            <div class="form-group">
-                <input asp-for="PhoneNumber" class="form-control" placeholder="رقم الهاتف" style="direction:rtl;" />
+    <div class="div-2">
+        <div class="div-3">
+            <div class="input-group flex-nowrap">
+                <span class="input-group-text" id="addon-wrapping">
+                    <img src="~/asset/Mail, Email, Letter.png" alt="Logo">
+                </span>
+                <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="رقم الهاتف" aria-label="رقم الهاتف" aria-describedby="addon-wrapping">
             </div>
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-10">
-            <div class="form-group">
-                <input asp-for="Password" class="form-control" placeholder="كلمه المرور" type="password" />
+            <div class="input-group flex-nowrap">
+                <span class="input-group-text" id="addon-wrapping">
+                    <img src="~/asset/Password.png" alt="Logo">
+                </span>
+                <input asp-for="Password" type="password" class="form-control" placeholder="كلمة المرور" aria-label="كلمة المرور" aria-describedby="addon-wrapping">
             </div>
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="row mb-3 align-items-center">
-        <div class="col-5">
-            <div class="icheck-primary">
-                <input asp-for="RememberMe" id="remember" />
-                <label for="remember">
-                    تذكرني
-                </label>
+            <div class="save-and-forgot">
+                <a asp-action="ForgotPassword" class="text-wrapper-4">هل نسيت كلمة السر؟</a>
+                <div class="icon-with-text">
+                    <label for="remember" class="text-wrapper-5">تذكرنى</label>
+                    <input asp-for="RememberMe" id="remember" type="checkbox" class="check-box" />
+                </div>
             </div>
-        </div>
-        <div class="col-5">
-            <button type="submit" class="btn btn-primary btn-block">تسجيل دخول</button>
+            <button type="submit" class="button">
+                <div class="state-layer">
+                    <div class="label-text">تسجيل الدخول</div>
+                </div>
+            </button>
         </div>
     </div>
 </form>
-
-<p class="mb-1 text-center">
-    <a asp-area="Lawyer" asp-controller="Lawyer" asp-action="Register" class="link-primary">
-        انشاء حساب
-    </a>
-</p>

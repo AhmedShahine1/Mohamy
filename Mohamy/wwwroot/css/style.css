@@ -1,68 +1,411 @@
-﻿* {
-    margin: 0;
-    padding: 0;
+﻿@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+@import url("https://fonts.googleapis.com/css?family=Almendra:700,400");
+
+* {
+    -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
-    font-family: "Zain", sans-serif;
 }
 
-body, html {
-    height: 100%;
-}
-
+html,
 body {
+    margin: 0px;
     height: 100%;
-    background-size: cover;
+}
+/* a blue color as a generic focus style */
+button:focus-visible {
+    outline: 2px solid #4a90e2 !important;
+    outline: -webkit-focus-ring-color auto 5px !important;
+}
+
+a {
+    text-decoration: none;
+}
+:root {
+    --primary-50: rgba(243, 245, 255, 1);
+    --primary-100: rgba(217, 221, 237, 1);
+    --primary-200: rgba(179, 187, 219, 1);
+    --primary-300: rgba(140, 153, 201, 1);
+    --primary-400: rgba(102, 119, 183, 1);
+    --primary-500: rgba(64, 85, 165, 1);
+    --primary-600: rgba(51, 68, 132, 1);
+    --primary-700: rgba(38, 51, 99, 1);
+    --primary-800: rgba(26, 34, 66, 1);
+    --primary-900: rgba(13, 17, 33, 1);
+    --grey-50: rgba(255, 255, 255, 1);
+    --grey-100: rgba(248, 248, 248, 1);
+    --grey-200: rgba(243, 243, 243, 1);
+    --grey-300: rgba(238, 238, 238, 1);
+    --grey-400: rgba(230, 230, 230, 1);
+    --grey-500: rgba(218, 218, 218, 1);
+    --grey-600: rgba(206, 206, 206, 1);
+    --grey-700: rgba(194, 194, 194, 1);
+    --grey-800: rgba(157, 157, 157, 1);
+    --grey-900: rgba(59, 59, 59, 1);
+    --body-color: rgba(93, 93, 93, 1);
+    --white-color-color: rgba(255, 255, 255, 1);
+    --spacing-0: 0px;
+}
+.login {
     display: flex;
-    justify-content: center;
+    max-height: 100vh;
     align-items: center;
+    position: relative;
+    background-color: #ffffff;
 }
 
-.containerstyle {
-    width: 100%; /* Set to 100% for full responsiveness */
-    max-width: 500px; /* Max width for larger screens */
-    background-color: white;
-    padding: 20px; /* Add padding for mobile devices */
-    margin: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-radius: 20px;
-}
-
-.logo img {
-    width: 150px;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-
-.center-text {
-    text-align: center;
-    font-size: 18px;
-    color: black;
-    word-wrap: break-word;
-    padding: 0 20px;
-    margin: 0 auto;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .containerstyle {
-        width: 90%; /* Adjust container width for tablets/smaller screens */
+    .login .image {
+        position: relative;
+        align-self: stretch;
+        width: 1024px;
+        border-radius: 24px;
+        overflow: hidden;
+        background-image: url(https://c.animaapp.com/4lOezKfM/img/image.png);
+        background-size: cover;
+        background-position: 50% 50%;
     }
 
-    .center-text {
-        font-size: 16px; /* Decrease font size slightly for smaller screens */
-    }
-}
-
-@media (max-width: 576px) {
-    .containerstyle {
-        width: 95%; /* Full width for mobile phones */
-        padding: 10px; /* Reduce padding for mobile devices */
+    .login .overlap {
+        position: relative;
+        height: 992px;
+        background-image: url(https://c.animaapp.com/4lOezKfM/img/bg.svg);
+        background-size: 100% 100%;
     }
 
-    .center-text {
-        font-size: 14px; /* Further decrease font size for mobile */
+    .login .img {
+        position: absolute;
+        width: 1024px;
+        height: 992px;
+        top: 0;
+        left: 0;
     }
-}
+    .login .text {
+        position: absolute;
+        width: 320px;
+        height: 194px;
+        top: 7px;
+        left: 354px;
+    }
+
+    .login .overlap-group {
+        position: relative;
+        width: 316px;
+        height: 194px;
+    }
+
+    .login .text-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        filter: blur(40px);
+        font-family: "Almendra", Helvetica;
+        font-weight: 700;
+        color: #5377ff;
+        font-size: 150px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-family: "Almendra", Helvetica;
+        font-weight: 700;
+        color: #d9d9d9;
+        font-size: 150px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .right-side-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 79px;
+        position: relative;
+        flex: 1;
+        align-self: stretch;
+        flex-grow: 1;
+        background-color: var(--white-color-color);
+        border-radius: 24px;
+    }
+
+    .login .signin-with-other {
+        display: flex;
+        flex-direction: column;
+        width: 565px;
+        align-items: center;
+        gap: 32px;
+        position: relative;
+        margin-left: -78.5px;
+        margin-right: -78.5px;
+    }
+
+    .login .logo {
+        position: relative;
+        width: 263.9px;
+        height: 78px;
+        object-fit: cover;
+    }
+
+    .login .sigin-in-with-other {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 32px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .title-with {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .text-wrapper-2 {
+        position: relative;
+        align-self: stretch;
+        margin-top: -1px;
+        font-family: "Almendra", Helvetica;
+        font-weight: 700;
+        color: #1f2a37;
+        font-size: 36px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: 44px;
+        direction: rtl;
+    }
+
+    .login .p {
+        position: relative;
+        align-self: stretch;
+        font-family: "Almendra", Helvetica;
+        font-weight: 400;
+        color: var(--body-color);
+        font-size: 16px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: 24px;
+        direction: rtl;
+    }
+
+    .login .div-2 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .div-3 {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .input {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 4px;
+        padding: 20px 16px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+        background-color: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid;
+        border-color: #d1d5db;
+    }
+
+    .login .content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .text-wrapper-3 {
+        position: relative;
+        width: fit-content;
+        font-family: "Almendra", Helvetica;
+        font-weight: 400;
+        color: var(--grey-900);
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .emails-mail-email {
+        position: relative;
+        width: 20px;
+        height: 20px;
+    }
+
+    .login .group {
+        position: relative;
+        height: 20px;
+    }
+
+    .login .group-2 {
+        position: absolute;
+        width: 16px;
+        height: 17px;
+        top: 2px;
+        left: 2px;
+    }
+
+    .login .save-and-forgot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .login .text-wrapper-4 {
+        position: relative;
+        width: fit-content;
+        margin-top: -1px;
+        font-family: "Almendra", Helvetica;
+        font-weight: 400;
+        color: var(--grey-900);
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .icon-with-text {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        flex: 0 0 auto;
+    }
+
+    .login .text-wrapper-5 {
+        position: relative;
+        width: fit-content;
+        margin-top: -1px;
+        font-family: "Almendra", Helvetica;
+        font-weight: 700;
+        color: var(--grey-900);
+        font-size: 14px;
+        text-align: left;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .check-box {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        background-color: #4055a5;
+        border-radius: 4px;
+    }
+
+    .login .vector {
+        position: absolute;
+        width: 9px;
+        height: 7px;
+        top: 6px;
+        left: 4px;
+    }
+
+    .login .button {
+        all: unset;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 0px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+        flex: 0 0 auto;
+        background-color: #4055a5;
+        border-radius: 100px;
+        overflow: hidden;
+    }
+
+    .login .state-layer {
+        display: flex;
+        height: 48px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0px 24px;
+        position: relative;
+        align-self: stretch;
+        width: 100%;
+    }
+
+    .login .label-text {
+        position: relative;
+        width: fit-content;
+        font-family: "Almendra", Helvetica;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 16px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: 24px;
+        white-space: nowrap;
+        direction: rtl;
+    }
+
+    .login .div-4 {
+        position: relative;
+        align-self: stretch;
+        font-family: "Almendra", Helvetica;
+        font-weight: 400;
+        color: transparent;
+        font-size: 16px;
+        text-align: center;
+        letter-spacing: 0;
+        line-height: normal;
+        direction: rtl;
+    }
+
+    .login .span {
+        color: #5c5c5c;
+    }
+
+    .login .text-wrapper-6 {
+        font-weight: 700;
+        color: #2c2c2c;
+    }
