@@ -732,6 +732,356 @@ namespace Mohamy.Controllers.API
                 });
             }
         }
+
+        [HttpPost("UpdateLawyer")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerName([FromBody] UpdateLawyer model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyer(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyer")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerPhone([FromBody] UpdateLawyer model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyer(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerPhone")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerPhone([FromBody] UpdatePhone model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerPhone(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerBank")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerBank([FromBody] UpdateBank model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerBank(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerPrice")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerPrice([FromBody] UpdatePrice model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerPrice(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerSpecialities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerSpecialities([FromBody] UpdateSpecialities model)
+        {
+            if (model.subConsultingId.Count == 0)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerSpecialities(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Specialities updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Specialities update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+
         [HttpGet("GetCities")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetCities()

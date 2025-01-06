@@ -22,6 +22,7 @@ using System.Linq.Expressions;
 using System.IO;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.DTO.CityViewModel;
+using Microsoft.CodeAnalysis;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -207,7 +208,122 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyer(string lawyerId, UpdateLawyer model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        if (!await _userManager.CheckPasswordAsync(user, model.Password))
+            throw new ArgumentException("Invalid Password");
+
+        user.FullName = model.FullName;
+        user.Email = model.Email;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerPhone(string lawyerId, UpdatePhone model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        if (await IsPhoneExistAsync(model.PhoneNumber, null, true))
+            throw new ArgumentException("Phone number already exists.");
+
+        user.PhoneNumber = model.PhoneNumber;
+        user.UserName = $"{model.PhoneNumber}_lawyer";
+        user.NormalizedUserName = user.UserName.ToUpper();
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerPrice(string lawyerId, UpdatePrice model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        user.PriceService = model.PriceService;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerSpecialities(string lawyerId, UpdateSpecialities model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        var oldSpecialities = await _unitOfWork.SpecialtiesRepository.FindAllAsync(s => s.LawyerId == lawyerId);
+
+        // Delete old specialities
+        if (oldSpecialities != null && oldSpecialities.Any())
+        {
+            _unitOfWork.SpecialtiesRepository.DeleteRange(oldSpecialities);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        if (model.subConsultingId != null && model.subConsultingId.Any())
+        {
+            var newSpecialities = model.subConsultingId.Select(id => new Specialties
+            {
+                LawyerId = lawyerId,
+                subConsultingId = id
+            }).ToList();
+
+            await _unitOfWork.SpecialtiesRepository.AddRangeAsync(newSpecialities);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        // Return successful result
+        return IdentityResult.Success;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerBank(string lawyerId, UpdateBank model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        user.BankName = model.BankName;
+        user.BeneficiaryName = model.BeneficiaryName;
+        user.AccountNumber = model.AccountNumber;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
