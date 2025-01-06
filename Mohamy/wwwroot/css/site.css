@@ -194,6 +194,8 @@ a {
 }
 
     .nav_link:hover {
+        margin-left: 5px;
+        border-radius: 10px;
         background-color: #0D1121
     }
 

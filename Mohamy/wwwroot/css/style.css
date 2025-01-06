@@ -60,7 +60,7 @@ a {
         width: 50vw;
         border-radius: 24px;
         overflow: hidden;
-        background-image: url(~/asset/Image.png);
+        background-image: url(/asset/Image.png);
         background-size: cover;
         background-position: 50% 50%;
     }
