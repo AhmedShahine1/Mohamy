@@ -36,6 +36,7 @@ public static class ApplicationServicesExtensions
         services.AddTransient<IFileHandling, FileHandling>();
         services.AddTransient<IChatService, ChatService>();
         services.AddTransient<INotificationService, NotificationService>();
+        services.AddTransient<ICommunicationService, CommunicationSerivce>();
         services.AddSignalR();
         services.AddHttpClient();
         services.AddAutoMapper(typeof(MappingProfile));

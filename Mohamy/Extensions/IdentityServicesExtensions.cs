@@ -6,6 +6,7 @@ using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Agora;
 
 namespace Mohamy.Extensions;
 
@@ -26,6 +27,7 @@ public static class IdentityServicesExtensions
         .AddDefaultTokenProviders();
         services.Configure<Jwt>(config.GetSection("JWT"));
         services.Configure<SmsSettings>(config.GetSection("SmsSettings"));
+        services.Configure<AgoraConfigurations>(config.GetSection("Agora"));
 
         services.AddAuthentication()
             .AddJwtBearer(options =>
