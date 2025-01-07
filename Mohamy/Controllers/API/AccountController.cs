@@ -735,65 +735,7 @@ namespace Mohamy.Controllers.API
 
         [HttpPost("UpdateLawyer")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
-        public async Task<IActionResult> UpdateLawyerName([FromBody] UpdateLawyer model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
-                });
-            }
-
-            try
-            {
-                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
-                var lawyer = await _accountService.GetUserFromToken(token);
-                var result = await _accountService.UpdateLawyer(lawyer.Id, model);
-
-                if (result.Succeeded)
-                {
-                    return Ok(new BaseResponse
-                    {
-                        status = true,
-                        Data = "Lawyer updated successfully"
-                    });
-                }
-
-                return BadRequest(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
-                    Data = result.Errors.Select(e => e.Description).ToArray()
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 404,
-                    ErrorMessage = ex.Message
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
-                    Data = ex.Message
-                });
-            }
-        }
-
-        [HttpPost("UpdateLawyer")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
-        public async Task<IActionResult> UpdateLawyerPhone([FromBody] UpdateLawyer model)
+        public async Task<IActionResult> UpdateLawyer([FromBody] UpdateLawyer model)
         {
             if (!ModelState.IsValid)
             {
