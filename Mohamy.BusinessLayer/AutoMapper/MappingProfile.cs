@@ -156,6 +156,7 @@ namespace Mohamy.BusinessLayer.AutoMapper
            .ForMember(dest => dest.GraduationCertificates, opt => opt.MapFrom(src => src.graduationCertificates))
            .ForMember(dest => dest.Specialties, opt => opt.MapFrom(src => src.Specialties))
            .ForMember(dest => dest.Experiences, opt => opt.MapFrom(src => src.Experiences))
+           .ForMember(dest => dest.PriceService, opt => opt.MapFrom(src => src.PriceService))
            .ReverseMap();
             //--------------------------------------------------------------------------------------------------------
             CreateMap<graduationCertificate, GraduationCertificateDTO>();

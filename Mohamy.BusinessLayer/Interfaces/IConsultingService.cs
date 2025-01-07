@@ -21,5 +21,6 @@ namespace Mohamy.BusinessLayer.Interfaces
         public Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations();
         public Task AcceptConsultation(string lawyerId, string consultationId);
         public Task<IEnumerable<ConsultingDTO>> GetAvailableServices();
+        Task<IEnumerable<ConsultingDTO>> GetRequestConsultings(string lawyerId, statusConsulting status);
     }
 }

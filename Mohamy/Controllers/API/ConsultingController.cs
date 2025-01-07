@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mohamy.BusinessLayer.Interfaces;
+using Mohamy.BusinessLayer.Services;
 using Mohamy.Core.DTO;
 using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
@@ -547,6 +548,52 @@ namespace Mohamy.Controllers.API
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet("GetInProgressRequestConsultings")]
+        public async Task<ActionResult<BaseResponse>> GetInProgressRequestConsultings()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetRequestConsultings(CurrentUser.Id, statusConsulting.InProgress);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet("GetCompletedRequestConsultings")]
+        public async Task<ActionResult<BaseResponse>> GetCompletedRequestConsultings()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetRequestConsultings(CurrentUser.Id, statusConsulting.Completed);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
         }
     }
 }

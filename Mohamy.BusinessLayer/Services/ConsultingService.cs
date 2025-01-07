@@ -697,6 +697,57 @@ namespace Mohamy.BusinessLayer.Services
             return consultingDTOs.ToList();
         }
 
+        public async Task<IEnumerable<ConsultingDTO>> GetRequestConsultings(string lawyerId, statusConsulting status)
+        {
+            IEnumerable<Consulting> consultings = new List<Consulting>();
+
+            // Retrieve consultings and related data from the database first
+            consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                a => a.LawyerId == lawyerId &&
+                a.statusConsulting == status &&
+                a.RequestConsultings.Any(rc => rc.LawyerId == lawyerId && rc.statusRequestConsulting == statusRequestConsulting.Approved),
+            include: q => q
+                .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                .Include(c => c.Lawyer)
+                .Include(c => c.Customer)
+                .Include(c => c.Files)
+            );
+
+
+
+            // Map consulting entities to DTOs
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+
+            // After completing all database operations, fetch profile images asynchronously
+            foreach (var consulting in consultingDTOs)
+            {
+                if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
+                {
+                    consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);
+                }
+
+                if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
+                {
+                    consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
+                }
+
+                consulting.SubConsultingName = _unitOfWork.SubConsultingRepository.GetByIdAsync(consulting.SubConsultingId).Result.Name;
+                consulting.FilesUrl = new List<string>();
+                foreach (var consulting1 in consultings.ToList())
+                {
+                    if (consulting1.Id == consulting.Id)
+                    {
+                        foreach (var file in consulting1.Files)
+                        {
+                            consulting.FilesUrl.Add(await _fileHandling.GetFile(file.Id));
+                        }
+                    }
+                }
+            }
+
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber);
+        }
+
 
     }
 

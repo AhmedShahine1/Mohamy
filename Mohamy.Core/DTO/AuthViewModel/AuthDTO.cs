@@ -19,6 +19,7 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string ProfileImage { get; set; }
         public string ProfileImageId { get; set; }
         public LawyerRegistrationStatus RegistrationStatus { get; set; }
+        public double? PriceService { get; set; }
         // Lawyer license details
         public string lawyerLicenseId { get; set; }
         public string lawyerLicenseNumber { get; set; }

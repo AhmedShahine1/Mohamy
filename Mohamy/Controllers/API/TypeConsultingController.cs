@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
 
 namespace Mohamy.Controllers.API
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Customer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TypeConsultingController : BaseController
     {
         private readonly IMainConsultingService _mainConsultingService;
@@ -20,7 +19,9 @@ namespace Mohamy.Controllers.API
             _subConsultingService = subConsultingService;
             _accountService = accountService;
         }
+
         // GET: api/Consulting/MainConsultings
+        [Authorize(Policy = "Customer")]
         [HttpGet("MainConsultings")]
         public async Task<ActionResult<BaseResponse>> GetAllMainConsultings()
         {
@@ -43,6 +44,7 @@ namespace Mohamy.Controllers.API
         }
 
         // GET: api/Consulting/MainConsultings
+        [Authorize(Policy = "Customer")]
         [HttpGet("MainConsultingsById")]
         public async Task<ActionResult<BaseResponse>> GetMainConsultingsID([FromQuery]string MainConsultingId)
         {
@@ -86,7 +88,9 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet("subconsulting")]
+
         public async Task<ActionResult<BaseResponse>> GetUsersBySubConsulting([FromQuery] string subConsultingId)
         {
             var response = new BaseResponse();
@@ -139,6 +143,7 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
+        [Authorize(Policy = "Customer")]
         [HttpGet("subconsultingUser")]
         public async Task<ActionResult<BaseResponse>> GetSubConsultingByUser([FromQuery] string UserId)
         {
