@@ -135,6 +135,7 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ForMember(dest => dest.StatusConsultingEnum, opt => opt.MapFrom(src => src.statusConsulting))
                 .ForMember(dest => dest.LaywerId, opt => opt.MapFrom(src => src.LawyerId))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+                .ForMember(dest => dest.MainConsultingName, opt => opt.MapFrom(src => src.subConsulting.MainConsulting.Name))
                 .ReverseMap();
 
             //--------------------------------------------------------------------------------------------------------

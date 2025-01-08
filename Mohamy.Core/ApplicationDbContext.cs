@@ -36,6 +36,7 @@ namespace Mohamy.Core
         //----------------------------------------------------------------------------------
         public virtual DbSet<Consulting> Consultings { get; set; }
         public virtual DbSet<RequestConsulting> RequestConsultings { get; set; }
+        public virtual DbSet<IgnoredConsultation> IgnoredConsultations { get; set; }
         //----------------------------------------------------------------------------------
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Chat> Chats { get; set; }
@@ -93,6 +94,13 @@ namespace Mohamy.Core
                 .HasOne(s => s.subConsulting)
                 .WithMany()
                 .HasForeignKey(s => s.subConsultingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Specialties to SubConsulting relationship
+            modelBuilder.Entity<IgnoredConsultation>()
+                .HasOne(s => s.consulting)
+                .WithMany()
+                .HasForeignKey(s => s.consultingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // LawyerLicense to ApplicationUser relationship

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Azure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -8,6 +9,7 @@ using Mohamy.Core.DTO;
 using Mohamy.Core.DTO.ChatViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ApplicationData;
+using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Helpers;
 
 namespace Mohamy.Controllers.API
@@ -440,7 +442,7 @@ namespace Mohamy.Controllers.API
 
             try
             {
-                var consultings = await _consultingService.GetAvailableConsultations();
+                var consultings = await _consultingService.GetAvailableConsultations(CurrentUser.Id);
 
                 response.status = true;
                 response.Data = consultings;
@@ -595,5 +597,29 @@ namespace Mohamy.Controllers.API
 
             return StatusCode(response.ErrorCode, response);
         }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpPost("Ignore")]
+        public async Task<IActionResult> IgnoreConsultationAsync([FromQuery] string consultingId)
+        {
+            var response = new BaseResponse();
+            try
+            {
+                await _consultingService.IgnoreConsultationAsync(CurrentUser.Id, consultingId);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = "Consulting ignored successfully";
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while ignoring consulting: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
+        }
+
+
     }
 }

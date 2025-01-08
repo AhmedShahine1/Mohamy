@@ -23,6 +23,7 @@ using System.IO;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.DTO.CityViewModel;
 using Microsoft.CodeAnalysis;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -830,6 +831,15 @@ public class AccountService : IAccountService
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, "Lawyer");
+
+            lawyerLicense license = new lawyerLicense()
+            {
+                LicenseNumber = model.LicenseNumber,
+                LawyerId = user.Id,
+                State = model.City
+            };
+            _unitOfWork.lawyerLicenseRepository.Add(license);
+            await _unitOfWork.SaveChangesAsync();
         }
         else
         {

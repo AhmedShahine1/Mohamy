@@ -113,6 +113,21 @@ namespace Mohamy.Controllers.API
                 }
 
                 var authDto = _mapper.Map<AuthDTO>(customer);
+                var specialties = await _accountService.GetAllSpecialtiesAsync(authDto.Id);
+                authDto.Specialties = specialties.Select(s => new SpecialtiesDTO
+                {
+                    Id = s.subConsultingId,
+                    subConsultingName = s.subConsulting.Name
+                }).ToList();
+
+                var licenses = await _accountService.GetAllLawyerLicensesAsync(authDto.Id);
+                if (licenses.Any())
+                {
+                    var primaryLicense = licenses.FirstOrDefault();
+                    authDto.lawyerLicenseId = primaryLicense.Id;
+                    authDto.lawyerLicenseNumber = primaryLicense.LicenseNumber;
+                }
+
                 authDto.ProfileImage = await _accountService.GetUserProfileImage(customer.ProfileId);
                 return Ok(new BaseResponse
                 {

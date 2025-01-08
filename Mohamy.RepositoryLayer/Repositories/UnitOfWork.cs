@@ -36,6 +36,7 @@ public class UnitOfWork : IUnitOfWork
     public IBaseRepository<graduationCertificate> graduationCertificateRepository { get; set; }
     public IBaseRepository<Experience> ExperienceRepository { get; set; }
     public IBaseRepository<Specialties> SpecialtiesRepository { get; set; }
+    public IBaseRepository<IgnoredConsultation> IgnoredConsultationsRepository { get; set; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -58,6 +59,7 @@ public class UnitOfWork : IUnitOfWork
         lawyerLicenseRepository = new BaseRepository<lawyerLicense>(context);
         graduationCertificateRepository = new BaseRepository<graduationCertificate>(context);
         SpecialtiesRepository = new BaseRepository<Specialties>(context);
+        IgnoredConsultationsRepository = new BaseRepository<IgnoredConsultation>(context);
     }
 
     public int SaveChanges()

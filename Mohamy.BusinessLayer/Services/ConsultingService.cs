@@ -628,17 +628,23 @@ namespace Mohamy.BusinessLayer.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations()
+        public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations(string lawyerId)
         {
+            List<string> ignoredConsultationIds = (await _unitOfWork.IgnoredConsultationsRepository
+                .FindAllAsync(i => i.LawyerId == lawyerId))
+                .Select(i => i.consultingId)
+                .ToList();
+
+
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                c => c.LawyerId == null && !c.IsDeleted && !c.subConsulting.MainConsulting.service && c.LawyerId == null && c.statusConsulting == statusConsulting.UserRequestedNotPaid,
+                c => c.LawyerId == null && !c.IsDeleted && !c.subConsulting.MainConsulting.service && c.LawyerId == null && c.statusConsulting == statusConsulting.UserRequestedNotPaid && !ignoredConsultationIds.Contains(c.Id),
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Customer)
                     .Include(c => c.Files)
             );
 
-            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings.Where(c => c.statusConsulting != statusConsulting.Cancelled));
+            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -677,12 +683,13 @@ namespace Mohamy.BusinessLayer.Services
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
                 c => c.LawyerId == null && !c.IsDeleted && c.subConsulting.MainConsulting.service && c.LawyerId == null && c.statusConsulting == statusConsulting.UserRequestedNotPaid,
                 include: q => q
-                    .Include(c => c.subConsulting)
+                    .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                     .Include(c => c.Customer)
                     .Include(c => c.Files)
             );
 
-            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings.Where(c => c.statusConsulting != statusConsulting.Cancelled));
+            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
+
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -746,6 +753,18 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             return consultingDTOs.OrderByDescending(q => q.OrderNumber);
+        }
+
+        public async Task IgnoreConsultationAsync(string lawyerId, string consultingId)
+        {
+            var ignored = new IgnoredConsultation
+            {
+                LawyerId = lawyerId,
+                consultingId = consultingId,
+            };
+
+            await _unitOfWork.IgnoredConsultationsRepository.AddAsync(ignored);
+            await _unitOfWork.SaveChangesAsync();
         }
 
 

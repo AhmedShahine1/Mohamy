@@ -17,6 +17,7 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
         public string Description { get; set; }
         public decimal PriceService { get; set; }
         public string? SubConsultingName { get; set; }
+        public string? MainConsultingName { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? StartDate { get; set; }
         public ICollection<RequestConsultingDTO>? RequestConsultings { get; set; }
