@@ -647,6 +647,12 @@ namespace Mohamy.BusinessLayer.Services
 
             var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
 
+            var allFiles = consultings
+            .SelectMany(c => c.Files.Select(file => file.Id))
+            .ToList();
+
+            var fileUrls = await _fileHandling.GetAllFiles(allFiles);
+
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
@@ -654,6 +660,13 @@ namespace Mohamy.BusinessLayer.Services
                 {
                     consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
                 }
+
+                var matchingConsulting = consultings.FirstOrDefault(c => c.Id == consulting.Id);
+
+                consulting.FilesUrl = matchingConsulting?
+                    .Files.Select(file => fileUrls.TryGetValue(file.Id, out var fileUrl) ? fileUrl : null)
+                    .ToList() ?? new List<string>();
+
             }
 
 
@@ -692,6 +705,12 @@ namespace Mohamy.BusinessLayer.Services
             var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
 
 
+            var allFiles = consultings
+            .SelectMany(c => c.Files.Select(file => file.Id))
+            .ToList();
+
+            var fileUrls = await _fileHandling.GetAllFiles(allFiles);
+
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
@@ -699,6 +718,12 @@ namespace Mohamy.BusinessLayer.Services
                 {
                     consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
                 }
+
+                var matchingConsulting = consultings.FirstOrDefault(c => c.Id == consulting.Id);
+
+                consulting.FilesUrl = matchingConsulting?
+                    .Files.Select(file => fileUrls.TryGetValue(file.Id, out var fileUrl) ? fileUrl : null)
+                    .ToList() ?? new List<string>();
             }
 
 

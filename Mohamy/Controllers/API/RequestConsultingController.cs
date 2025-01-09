@@ -121,7 +121,7 @@ namespace Mohamy.Controllers.API
         }
 
         [Authorize(Policy = "Customer")]
-        [HttpPost("negotiate")]
+        [HttpPost("Negotiate")]
         public async Task<ActionResult<BaseResponse>> NegotiateRequestStatus([FromQuery] string requestId)
         {
             var response = new BaseResponse();
