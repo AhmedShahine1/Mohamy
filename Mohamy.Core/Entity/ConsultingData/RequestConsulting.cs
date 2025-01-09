@@ -23,6 +23,9 @@ namespace Mohamy.Core.Entity.ConsultingData
         [Column(TypeName = "decimal(18,2)")]
         public decimal PriceService { get; set; }
 
+        [Required(ErrorMessage = "يجب إدخال الوصف")]
+        public string Description { get; set; }
+
         public statusRequestConsulting statusRequestConsulting { get; set; } = statusRequestConsulting.Waiting;
     }
 }

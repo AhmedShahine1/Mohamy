@@ -121,6 +121,33 @@ namespace Mohamy.Controllers.API
         }
 
         [Authorize(Policy = "Customer")]
+        [HttpPost("negotiate")]
+        public async Task<ActionResult<BaseResponse>> NegotiateRequestStatus([FromQuery] string requestId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var success = await _requestConsultingService.UpdateRequestStatusAsync(requestId, statusRequestConsulting.Negotiating);
+                response.status = success;
+
+                if (!success)
+                {
+                    response.ErrorCode = 400;
+                    response.ErrorMessage = "Unable to update the status for the request.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Customer")]
         [HttpPost("Rejected")]
         public async Task<ActionResult<BaseResponse>> RejectedRequestStatus([FromQuery] string requestId)
         {

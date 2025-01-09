@@ -5,6 +5,7 @@ using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Files;
+using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Helpers;
 using Mohamy.RepositoryLayer.Interfaces;
 
@@ -728,6 +729,72 @@ namespace Mohamy.BusinessLayer.Services
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
             {
+                if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
+                {
+                    consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);
+                }
+
+                if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
+                {
+                    consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
+                }
+
+                consulting.SubConsultingName = _unitOfWork.SubConsultingRepository.GetByIdAsync(consulting.SubConsultingId).Result.Name;
+                consulting.FilesUrl = new List<string>();
+                foreach (var consulting1 in consultings.ToList())
+                {
+                    if (consulting1.Id == consulting.Id)
+                    {
+                        foreach (var file in consulting1.Files)
+                        {
+                            consulting.FilesUrl.Add(await _fileHandling.GetFile(file.Id));
+                        }
+                    }
+                }
+            }
+
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber);
+        }
+
+        public async Task<IEnumerable<ConsultingDTO>> GetOfferedRequestConsultingsAsync(string lawyerId, statusRequestConsulting requestStatus)
+        {
+            IEnumerable<Consulting> consultings = new List<Consulting>();
+
+            // Retrieve consultings and related data from the database first
+            consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                a => a.LawyerId == null &&
+                a.statusConsulting == statusConsulting.UserRequestedNotPaid &&
+                a.RequestConsultings.Any(rc => rc.LawyerId == lawyerId && rc.statusRequestConsulting == requestStatus),
+            include: q => q
+                .Include(c => c.RequestConsultings)
+                .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                .Include(c => c.Lawyer)
+                .Include(c => c.Customer)
+                .Include(c => c.Files)
+            );
+
+
+
+            // Map consulting entities to DTOs
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+
+            // After completing all database operations, fetch profile images asynchronously
+            foreach (var consulting in consultingDTOs)
+            {
+                var lawyerRequests = consulting.RequestConsultings?.Where(c => c.LawyerId == lawyerId).ToList();
+                if (lawyerRequests.Any()) {
+                    var lawyerRequest = lawyerRequests.FirstOrDefault();
+                    consulting.RequestConsultings = new List<RequestConsultingDTO>
+                    {
+                        new RequestConsultingDTO
+                        {
+                            Id = lawyerRequest.Id,
+                            Description = lawyerRequest.Description,
+                            PriceService = lawyerRequest.PriceService
+                        }
+                    };
+                }
+
                 if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
                 {
                     consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);

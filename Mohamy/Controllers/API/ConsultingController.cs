@@ -332,7 +332,6 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
-        [Authorize(Policy = "Customer")]
         [HttpPost]
         [Route("FinishConsulting")]
         public async Task<ActionResult<BaseResponse>> FinishConsulting([FromQuery] string id)
@@ -561,6 +560,52 @@ namespace Mohamy.Controllers.API
             try
             {
                 var consultings = await _consultingService.GetRequestConsultings(CurrentUser.Id, statusConsulting.InProgress);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet("GetInNegotiationRequestConsultings")]
+        public async Task<ActionResult<BaseResponse>> GetInNegotiationRequestConsultings()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetOfferedRequestConsultingsAsync(CurrentUser.Id, statusRequestConsulting.Negotiating);
+                response.status = true;
+                response.ErrorCode = 200;
+                response.Data = consultings;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+            }
+
+            return StatusCode(response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Lawyer")]
+        [HttpGet("GetInWaitingRequestConsultings")]
+        public async Task<ActionResult<BaseResponse>> GetInWaitingRequestConsultings()
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var consultings = await _consultingService.GetOfferedRequestConsultingsAsync(CurrentUser.Id, statusRequestConsulting.Waiting);
                 response.status = true;
                 response.ErrorCode = 200;
                 response.Data = consultings;

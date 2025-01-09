@@ -2,6 +2,7 @@
 using Mohamy.Core.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
         public string ConsultingId { get; set; }
         public ConsultingDTO? Consulting { get; set; }
         public decimal PriceService { get; set; }
+        public string Description { get; set; }
         public statusRequestConsulting StatusRequestConsultingEnum { get; set; }
         public DateTime? CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }

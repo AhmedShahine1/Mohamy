@@ -81,7 +81,11 @@ namespace Mohamy.BusinessLayer.Services
                     {
                         consulting.LawyerId = request.LawyerId;
                         consulting.PriceService = request.PriceService;
-                        _unitOfWork.ConsultingRepository.Update(consulting);
+                        consulting.StartDate = DateTime.UtcNow;
+                        consulting.statusConsulting = statusConsulting.InProgress;
+                        consulting.IsUpdated = true;
+                        consulting.UpdatedAt = DateTime.Now;
+                    _unitOfWork.ConsultingRepository.Update(consulting);
                     }
                 }
 

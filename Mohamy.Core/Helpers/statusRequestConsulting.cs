@@ -11,6 +11,7 @@ namespace Mohamy.Core.Helpers
         Waiting,
         Approved,
         Rejection,
-        Cancel
+        Cancel,
+        Negotiating
     }
 }
