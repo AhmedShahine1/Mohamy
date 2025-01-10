@@ -32,6 +32,7 @@ public interface IUnitOfWork : IDisposable
     public IBaseRepository<graduationCertificate> graduationCertificateRepository { get; }
     public IBaseRepository<Specialties> SpecialtiesRepository { get; }
     public IBaseRepository<IgnoredConsultation> IgnoredConsultationsRepository { get; }
+    public IBaseRepository<Profession> ProfessionsRepository { get; }
 
     //-----------------------------------------------------------------------------------
     int SaveChanges();

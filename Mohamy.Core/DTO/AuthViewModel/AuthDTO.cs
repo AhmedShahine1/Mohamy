@@ -1,4 +1,6 @@
 ﻿using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
+using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
+using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Helpers;
 using System.Collections.Generic;
 
@@ -14,6 +16,9 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string? Description { get; set; }
         public int? yearsExperience { get; set; }
         public string? City { get; set; }
+        public string? Languages { get; set; }
+        public string? AcademicQualification { get; set; }
+        public bool Available { get; set; }
         public string? academicSpecialization { get; set; }
         public string? Education { get; set; }
         public string ProfileImage { get; set; }
@@ -35,6 +40,8 @@ namespace Mohamy.Core.DTO.AuthViewModel
 
         // Experiences
         public List<ExperienceDTO> Experiences { get; set; } = new List<ExperienceDTO>();
+
+        public List<ProfessionDto> Professions { get; set; } = new List<ProfessionDto>();
 
         public int numberConsulting { get; set; }
 

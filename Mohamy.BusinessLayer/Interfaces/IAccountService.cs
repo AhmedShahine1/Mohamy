@@ -23,6 +23,9 @@ public interface IAccountService
     Task<IdentityResult> UpdateCustomer(string adminId, UpdateCustomer model);
     Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model);
     Task<IdentityResult> UpdateLawyer(string lawyerId, UpdateLawyer model);
+    Task<IdentityResult> UpdateLawyerProfile(string lawyerId, UpdateLawyerProfile model);
+    Task<IdentityResult> UpdateLawyerLanguages(string lawyerId, UpdateLanguages model);
+    Task<IdentityResult> ChangeLawyerAvailability(string lawyerId);
     Task<IdentityResult> UpdateLawyerPhone(string lawyerId, UpdatePhone model);
     Task<IdentityResult> UpdateLawyerPrice(string lawyerId, UpdatePrice model);
     Task<IdentityResult> UpdateLawyerSpecialities(string lawyerId, UpdateSpecialities model);
@@ -33,6 +36,7 @@ public interface IAccountService
     Task<(bool IsSuccess, string Message)> ChangeLawyerRegistrationStatus(string lawyerId);
     Task<bool> Logout(ApplicationUser user);
     Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId);
+    Task<IEnumerable<Profession>> GetAllProfessionsAsync(string userId);
     Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId);
     Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
     Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);

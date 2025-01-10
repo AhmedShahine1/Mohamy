@@ -35,6 +35,9 @@ namespace Mohamy.Core.Entity.ApplicationData
 
         public string? IBAN { get; set; }
         public double? PriceService { get; set; }
+        public string? AcademicQualification { get; set; }
+        public string? Languages { get; set; }
+        public bool Available { get; set; } = false;
 
         [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }
@@ -49,6 +52,7 @@ namespace Mohamy.Core.Entity.ApplicationData
         public string? lawyerLicenseId { get; set; }
         public lawyerLicense? lawyerLicense { get; set; }
 
+        public ICollection<Profession>? Professions { get; set; }
         public ICollection<Experience>? Experiences { get; set; }
 
         public ICollection<Specialties>? Specialties { get; set; }

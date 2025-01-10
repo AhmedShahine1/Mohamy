@@ -29,6 +29,7 @@ namespace Mohamy.Core
         //----------------------------------------------------------------------------------
         public virtual DbSet<Specialties> Specialties { get; set; }
         public virtual DbSet<Experience> Experiences { get; set; }
+        public virtual DbSet<Profession> Professions { get; set; }
         public virtual DbSet<lawyerLicense> LawyerLicenses { get; set; }
         public virtual DbSet<graduationCertificate> graduationCertificate { get; set; }
         public virtual DbSet<mainConsulting> MainConsultings { get; set; }

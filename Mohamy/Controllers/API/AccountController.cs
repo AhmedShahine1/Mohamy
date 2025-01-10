@@ -120,6 +120,13 @@ namespace Mohamy.Controllers.API
                     subConsultingName = s.subConsulting.Name
                 }).ToList();
 
+                var professions = await _accountService.GetAllProfessionsAsync(authDto.Id);
+                authDto.Professions = professions.Select(p => new ProfessionDto
+                {
+                    Name = p.Name,
+                    Description = p.Description
+                }).ToList();
+
                 var licenses = await _accountService.GetAllLawyerLicensesAsync(authDto.Id);
                 if (licenses.Any())
                 {
@@ -782,6 +789,238 @@ namespace Mohamy.Controllers.API
                     status = false,
                     ErrorCode = 500,
                     ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerProfile")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerProfile([FromBody] UpdateLawyerProfile model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerProfile(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Lawyer updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Lawyer update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerLanguages")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerLanguages([FromBody] UpdateLanguages model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdateLawyerLanguages(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Language updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Language update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("ChangeLawyerAvailability")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> ChangeLawyerAvailability()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.ChangeLawyerAvailability(lawyer.Id);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Availability updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Availability update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateLawyerPassword")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> UpdateLawyerPassword(UpdatePassword model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "Invalid model"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.UpdatePasswordAsync(lawyer.Id, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Passowrd updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Passowrd update failed",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }

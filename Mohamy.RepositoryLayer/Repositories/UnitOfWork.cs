@@ -35,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
     public IBaseRepository<lawyerLicense> lawyerLicenseRepository { get; set; }
     public IBaseRepository<graduationCertificate> graduationCertificateRepository { get; set; }
     public IBaseRepository<Experience> ExperienceRepository { get; set; }
+    public IBaseRepository<Profession> ProfessionsRepository { get; set; }
     public IBaseRepository<Specialties> SpecialtiesRepository { get; set; }
     public IBaseRepository<IgnoredConsultation> IgnoredConsultationsRepository { get; set; }
 
@@ -56,6 +57,7 @@ public class UnitOfWork : IUnitOfWork
         EvaluationRepository = new BaseRepository<Evaluation>(context);
         CityRepository = new BaseRepository<City>(context);
         ExperienceRepository = new BaseRepository<Experience>(context);
+        ProfessionsRepository = new BaseRepository<Profession>(context);
         lawyerLicenseRepository = new BaseRepository<lawyerLicense>(context);
         graduationCertificateRepository = new BaseRepository<graduationCertificate>(context);
         SpecialtiesRepository = new BaseRepository<Specialties>(context);

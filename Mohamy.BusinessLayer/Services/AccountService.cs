@@ -24,6 +24,7 @@ using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.DTO.CityViewModel;
 using Microsoft.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
+using Azure.Core;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -232,6 +233,111 @@ public class AccountService : IAccountService
         if (!result.Succeeded)
         {
             throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerProfile(string lawyerId, UpdateLawyerProfile model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        user.Description= model.Description;
+        user.yearsExperience = model.YearsExperience;
+        user.AcademicQualification = model.AcademicQualification;
+        user.City = model.City;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded) 
+        {
+            var licenses = await GetAllLawyerLicensesAsync(lawyerId);
+            if (licenses.Any())
+            {
+                var primaryLicense = licenses.FirstOrDefault();
+                primaryLicense.LicenseNumber = model.LicenseNumber;
+                _unitOfWork.lawyerLicenseRepository.Update(primaryLicense);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            else 
+            {
+                lawyerLicense license = new lawyerLicense()
+                {
+                    LicenseNumber = model.LicenseNumber,
+                    LawyerId = lawyerId,
+                    State = model.City
+                };
+                _unitOfWork.lawyerLicenseRepository.Add(license);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            if (model.Professions.Any()) 
+            {
+                var oldProfessions = await _unitOfWork.ProfessionsRepository.FindAllAsync(s => s.LawyerId == lawyerId);
+
+                // Delete old professions
+                if (oldProfessions != null && oldProfessions.Any())
+                {
+                    _unitOfWork.ProfessionsRepository.DeleteRange(oldProfessions);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+
+                var professions = model.Professions.Select(dto => new Profession
+                {
+                    Name = dto.Name,
+                    Description = dto.Description,
+                    LawyerId = lawyerId
+                }).ToList();
+
+                _unitOfWork.ProfessionsRepository.AddRange(professions);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+        }
+        
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer profile: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> UpdateLawyerLanguages(string lawyerId, UpdateLanguages model)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        user.Languages = model.Languages;
+        
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer language: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> ChangeLawyerAvailability(string lawyerId)
+    {
+
+        var user = await _userManager.FindByIdAsync(lawyerId);
+        if (user == null)
+            throw new ArgumentException("Lawyer not found");
+
+        user.Available = !user.Available;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update lawyer availability: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -662,6 +768,11 @@ public class AccountService : IAccountService
         return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
     }
 
+    public async Task<IEnumerable<Profession>> GetAllProfessionsAsync(string userId)
+    {
+        return await _unitOfWork.ProfessionsRepository.FindAllAsync(q => q.LawyerId == userId);
+    }
+
     public async Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId)
     {
         return await _unitOfWork.ExperienceRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
@@ -697,7 +808,7 @@ public class AccountService : IAccountService
             .Select(ur => ur.UserId);
 
         // Start building the filter expression
-        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id);
+        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && u.Available;
 
         // Apply filters dynamically
         if (!string.IsNullOrWhiteSpace(keyword))
