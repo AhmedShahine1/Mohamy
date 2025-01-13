@@ -6,7 +6,7 @@ namespace Mohamy.Core.DTO.AuthViewModel.UpdateModel
     public class UpdateLanguages
     {
         [DisplayName("Languages")]
-        [Required(ErrorMessage = "You should enter Languages"), StringLength(15)]
+        [Required(ErrorMessage = "You should enter Languages")]
         public string Languages { get; set; }
     }
 }
