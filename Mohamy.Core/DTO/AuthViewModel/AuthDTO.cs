@@ -19,6 +19,7 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string? Languages { get; set; }
         public string? AcademicQualification { get; set; }
         public bool Available { get; set; }
+        public bool Online { get; set; }
         public string? academicSpecialization { get; set; }
         public string? Education { get; set; }
         public string ProfileImage { get; set; }

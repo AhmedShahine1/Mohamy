@@ -127,7 +127,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting != statusConsulting.Cancelled && a.statusConsulting != statusConsulting.UserRequestedNotPaid,
+                a => a.CustomerId == customerId && a.statusConsulting != statusConsulting.Cancelled && a.statusConsulting != statusConsulting.UserRequestedNotPaid && !a.IsDeleted,
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Lawyer)
@@ -136,7 +136,7 @@ namespace Mohamy.BusinessLayer.Services
             );
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -178,7 +178,7 @@ namespace Mohamy.BusinessLayer.Services
             {
                 // Retrieve consultings and related data from the database first
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.InProgress,
+                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.InProgress && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                     include: q => q
                         .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                         .Include(c => c.Lawyer)
@@ -189,7 +189,7 @@ namespace Mohamy.BusinessLayer.Services
             else {
                 // Retrieve consultings and related data from the database first
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.InProgress,
+                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.InProgress && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                     include: q => q
                         .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                         .Include(c => c.Lawyer)
@@ -199,7 +199,7 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && !c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -241,7 +241,7 @@ namespace Mohamy.BusinessLayer.Services
             if (isLawyer)
             {
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.Completed,
+                    a => a.LawyerId == id && a.statusConsulting == statusConsulting.Completed && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                     include: q => q
                         .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                         .Include(c => c.Lawyer)
@@ -251,7 +251,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             else {
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.Completed,
+                    a => a.CustomerId == id && a.statusConsulting == statusConsulting.Completed && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                     include: q => q
                         .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                         .Include(c => c.Lawyer)
@@ -261,7 +261,7 @@ namespace Mohamy.BusinessLayer.Services
             }
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && !c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -300,7 +300,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Cancelled,
+                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Cancelled && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                 include: q => q
                     .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                     .Include(c => c.Lawyer)
@@ -309,7 +309,7 @@ namespace Mohamy.BusinessLayer.Services
             );
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && !c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -396,7 +396,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Completed,
+                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Completed && !a.IsDeleted && a.subConsulting.MainConsulting.service,
                 include: q => q
                     .Include(c => c.subConsulting).ThenInclude(c=>c.MainConsulting)
                     .Include(c => c.Lawyer)
@@ -405,7 +405,7 @@ namespace Mohamy.BusinessLayer.Services
             );
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -444,7 +444,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Cancelled,
+                a => a.CustomerId == customerId && a.statusConsulting == statusConsulting.Cancelled && !a.IsDeleted && a.subConsulting.MainConsulting.service,
                 include: q => q
                     .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                     .Include(c => c.Lawyer)
@@ -453,7 +453,7 @@ namespace Mohamy.BusinessLayer.Services
             );
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -492,7 +492,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             // Retrieve consultings and related data from the database first
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.CustomerId == customerId && a.statusConsulting==statusConsulting.UserRequestedNotPaid,
+                a => a.CustomerId == customerId && a.statusConsulting==statusConsulting.UserRequestedNotPaid && !a.IsDeleted && a.subConsulting.MainConsulting.service,
                 include: q => q
                     .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                     .Include(c => c.Lawyer)
@@ -501,7 +501,7 @@ namespace Mohamy.BusinessLayer.Services
             );
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -539,7 +539,7 @@ namespace Mohamy.BusinessLayer.Services
         public async Task<IEnumerable<ConsultingDTO>> GetConsultingsByLawyerIdAsync(string lawyerId, statusConsulting status)
         {
             var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
-                a => a.statusConsulting == status && a.statusConsulting != statusConsulting.Cancelled,
+                a => a.statusConsulting == status && a.statusConsulting != statusConsulting.Cancelled && !a.IsDeleted,
                 include: q => q
                     .Include(c => c.subConsulting)
                     .Include(c => c.Lawyer)
@@ -547,7 +547,7 @@ namespace Mohamy.BusinessLayer.Services
                     .Include(c => c.Files)
             );
 
-            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted));
+            var consultingDTOs = _mapper.Map<IEnumerable<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -738,7 +738,8 @@ namespace Mohamy.BusinessLayer.Services
             consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
                 a => a.LawyerId == lawyerId &&
                 a.statusConsulting == status &&
-                a.RequestConsultings.Any(rc => rc.LawyerId == lawyerId && rc.statusRequestConsulting == statusRequestConsulting.Approved),
+                !a.IsDeleted &&
+                a.subConsulting.MainConsulting.service,
             include: q => q
                 .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
                 .Include(c => c.Lawyer)
@@ -749,7 +750,7 @@ namespace Mohamy.BusinessLayer.Services
 
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)
@@ -789,6 +790,7 @@ namespace Mohamy.BusinessLayer.Services
             consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
                 a => a.LawyerId == null &&
                 a.statusConsulting == statusConsulting.UserRequestedNotPaid &&
+                !a.IsDeleted && a.subConsulting.MainConsulting.service &&
                 a.RequestConsultings.Any(rc => rc.LawyerId == lawyerId && rc.statusRequestConsulting == requestStatus),
             include: q => q
                 .Include(c => c.RequestConsultings)
@@ -801,7 +803,7 @@ namespace Mohamy.BusinessLayer.Services
 
 
             // Map consulting entities to DTOs
-            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings.Where(c => !c.IsDeleted && c.subConsulting.MainConsulting.service));
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
 
             // After completing all database operations, fetch profile images asynchronously
             foreach (var consulting in consultingDTOs)

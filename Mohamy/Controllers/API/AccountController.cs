@@ -1277,6 +1277,101 @@ namespace Mohamy.Controllers.API
             }
         }
 
+        [HttpPost("SetUserOnline")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> SetUserOnlineAsync()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.SetUserOnlineOfflineStatusAsync(lawyer.Id, true);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "User updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "User update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("SetUserOffline")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> SetUserOfflineAsync()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var lawyer = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.SetUserOnlineOfflineStatusAsync(lawyer.Id, false);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "User updated successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "User update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
 
         [HttpGet("GetCities")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

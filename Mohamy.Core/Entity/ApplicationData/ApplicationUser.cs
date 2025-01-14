@@ -38,6 +38,7 @@ namespace Mohamy.Core.Entity.ApplicationData
         public string? AcademicQualification { get; set; }
         public string? Languages { get; set; }
         public bool Available { get; set; } = false;
+        public bool Online { get; set; } = false;
 
         [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }

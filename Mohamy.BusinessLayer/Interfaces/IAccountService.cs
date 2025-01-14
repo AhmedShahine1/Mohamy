@@ -59,4 +59,5 @@ public interface IAccountService
     //Task<bool> ActiveUserConnnection(string userId);
 
     Task<(IdentityResult result, string userId)> RegisterLawyer(RegisterLawyer model);
+    Task<IdentityResult> SetUserOnlineOfflineStatusAsync(string userId, bool online);
 }

@@ -238,6 +238,24 @@ public class AccountService : IAccountService
         return result;
     }
 
+    public async Task<IdentityResult> SetUserOnlineOfflineStatusAsync(string userId, bool online)
+    {
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new ArgumentException("User not found");
+
+        user.Online = online;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
     public async Task<IdentityResult> UpdateLawyerProfile(string lawyerId, UpdateLawyerProfile model)
     {
 
@@ -808,7 +826,7 @@ public class AccountService : IAccountService
             .Select(ur => ur.UserId);
 
         // Start building the filter expression
-        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && u.Available;
+        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && u.RegistrationStatus.Equals(LawyerRegistrationStatus.Approved) && u.Available;
 
         // Apply filters dynamically
         if (!string.IsNullOrWhiteSpace(keyword))

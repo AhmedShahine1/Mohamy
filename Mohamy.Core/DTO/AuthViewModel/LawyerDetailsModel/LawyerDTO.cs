@@ -9,6 +9,7 @@
         public string? Region { get; set; }
         public double ConsultingPrice { get; set; }
         public double Rating { get; set; }
+        public bool Online { get; set; }
         public int NumberConsulting { get; set; }
         public string? ProfileImage { get; set; }
     }
