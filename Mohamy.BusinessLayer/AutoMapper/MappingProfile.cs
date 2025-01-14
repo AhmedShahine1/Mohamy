@@ -6,6 +6,7 @@ using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.RoleModel;
 using Mohamy.Core.DTO.CityViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.DTO.EvaluationViewModel;
 using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Files;
@@ -138,6 +139,13 @@ namespace Mohamy.BusinessLayer.AutoMapper
                 .ForMember(dest => dest.MainConsultingName, opt => opt.MapFrom(src => src.subConsulting.MainConsulting.Name))
                 .ReverseMap();
 
+            CreateMap<Evaluation, EvaluationDetailsDTO>()
+                .ForMember(dest => dest.EvaluatorId, opt => opt.MapFrom(src => src.EvaluatorId))
+                .ForMember(dest => dest.EvaluatorName, opt => opt.MapFrom(src => src.Evaluator.FullName))
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating))
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.CreatedAt))
+                .ReverseMap();
             //--------------------------------------------------------------------------------------------------------
             // Mapping for RequestConsultingService <-> RequestConsultingDTO
             CreateMap<RequestConsulting, RequestConsultingDTO>()

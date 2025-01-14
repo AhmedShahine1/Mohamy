@@ -8,6 +8,7 @@ namespace Mohamy.Core.DTO.EvaluationViewModel
 {
     public class EvaluationDTO
     {
+        public string ConsultingId { get; set; }
         public string EvaluatedId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }

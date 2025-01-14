@@ -3,30 +3,39 @@ using Mohamy.Core.DTO.EvaluationViewModel;
 using Mohamy.Core.Entity.Others;
 using Mohamy.Core;
 using Microsoft.EntityFrameworkCore;
+using Mohamy.RepositoryLayer.Interfaces;
 
 namespace Mohamy.BusinessLayer.Services
 {
     public class EvaluationService : IEvaluationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EvaluationService(ApplicationDbContext context)
+        public EvaluationService(IUnitOfWork unitOfWork, ApplicationDbContext context)
         {
+            _unitOfWork = unitOfWork;
             _context = context;
         }
 
         public async Task AddEvaluationAsync(string evaluatorId, EvaluationDTO evaluation)
         {
-            var newEvaluation = new Evaluation
-            {
-                EvaluatorId = evaluatorId,
-                EvaluatedId = evaluation.EvaluatedId,
-                Rating = evaluation.Rating,
-                Comment = evaluation.Comment
+            var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(evaluation.ConsultingId);
+            if (consulting == null) throw new ArgumentException("Consulting not found");
+
+           
+            consulting.Reviews = new List<Evaluation>{ 
+                new Evaluation
+                {
+                    EvaluatorId = evaluatorId,
+                    EvaluatedId = evaluation.EvaluatedId,
+                    Rating = evaluation.Rating,
+                    Comment = evaluation.Comment
+                } 
             };
 
-            _context.Evaluations.Add(newEvaluation);
-            await _context.SaveChangesAsync();
+            _unitOfWork.ConsultingRepository.Update(consulting);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<EvaluationDetailsDTO>> GetEvaluationsAsync(string userId)

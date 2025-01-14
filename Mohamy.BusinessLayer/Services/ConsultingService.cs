@@ -745,6 +745,7 @@ namespace Mohamy.BusinessLayer.Services
                 .Include(c => c.Lawyer)
                 .Include(c => c.Customer)
                 .Include(c => c.Files)
+                .Include(c => c.Reviews)
             );
 
 

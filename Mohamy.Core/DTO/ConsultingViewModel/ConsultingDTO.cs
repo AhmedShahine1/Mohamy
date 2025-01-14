@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Mohamy.Core.DTO.AuthViewModel;
+using Mohamy.Core.DTO.EvaluationViewModel;
+using Mohamy.Core.Entity.Others;
 using Mohamy.Core.Helpers;
 
 namespace Mohamy.Core.DTO.ConsultingViewModel
@@ -22,6 +24,7 @@ namespace Mohamy.Core.DTO.ConsultingViewModel
         public DateTime? StartDate { get; set; }
         public ICollection<RequestConsultingDTO>? RequestConsultings { get; set; }
         public ICollection<IFormFile>? Files { get; set; }
+        public ICollection<EvaluationDetailsDTO>? Reviews { get; set;  }
         public ICollection<string>? FilesUrl { get; set; }
         public statusConsulting StatusConsultingEnum { get; set; }
         public bool voiceConsulting { get; set; }

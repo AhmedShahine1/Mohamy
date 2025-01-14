@@ -1,5 +1,6 @@
 ﻿using Mohamy.Core.Entity.ApplicationData;
 using Mohamy.Core.Entity.Files;
+using Mohamy.Core.Entity.Others;
 using Mohamy.Core.Helpers;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -40,6 +41,8 @@ namespace Mohamy.Core.Entity.ConsultingData
         public statusConsulting statusConsulting { get; set; } = statusConsulting.UserRequestedNotPaid;
 
         public ICollection<RequestConsulting>? RequestConsultings { get; set; }
+
+        public ICollection<Evaluation>? Reviews { get; set; }
 
         public bool voiceConsulting { get; set; }
 
