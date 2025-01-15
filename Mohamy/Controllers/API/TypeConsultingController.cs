@@ -126,6 +126,7 @@ namespace Mohamy.Controllers.API
                     u.City,
                     u.Region,
                     u.PriceService,
+                    u.Online,
                     numberConsulting = 0,
                     rating = 0,
                 });
