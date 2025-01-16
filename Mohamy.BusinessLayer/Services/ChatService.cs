@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Hubs;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.ChatViewModel;
+using Mohamy.Core.DTO.NotificationViewModel;
 using Mohamy.Core.Entity.ChatData;
+using Mohamy.Core.Helpers;
 using Mohamy.RepositoryLayer.Interfaces;
 
 namespace Mohamy.BusinessLayer.Services
@@ -14,13 +16,15 @@ namespace Mohamy.BusinessLayer.Services
         private readonly IFileHandling _fileHandling;
         private readonly IAccountService _accountService;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly INotificationService _notificationService;
 
-        public ChatService(IUnitOfWork unitOfWork, IFileHandling fileHandling, IAccountService accountService, IHubContext<ChatHub> hubContext)
+        public ChatService(IUnitOfWork unitOfWork, IFileHandling fileHandling, INotificationService notificationService, IAccountService accountService, IHubContext<ChatHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _fileHandling = fileHandling;
             _accountService = accountService;
             _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<ChatDTO>> GetChatsAsync(string senderId, string receiverId)
@@ -79,6 +83,13 @@ namespace Mohamy.BusinessLayer.Services
             await _unitOfWork.ChatRepository.AddAsync(message);
             await _unitOfWork.SaveChangesAsync();
 
+            
+            await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+            {
+                UserId = message.ReceiverId,
+                NotificationType = NotificationType.Message,
+                ActionId = message.SenderId
+            });
 
             return chatDTO;
         }

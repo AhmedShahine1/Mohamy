@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Interfaces;
-using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.DTO.NotificationViewModel;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Files;
-using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Helpers;
 using Mohamy.RepositoryLayer.Interfaces;
 
@@ -17,13 +16,15 @@ namespace Mohamy.BusinessLayer.Services
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
         private readonly IFileHandling _fileHandling;
+        private readonly INotificationService _notificationService;
 
-        public ConsultingService(IUnitOfWork unitOfWork, IMapper mapper, IAccountService accountService, IFileHandling fileHandling)
+        public ConsultingService(IUnitOfWork unitOfWork, INotificationService notificationService, IMapper mapper, IAccountService accountService, IFileHandling fileHandling)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _accountService = accountService;
             _fileHandling = fileHandling;
+            _notificationService = notificationService;
         }
 
         public async Task<int> GetNextOrderNumberAsync()
@@ -627,6 +628,49 @@ namespace Mohamy.BusinessLayer.Services
 
             _unitOfWork.ConsultingRepository.Update(consulting);
             await _unitOfWork.SaveChangesAsync();
+
+            if (status == statusConsulting.InProgress) {
+                if (consulting.LawyerId is not null)
+                {
+                    await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                    {
+                        UserId = consulting.LawyerId,
+                        NotificationType = NotificationType.ConsultationStarted,
+                        ActionId = consulting.Id
+                    });
+                }
+
+                if (consulting.CustomerId is not null)
+                {
+                    await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                    {
+                        UserId = consulting.CustomerId,
+                        NotificationType = NotificationType.ConsultationStarted,
+                        ActionId = consulting.Id
+                    });
+                }
+            }
+            else if (status == statusConsulting.Cancelled) {
+                if (consulting.LawyerId is not null)
+                {
+                    await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                    {
+                        UserId = consulting.LawyerId,
+                        NotificationType = NotificationType.ConsultationCancelled,
+                        ActionId = consulting.Id
+                    });
+                }
+
+                if (consulting.CustomerId is not null)
+                {
+                    await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                    {
+                        UserId = consulting.CustomerId,
+                        NotificationType = NotificationType.ConsultationCancelled,
+                        ActionId = consulting.Id
+                    });
+                }
+            }
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations(string lawyerId)
@@ -690,6 +734,15 @@ namespace Mohamy.BusinessLayer.Services
 
             _unitOfWork.ConsultingRepository.Update(consulting);
             await _unitOfWork.SaveChangesAsync();
+
+
+                await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                {
+                    UserId = consulting.CustomerId,
+                    NotificationType = NotificationType.ConsultationStarted,
+                    ActionId = consulting.Id
+                });
+            
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetAvailableServices()

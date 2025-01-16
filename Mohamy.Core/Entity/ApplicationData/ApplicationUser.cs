@@ -6,6 +6,7 @@ using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Entity.Others;
 using Mohamy.Core.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mohamy.Core.Entity.ApplicationData
 {
@@ -39,6 +40,7 @@ namespace Mohamy.Core.Entity.ApplicationData
         public string? Languages { get; set; }
         public bool Available { get; set; } = false;
         public bool Online { get; set; } = false;
+        public string? Device { get; set; }
 
         [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }

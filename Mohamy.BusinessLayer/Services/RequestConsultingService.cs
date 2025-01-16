@@ -3,14 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.ConsultingViewModel;
+using Mohamy.Core.DTO.NotificationViewModel;
 using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.Helpers;
 using Mohamy.RepositoryLayer.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mohamy.BusinessLayer.Services
 {
@@ -19,12 +15,14 @@ namespace Mohamy.BusinessLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
+        private readonly INotificationService _notificationService;
 
-        public RequestConsultingService(IUnitOfWork unitOfWork, IMapper mapper, IAccountService accountService)
+        public RequestConsultingService(IUnitOfWork unitOfWork, INotificationService notificationService, IMapper mapper, IAccountService accountService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _accountService = accountService;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<RequestConsultingDTO>> GetAllRequestsAsync()
@@ -94,6 +92,21 @@ namespace Mohamy.BusinessLayer.Services
                 try
                 {
                     await _unitOfWork.SaveChangesAsync();
+
+                    if (newStatus == statusRequestConsulting.Approved || newStatus == statusRequestConsulting.Rejection)
+                    {
+                        var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(request.ConsultingId);
+                        if (consulting is not null)
+                        {
+                            await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+                            {
+                                UserId = consulting.LawyerId,
+                                NotificationType = newStatus == statusRequestConsulting.Approved ? NotificationType.OfferApproved: NotificationType.OfferRejected,
+                                ActionId = consulting.Id
+                            });
+                        }
+                    }
+                    
                     return true;
                 }
                 catch (Exception ex)
@@ -113,6 +126,14 @@ namespace Mohamy.BusinessLayer.Services
 
             await _unitOfWork.RequestConsultingRepository.AddAsync(requestConsult);
             await _unitOfWork.SaveChangesAsync();
+
+            var consulting = await _unitOfWork.ConsultingRepository.FindAsync(c => c.Id == requestConsultingDTO.ConsultingId);
+            await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+            {
+                UserId = consulting.CustomerId,
+                NotificationType = NotificationType.OfferReceived,
+                ActionId = requestConsultingDTO.ConsultingId
+            });
 
             return _mapper.Map<RequestConsultingDTO>(requestConsult);
         }

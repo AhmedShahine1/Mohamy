@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mohamy.Core;
 
@@ -11,9 +12,11 @@ using Mohamy.Core;
 namespace Mohamy.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250115104541_DeviceTableAdded")]
+    partial class DeviceTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,9 +232,6 @@ namespace Mohamy.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Device")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -812,6 +812,41 @@ namespace Mohamy.Core.Migrations
                     b.ToTable("LawyerLicenses", "dbo");
                 });
 
+            modelBuilder.Entity("Mohamy.Core.Entity.Notification.Device", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUpdated")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Devices", "dbo");
+                });
+
             modelBuilder.Entity("Mohamy.Core.Entity.Notification.Notification", b =>
                 {
                     b.Property<string>("Id")
@@ -839,7 +874,7 @@ namespace Mohamy.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NotificationType")
+                    b.Property<int>("RegistrationStatus")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1209,6 +1244,17 @@ namespace Mohamy.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("Lawyer");
+                });
+
+            modelBuilder.Entity("Mohamy.Core.Entity.Notification.Device", b =>
+                {
+                    b.HasOne("Mohamy.Core.Entity.ApplicationData.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Mohamy.Core.Entity.Notification.Notification", b =>

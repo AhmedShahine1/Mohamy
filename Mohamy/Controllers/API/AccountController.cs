@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Net;
 using Mohamy.Core.Helpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Mohamy.Core.DTO.NotificationViewModel;
 
 namespace Mohamy.Controllers.API
 {
@@ -1349,6 +1350,54 @@ namespace Mohamy.Controllers.API
                     status = false,
                     ErrorCode = 500,
                     ErrorMessage = "User update failed",
+                    Data = result.Errors.Select(e => e.Description).ToArray()
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("SaveUserDevice")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> SaveUserDeviceAsync(SaveDeviceDTO saveDeviceDTO)
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var user = await _accountService.GetUserFromToken(token);
+                var result = await _accountService.SaveUserDeviceAsync(user.Id, saveDeviceDTO);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new BaseResponse
+                    {
+                        status = true,
+                        Data = "Device saved successfully"
+                    });
+                }
+
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "Device save failed",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
