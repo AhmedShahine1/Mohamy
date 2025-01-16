@@ -9,6 +9,7 @@ using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
 using Mohamy.Core.Helpers;
 using Mohamy.Core.DTO.CityViewModel;
+using Mohamy.Core.DTO.NotificationViewModel;
 
 namespace Mohamy.BusinessLayer.Interfaces;
 
@@ -60,4 +61,5 @@ public interface IAccountService
 
     Task<(IdentityResult result, string userId)> RegisterLawyer(RegisterLawyer model);
     Task<IdentityResult> SetUserOnlineOfflineStatusAsync(string userId, bool online);
+    Task<IdentityResult> SaveUserDeviceAsync(string userId, SaveDeviceDTO saveDeviceDTO);
 }

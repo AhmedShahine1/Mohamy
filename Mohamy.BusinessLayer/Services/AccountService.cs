@@ -25,6 +25,7 @@ using Mohamy.Core.DTO.CityViewModel;
 using Microsoft.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
 using Azure.Core;
+using Mohamy.Core.DTO.NotificationViewModel;
 
 namespace Mohamy.BusinessLayer.Services;
 
@@ -251,6 +252,34 @@ public class AccountService : IAccountService
         if (!result.Succeeded)
         {
             throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        return result;
+    }
+
+    public async Task<IdentityResult> SaveUserDeviceAsync(string userId, SaveDeviceDTO saveDeviceDTO)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new ArgumentException("User not found");
+
+        user.Device = saveDeviceDTO.DeviceId;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        IEnumerable<ApplicationUser> userWithSameDevices = await _unitOfWork.UserRepository.FindAllAsync(u => u.Id != userId && u.Device == saveDeviceDTO.DeviceId);
+        if (userWithSameDevices.Any())
+        {
+            foreach (var userWithDevice in userWithSameDevices)
+            {
+                userWithDevice.Device = null;
+                _unitOfWork.UserRepository.Update(userWithDevice);
+            }
+            await _unitOfWork.SaveChangesAsync();
         }
 
         return result;

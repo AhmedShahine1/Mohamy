@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.ChatViewModel;
-using Mohamy.Core.Entity.ChatData;
 
 namespace Mohamy.BusinessLayer.Hubs
 {

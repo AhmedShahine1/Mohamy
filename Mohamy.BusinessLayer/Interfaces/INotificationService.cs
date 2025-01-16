@@ -6,5 +6,6 @@ namespace Mohamy.BusinessLayer.Interfaces
     {
         Task<IEnumerable<NotificationDTO>> GetNotificationsAsync(string userId);
         Task CreateNotificationAsync(string userId, string message);
+        Task SaveNotificationAsync(SaveNotificationDTO saveNotificationDTO);
     }
 }

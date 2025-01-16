@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Mohamy.Core.Helpers;
 
 namespace Mohamy.Core.DTO.NotificationViewModel
 {
@@ -11,5 +7,17 @@ namespace Mohamy.Core.DTO.NotificationViewModel
         public string Message { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; }
+        public NotificationType NotificationType { get; set; }
+        public string? ActionId { get; set; }
     }
+
+        public class SaveNotificationDTO
+        {
+            public string UserId { get; set; }
+            public string Title { get; set; }
+            public string Message { get; set; }
+            public string DeviceId { get; set; }
+            public NotificationType NotificationType { get; set; }
+            public string? ActionId { get; set; }
+        }
 }
