@@ -87,16 +87,16 @@ namespace Mohamy.BusinessLayer.Services
             }
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetUsersBySubConsultingAsync(string subConsultingId)
+        public async Task<IEnumerable<ApplicationUser>> GetUsersByMainConsultingAsync(string mainConsultingId)
         {
-            if (string.IsNullOrEmpty(subConsultingId))
+            if (string.IsNullOrEmpty(mainConsultingId))
             {
-                throw new ArgumentException("subConsultingId cannot be null or empty", nameof(subConsultingId));
+                throw new ArgumentException("mainConsultingId cannot be null or empty", nameof(mainConsultingId));
             }
 
             // Fetch experiences that match the given subConsultingId
             var Specialties = await _unitOfWork.SpecialtiesRepository
-                .FindAllAsync(e => e.subConsultingId == subConsultingId, isNoTracking: true);
+                .FindAllAsync(e => e.mainConsultingId == mainConsultingId, isNoTracking: true);
 
             if (!Specialties.Any())
             {
@@ -114,7 +114,7 @@ namespace Mohamy.BusinessLayer.Services
             return users;
         }
 
-        public async Task<IEnumerable<SubConsultingDTO>> GetSubConsultingByUsersAsync(string UserId)
+        public async Task<IEnumerable<MainConsultingDTO>> GetMainConsultingByUsersAsync(string UserId)
         {
             if (string.IsNullOrEmpty(UserId))
             {
@@ -127,28 +127,26 @@ namespace Mohamy.BusinessLayer.Services
 
             if (!Specialties.Any())
             {
-                return Enumerable.Empty<SubConsultingDTO>();
+                return Enumerable.Empty<MainConsultingDTO>();
             }
 
             // Extract Lawyer IDs from the experiences
-            var SubConsultingIds = Specialties.Select(e => e.subConsultingId).Distinct().ToList();
+            var MainConsultingIds = Specialties.Select(e => e.mainConsultingId).Distinct().ToList();
 
             // Fetch users by Lawyer IDs
-            var entities = await _unitOfWork.SubConsultingRepository
-                .FindAllAsync(u => SubConsultingIds.Contains(u.Id), include: q => q.Include(s => s.MainConsulting));
+            var entities = await _unitOfWork.MainConsultingRepository
+                .FindAllAsync(u => MainConsultingIds.Contains(u.Id));
 
-            var dtos = new List<SubConsultingDTO>();
+            var dtos = new List<MainConsultingDTO>();
 
             foreach (var entity in entities)
             {
-                var dto = new SubConsultingDTO
+                var dto = new MainConsultingDTO
                 {
                     Id = entity.Id,
                     Name = entity.Name,
                     Description = entity.Description,
-                    MainConsultingId = entity.MainConsultingId,
                     IconUrl = await _fileHandling.GetFile(entity.iconId),
-                    mainConsultingname = entity.MainConsulting.Name
                 };
 
                 dtos.Add(dto);

@@ -21,7 +21,6 @@ namespace Mohamy.Controllers.API
         }
 
         // GET: api/Consulting/MainConsultings
-        [Authorize(Policy = "Customer")]
         [HttpGet("MainConsultings")]
         public async Task<ActionResult<BaseResponse>> GetAllMainConsultings()
         {
@@ -44,7 +43,6 @@ namespace Mohamy.Controllers.API
         }
 
         // GET: api/Consulting/MainConsultings
-        [Authorize(Policy = "Customer")]
         [HttpGet("MainConsultingsById")]
         public async Task<ActionResult<BaseResponse>> GetMainConsultingsID([FromQuery]string MainConsultingId)
         {
@@ -89,23 +87,23 @@ namespace Mohamy.Controllers.API
         }
 
         [Authorize(Policy = "Customer")]
-        [HttpGet("subconsulting")]
+        [HttpGet("mainconsulting")]
 
-        public async Task<ActionResult<BaseResponse>> GetUsersBySubConsulting([FromQuery] string subConsultingId)
+        public async Task<ActionResult<BaseResponse>> GetUsersByMainConsulting([FromQuery] string mainConsultingId)
         {
             var response = new BaseResponse();
 
-            if (string.IsNullOrEmpty(subConsultingId))
+            if (string.IsNullOrEmpty(mainConsultingId))
             {
                 response.status = false;
                 response.ErrorCode = 400;
-                response.ErrorMessage = "SubConsultingId cannot be null or empty.";
+                response.ErrorMessage = "MainConsultingId cannot be null or empty.";
                 return BadRequest(response);
             }
 
             try
             {
-                var users = await _subConsultingService.GetUsersBySubConsultingAsync(subConsultingId);
+                var users = await _subConsultingService.GetUsersByMainConsultingAsync(mainConsultingId);
 
                 if (users == null || !users.Any())
                 {
@@ -145,8 +143,8 @@ namespace Mohamy.Controllers.API
         }
 
         [Authorize(Policy = "Customer")]
-        [HttpGet("subconsultingUser")]
-        public async Task<ActionResult<BaseResponse>> GetSubConsultingByUser([FromQuery] string UserId)
+        [HttpGet("mainconsultingUser")]
+        public async Task<ActionResult<BaseResponse>> GetMainConsultingByUser([FromQuery] string UserId)
         {
             var response = new BaseResponse();
 
@@ -160,13 +158,13 @@ namespace Mohamy.Controllers.API
 
             try
             {
-                var SubConsultings = await _subConsultingService.GetSubConsultingByUsersAsync(UserId);
+                var SubConsultings = await _subConsultingService.GetMainConsultingByUsersAsync(UserId);
 
                 if (SubConsultings == null || !SubConsultings.Any())
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "Not found the specified subconsulting to User.";
+                    response.ErrorMessage = "Not found the specified mainconsulting to User.";
                     return NotFound(response);
                 }
                 response.status = true;

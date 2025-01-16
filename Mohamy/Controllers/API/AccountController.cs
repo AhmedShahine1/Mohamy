@@ -117,8 +117,8 @@ namespace Mohamy.Controllers.API
                 var specialties = await _accountService.GetAllSpecialtiesAsync(authDto.Id);
                 authDto.Specialties = specialties.Select(s => new SpecialtiesDTO
                 {
-                    Id = s.subConsultingId,
-                    subConsultingName = s.subConsulting.Name
+                    Id = s.mainConsultingId,
+                    mainConsultingName = s.mainConsulting.Name
                 }).ToList();
 
                 var professions = await _accountService.GetAllProfessionsAsync(authDto.Id);
@@ -411,7 +411,7 @@ namespace Mohamy.Controllers.API
                 authDto.Specialties = specialties.Select(s => new SpecialtiesDTO
                 {
                     Id = s.Id,
-                    subConsultingName = s.subConsulting.Name
+                    mainConsultingName = s.mainConsulting.Name
                 }).ToList();
 
                 // Populate experiences
@@ -1224,7 +1224,7 @@ namespace Mohamy.Controllers.API
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
         public async Task<IActionResult> UpdateLawyerSpecialities([FromBody] UpdateSpecialities model)
         {
-            if (model.subConsultingId.Count == 0)
+            if (model.mainConsultingId.Count == 0)
             {
                 return BadRequest(new BaseResponse
                 {

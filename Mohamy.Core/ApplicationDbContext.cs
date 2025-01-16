@@ -92,9 +92,9 @@ namespace Mohamy.Core
 
             // Specialties to SubConsulting relationship
             modelBuilder.Entity<Specialties>()
-                .HasOne(s => s.subConsulting)
+                .HasOne(s => s.mainConsulting)
                 .WithMany()
-                .HasForeignKey(s => s.subConsultingId)
+                .HasForeignKey(s => s.mainConsultingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Specialties to SubConsulting relationship

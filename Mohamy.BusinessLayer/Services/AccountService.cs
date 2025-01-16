@@ -447,12 +447,12 @@ public class AccountService : IAccountService
             await _unitOfWork.SaveChangesAsync();
         }
 
-        if (model.subConsultingId != null && model.subConsultingId.Any())
+        if (model.mainConsultingId != null && model.mainConsultingId.Any())
         {
-            var newSpecialities = model.subConsultingId.Select(id => new Specialties
+            var newSpecialities = model.mainConsultingId.Select(id => new Specialties
             {
                 LawyerId = lawyerId,
-                subConsultingId = id
+                mainConsultingId = id
             }).ToList();
 
             await _unitOfWork.SpecialtiesRepository.AddRangeAsync(newSpecialities);
@@ -812,7 +812,7 @@ public class AccountService : IAccountService
 
     public async Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId)
     {
-        return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
+        return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.mainConsulting));
     }
 
     public async Task<IEnumerable<Profession>> GetAllProfessionsAsync(string userId)
@@ -875,7 +875,7 @@ public class AccountService : IAccountService
         if (!string.IsNullOrWhiteSpace(specialization))
         {
             var specializationFilter = (Expression<Func<ApplicationUser, bool>>)(u =>
-                u.Specialties.Any(s => s.subConsulting.Name.Contains(specialization)));
+                u.Specialties.Any(s => s.mainConsulting.Name.Contains(specialization)));
 
             filter = CombineExpressions(filter, specializationFilter);
         }
