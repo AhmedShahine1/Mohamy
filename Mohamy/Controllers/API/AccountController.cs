@@ -14,6 +14,8 @@ using System.Net;
 using Mohamy.Core.Helpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Mohamy.Core.DTO.NotificationViewModel;
+using Mohamy.BusinessLayer.Services;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Mohamy.Controllers.API
 {
@@ -124,6 +126,7 @@ namespace Mohamy.Controllers.API
                 var professions = await _accountService.GetAllProfessionsAsync(authDto.Id);
                 authDto.Professions = professions.Select(p => new ProfessionDto
                 {
+                    Id = p.Id,
                     Name = p.Name,
                     Description = p.Description
                 }).ToList();
@@ -141,6 +144,32 @@ namespace Mohamy.Controllers.API
                 {
                     status = true,
                     Data = authDto
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "An unexpected error occurred.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+
+        [HttpGet("UserNotificationProfileData")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetUserNotificationProfileDataAsync([FromQuery] string userId)
+        {
+            try
+            {
+                var user = await _accountService.GetUserNotificationProfileDataAsync(userId);
+                return Ok(new BaseResponse
+                {
+                    status = true,
+                    Data = user
                 });
             }
             catch (Exception ex)
@@ -1102,6 +1131,25 @@ namespace Mohamy.Controllers.API
                     Data = ex.Message
                 });
             }
+        }
+
+        [HttpDelete("DeleteProfession")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
+        public async Task<IActionResult> DeleteProfessionAsync([FromQuery] string professionId)
+        {
+            var response = new BaseResponse();
+            try
+            {
+                await _accountService.DeleteProfessionAsync(professionId);
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while deleting profession: {ex.Message}";
+            }
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
         [HttpPost("UpdateLawyerBank")]

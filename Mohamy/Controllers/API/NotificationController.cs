@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
+using Mohamy.BusinessLayer.Services;
 using Mohamy.Core.DTO;
 
 namespace Mohamy.Controllers.API
@@ -34,6 +35,28 @@ namespace Mohamy.Controllers.API
                 response.ErrorMessage = ex.Message;
                 return StatusCode(500, response);
             }
+        }
+
+        
+        [HttpPost]
+        [Route("Read")]
+        public async Task<ActionResult<BaseResponse>> ReadNotificationAsync([FromQuery] string notificationId)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                await _notificationService.ReadNotificationAsync(notificationId);
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"An error occurred while reading notification: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
     }
 }

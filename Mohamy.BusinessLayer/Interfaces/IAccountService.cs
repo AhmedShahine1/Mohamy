@@ -32,6 +32,7 @@ public interface IAccountService
     Task<IdentityResult> UpdateLawyerSpecialities(string lawyerId, UpdateSpecialities model);
     Task<IdentityResult> UpdateLawyerBank(string lawyerId, UpdateBank model);
     Task<IdentityResult> UpdatePasswordAsync(string userId, UpdatePassword updatePasswordModel);
+    Task DeleteProfessionAsync(string professionId);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> Login(LoginModel model);
     Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model);
     Task<(bool IsSuccess, string Message)> ChangeLawyerRegistrationStatus(string lawyerId);
@@ -42,6 +43,7 @@ public interface IAccountService
     Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
     Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);
     Task<List<LawyerDTO>> GetLawyersAsync(string? keyword, string? city, string? specialization, int? minYearsExperience, int? maxYearsExperience, string? sortBy);
+    Task<UserNotificationProfileDTO> GetUserNotificationProfileDataAsync(string userId);
     Task<IEnumerable<CityDTO>> GetCitiesAsync();
     Task<bool> SendOTP(string customerEmail);
     Task<bool> ValidateOTP(string customerPhoneNumber, string OTPV);

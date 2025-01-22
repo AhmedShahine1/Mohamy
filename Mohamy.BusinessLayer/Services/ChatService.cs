@@ -43,8 +43,30 @@ namespace Mohamy.BusinessLayer.Services
                 ReceiverId = m.ReceiverId,
                 FileUrl=  m.Images is not null ? _fileHandling.GetFile(m.ImagesId).Result:null,
                 Message = m.Message,
-                SentAt = m.CreatedAt
+                SentAt = m.CreatedAt,
+                IsRead = m.IsRead
             });
+        }
+
+        public async Task<IList<MessageIdDTO>> ReadMessages(string senderId, string receiverId)
+        {
+            IList<MessageIdDTO> messageIds = new List<MessageIdDTO>();
+
+            var messages = await _unitOfWork.ChatRepository.FindAllAsync(
+                m => m.SenderId == receiverId && m.ReceiverId == senderId && m.IsRead == false);
+
+            if (messages.Any()) {
+                foreach (var message in messages)
+                {
+                    messageIds.Add(new MessageIdDTO() { Id = message.Id });
+                    message.IsRead = true;
+                    message.UpdatedAt = DateTime.UtcNow;
+                    _unitOfWork.ChatRepository.Update(message);
+                }
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            return messageIds;
         }
 
         public async Task<ChatDTO> SendMessageAsync(ChatDTO messageDTO)

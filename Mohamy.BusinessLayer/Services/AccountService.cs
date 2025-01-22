@@ -507,6 +507,17 @@ public class AccountService : IAccountService
         return result;
     }
 
+    public async Task DeleteProfessionAsync(string professionId)
+    {
+
+        var profession = await _unitOfWork.ProfessionsRepository.FindAsync(p => p.Id == professionId);
+        if (profession is null)
+            throw new ArgumentException("Profession not found");
+
+        _unitOfWork.ProfessionsRepository.Delete(profession);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     //------------------------------------------------------------------------------------------------------------
     public async Task<IdentityResult> UpdateAdmin(string adminId, RegisterAdmin model)
     {
@@ -940,6 +951,27 @@ public class AccountService : IAccountService
         return lawyerDtos;
     }
 
+
+    public async Task<UserNotificationProfileDTO> GetUserNotificationProfileDataAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user is null)
+            throw new ArgumentException("User not found");
+
+
+        UserNotificationProfileDTO userDTO = new UserNotificationProfileDTO()
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Online = user.Online,
+            ProfileImage = await GetUserProfileImage(user.ProfileId)
+        };
+
+        
+        return userDTO;
+    }
+
     public async Task<(IdentityResult result, string userId)> RegisterLawyer(RegisterLawyer model)
     {
         if (await IsPhoneExistAsync(model.PhoneNumber, null, true))
@@ -1006,6 +1038,8 @@ public class AccountService : IAccountService
 
         return (result, user.Id);
     }
+
+
 
 
     public async Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model)

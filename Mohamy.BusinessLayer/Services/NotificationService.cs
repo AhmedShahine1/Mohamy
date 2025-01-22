@@ -126,12 +126,26 @@ namespace Mohamy.BusinessLayer.Services
             var notifications = await _unitOfWork.NotificationRepository.FindAllAsync(n => n.UserId == userId);
             return notifications.OrderByDescending(n => n.CreatedAt).Select(n => new NotificationDTO
             {
+                Id = n.Id,
                 Message = n.Message,
                 CreatedAt = n.CreatedAt,
                 IsRead = n.IsRead,
                 ActionId = n.ActionId,
                 NotificationType = n.NotificationType
             });
+        }
+
+        public async Task ReadNotificationAsync(string notificationId)
+        {
+            var notification = await _unitOfWork.NotificationRepository.FindAsync(n => n.Id == notificationId);
+
+            if (notification is null) throw new ArgumentException("Notification not found");
+
+            notification.IsRead = true;
+            notification.UpdatedAt = DateTime.Now;
+
+            _unitOfWork.NotificationRepository.Update(notification);
+            await _unitOfWork.SaveChangesAsync();
         }
 
 

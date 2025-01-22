@@ -27,6 +27,16 @@ namespace Mohamy.BusinessLayer.Hubs
             await Clients.Group(chatGroup).SendAsync("ChatHistory", chatHistory);
         }
 
+        public async Task ReadMessages(string senderId, string receiverId)
+        {
+            var messageIds = await _chatService.ReadMessages(senderId, receiverId);
+            if (messageIds.Count > 0)
+            {
+                string chatGroup = GetGroupName(senderId, receiverId);
+                await Clients.Group(chatGroup).SendAsync("MessageReads", messageIds);
+            }
+        }
+
         // Method to send a message
         public async Task SendMessage(ChatDTO chatMessage)
         {
