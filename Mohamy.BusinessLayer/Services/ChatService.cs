@@ -39,6 +39,7 @@ namespace Mohamy.BusinessLayer.Services
 
             return messages.Select(m => new ChatDTO
             {
+                Id = m.Id,
                 SenderId = m.SenderId,
                 ReceiverId = m.ReceiverId,
                 FileUrl=  m.Images is not null ? _fileHandling.GetFile(m.ImagesId).Result:null,
