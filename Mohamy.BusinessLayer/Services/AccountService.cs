@@ -189,7 +189,16 @@ public class AccountService : IAccountService
         }
         else
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            var olduser = await _unitOfWork.UserRepository.FindAsync(q => q.UserName == model.PhoneNumber);
+            await Activate(olduser.Id);
+            var updateuser = new UpdateCustomer()
+            {
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                ImageProfile = model.ImageProfile,
+                FullName = model.FullName,
+            };
+            result = await UpdateCustomer(olduser.Id, updateuser);
         }
 
         return result;
