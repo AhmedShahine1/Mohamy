@@ -69,7 +69,7 @@ public class AccountService : IAccountService
     private async Task<bool> IsPhoneExistAsync(string phoneNumber, string userId = null, bool isLawyer = false)
     {
         var usersWithPhone = await _userManager.Users
-        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId)
+        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId && u.Status)
         .ToListAsync();
 
         // Check if any of the users have the specified role (lawyer) if required
@@ -174,7 +174,7 @@ public class AccountService : IAccountService
     {
         if (await IsPhoneExistAsync(model.PhoneNumber))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("هذا الرقم لديه حساب بالفعل.");
         }
 
         var user = mapper.Map<ApplicationUser>(model);
