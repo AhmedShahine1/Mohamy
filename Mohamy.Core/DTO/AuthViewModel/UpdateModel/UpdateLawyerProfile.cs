@@ -26,6 +26,6 @@ namespace Mohamy.Core.DTO.AuthViewModel.UpdateModel
         public string? AcademicQualification { get; set; }
 
         [Required(ErrorMessage = "You should enter profession")]
-        public List<ProfessionDto> Professions { get; set; }
+        public List<CreateProfessionDto> Professions { get; set; }
     }
 }
