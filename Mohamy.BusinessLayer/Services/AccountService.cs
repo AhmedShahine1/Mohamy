@@ -69,7 +69,7 @@ public class AccountService : IAccountService
     private async Task<bool> IsPhoneExistAsync(string phoneNumber, string userId = null, bool isLawyer = false)
     {
         var usersWithPhone = await _userManager.Users
-        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId)
+        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId && u.Status)
         .ToListAsync();
 
         // Check if any of the users have the specified role (lawyer) if required
@@ -174,7 +174,7 @@ public class AccountService : IAccountService
     {
         if (await IsPhoneExistAsync(model.PhoneNumber))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("هذا الرقم لديه حساب بالفعل.");
         }
 
         var user = mapper.Map<ApplicationUser>(model);
@@ -189,7 +189,16 @@ public class AccountService : IAccountService
         }
         else
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            var olduser = await _unitOfWork.UserRepository.FindAsync(q => q.UserName == model.PhoneNumber);
+            await Activate(olduser.Id);
+            var updateuser = new UpdateCustomer()
+            {
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                ImageProfile = model.ImageProfile,
+                FullName = model.FullName,
+            };
+            result = await UpdateCustomer(olduser.Id, updateuser);
         }
 
         return result;
@@ -797,17 +806,59 @@ public class AccountService : IAccountService
             throw new ArgumentException("Admin not found");
 
         user.Status = true;
-        return await _userManager.UpdateAsync(user);
+        return await _userManager.DeleteAsync(user);
     }
 
     public async Task<IdentityResult> Suspend(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            throw new ArgumentException("Admin not found");
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new ArgumentException("Admin not found");
 
-        user.Status = false;
-        return await _userManager.UpdateAsync(user);
+            user.Status = false;
+
+            // Find consultings related to the user
+            var consultings = await _unitOfWork.ConsultingRepository
+                .FindAllAsync(q => q.CustomerId == userId || q.LawyerId == userId,include:
+                a=>a.Include(q=>q.Files)
+                .Include(q=>q.Reviews));
+
+            // Delete related Images
+            foreach (var consulting in consultings)
+            {
+                if (consulting.Files != null)
+                {
+                    foreach (var file in consulting.Files)
+                    {
+                        var images = await _unitOfWork.ImagesRepository
+                            .FindAllAsync(img => img.Id == file.Id);
+                        _unitOfWork.ImagesRepository.DeleteRange(images);
+
+                    }
+                }
+                foreach (var review in consulting.Reviews)
+                {
+                    var reviews = await _unitOfWork.EvaluationRepository
+                        .FindAllAsync(ev => ev.Id == review.Id);
+                    _unitOfWork.EvaluationRepository.DeleteRange(reviews);
+
+                }
+            }
+
+            // Delete consultings
+            _unitOfWork.ConsultingRepository.DeleteRange(consultings);
+            _unitOfWork.ChatRepository.DeleteRange(await _unitOfWork.ChatRepository.FindAllAsync(q => q.ReceiverId == userId || q.SenderId == userId));
+            _unitOfWork.EvaluationRepository.DeleteRange(await _unitOfWork.EvaluationRepository.FindAllAsync(q => q.EvaluatorId == userId || q.EvaluatedId == userId));
+            _unitOfWork.SaveChanges();
+            return await _userManager.DeleteAsync(user);
+        }
+        catch (Exception ex)
+        {
+            // Log the error for debugging purposes
+            throw new Exception(ex.InnerException?.Message ?? ex.Message);
+        }
     }
 
     public async Task<string> GetUserProfileImage(string profileId)
