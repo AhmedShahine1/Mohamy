@@ -41,6 +41,7 @@ namespace Mohamy.Core.Entity.ApplicationData
         public bool Available { get; set; } = false;
         public bool Online { get; set; } = false;
         public string? Device { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }

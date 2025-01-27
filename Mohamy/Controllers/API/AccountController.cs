@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +8,7 @@ using Mohamy.Core.DTO.AuthViewModel;
 using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.Core.DTO.AuthViewModel.RegisterModel;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
-using System.Net.Sockets;
-using System.Net;
-using Mohamy.Core.Helpers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Mohamy.Core.DTO.NotificationViewModel;
-using Mohamy.BusinessLayer.Services;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace Mohamy.Controllers.API
 {
@@ -546,19 +539,19 @@ namespace Mohamy.Controllers.API
             try
             {
                 var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                var customer = await _accountService.GetUserFromToken(token);
+                var user = await _accountService.GetUserFromToken(token);
 
-                if (customer == null)
+                if (user == null)
                 {
                     return NotFound(new BaseResponse
                     {
                         status = false,
                         ErrorCode = 404,
-                        ErrorMessage = "Customer not found"
+                        ErrorMessage = "User not found"
                     });
                 }
 
-                var result = await _accountService.Suspend(customer.Id);
+                var result = await _accountService.DeleteAccountAsync(user.Id);
 
                 if (result.Succeeded)
                 {

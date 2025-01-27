@@ -61,7 +61,7 @@ public class AccountService : IAccountService
         var user = await _userManager.Users
             .Include(u => u.Profile)
             //.Include(u=>u.Experiences)
-            .FirstOrDefaultAsync(x => x.Id == id && x.Status);
+            .FirstOrDefaultAsync(x => x.Id == id && x.Status && !x.IsDeleted);
         return user;
     }
     //------------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class AccountService : IAccountService
     private async Task<bool> IsPhoneExistAsync(string phoneNumber, string userId = null, bool isLawyer = false)
     {
         var usersWithPhone = await _userManager.Users
-        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId && u.Status)
+        .Where(u => u.PhoneNumber == phoneNumber && u.Id != userId && !u.IsDeleted)
         .ToListAsync();
 
         // Check if any of the users have the specified role (lawyer) if required
@@ -189,16 +189,7 @@ public class AccountService : IAccountService
         }
         else
         {
-            var olduser = await _unitOfWork.UserRepository.FindAsync(q => q.UserName == model.PhoneNumber);
-            await Activate(olduser.Id);
-            var updateuser = new UpdateCustomer()
-            {
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                ImageProfile = model.ImageProfile,
-                FullName = model.FullName,
-            };
-            result = await UpdateCustomer(olduser.Id, updateuser);
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -637,7 +628,7 @@ public class AccountService : IAccountService
         try
         {
             var user = await _userManager.FindByNameAsync(model.PhoneNumber);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password) || user.IsDeleted)
             {
                 return (false, null, "Invalid login attempt.");
             }
@@ -806,60 +797,32 @@ public class AccountService : IAccountService
             throw new ArgumentException("Admin not found");
 
         user.Status = true;
-        return await _userManager.DeleteAsync(user);
+        return await _userManager.UpdateAsync(user);
     }
 
     public async Task<IdentityResult> Suspend(string userId)
     {
-        try
-        {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 throw new ArgumentException("Admin not found");
 
             user.Status = false;
-
-            // Find consultings related to the user
-            var consultings = await _unitOfWork.ConsultingRepository
-                .FindAllAsync(q => q.CustomerId == userId || q.LawyerId == userId,include:
-                a=>a.Include(q=>q.Files)
-                .Include(q=>q.Reviews));
-
-            // Delete related Images
-            foreach (var consulting in consultings)
-            {
-                if (consulting.Files != null)
-                {
-                    foreach (var file in consulting.Files)
-                    {
-                        var images = await _unitOfWork.ImagesRepository
-                            .FindAllAsync(img => img.Id == file.Id);
-                        _unitOfWork.ImagesRepository.DeleteRange(images);
-
-                    }
-                }
-                foreach (var review in consulting.Reviews)
-                {
-                    var reviews = await _unitOfWork.EvaluationRepository
-                        .FindAllAsync(ev => ev.Id == review.Id);
-                    _unitOfWork.EvaluationRepository.DeleteRange(reviews);
-
-                }
-            }
-
-            // Delete consultings
-            _unitOfWork.ConsultingRepository.DeleteRange(consultings);
-            _unitOfWork.ChatRepository.DeleteRange(await _unitOfWork.ChatRepository.FindAllAsync(q => q.ReceiverId == userId || q.SenderId == userId));
-            _unitOfWork.EvaluationRepository.DeleteRange(await _unitOfWork.EvaluationRepository.FindAllAsync(q => q.EvaluatorId == userId || q.EvaluatedId == userId));
-            _unitOfWork.SaveChanges();
-            return await _userManager.DeleteAsync(user);
-        }
-        catch (Exception ex)
-        {
-            // Log the error for debugging purposes
-            throw new Exception(ex.InnerException?.Message ?? ex.Message);
-        }
+            return await _userManager.UpdateAsync(user);       
     }
+
+    public async Task<IdentityResult> DeleteAccountAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new ArgumentException("User not found");
+
+        user.UserName += "_deleted";
+        user.NormalizedUserName = _userManager.NormalizeName(user.UserName);
+        user.IsDeleted = true;
+
+        return await _userManager.UpdateAsync(user);
+    }
+
 
     public async Task<string> GetUserProfileImage(string profileId)
     {
@@ -917,7 +880,7 @@ public class AccountService : IAccountService
             .Select(ur => ur.UserId);
 
         // Start building the filter expression
-        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && u.RegistrationStatus.Equals(LawyerRegistrationStatus.Approved) && u.Available;
+        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && !u.IsDeleted && u.RegistrationStatus.Equals(LawyerRegistrationStatus.Approved) && u.Available;
 
         // Apply filters dynamically
         if (!string.IsNullOrWhiteSpace(keyword))
@@ -1099,7 +1062,7 @@ public class AccountService : IAccountService
         {
             model.PhoneNumber = $"{model.PhoneNumber}_lawyer";
             var user = await _userManager.FindByNameAsync(model.PhoneNumber);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password) || user.IsDeleted)
             {
                 return (false, null, "Invalid login attempt.");
             }

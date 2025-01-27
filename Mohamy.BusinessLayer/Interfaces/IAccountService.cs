@@ -57,6 +57,8 @@ public interface IAccountService
     ////------------------------------------------------------
     Task<IdentityResult> Activate(string userId);
     Task<IdentityResult> Suspend(string userId);
+    Task<IdentityResult> DeleteAccountAsync(string userId);
+
     //string RandomString(int length);
     //Task<bool> DisActiveUserConnnection(string userId);
     //Task<bool> ActiveUserConnnection(string userId);
