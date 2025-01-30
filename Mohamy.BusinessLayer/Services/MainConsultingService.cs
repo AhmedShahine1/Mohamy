@@ -50,7 +50,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("An error occurred while retrieving main consultings.", ex);
+                throw new ApplicationException("حدث خطأ أثناء استرجاع الاستشارات الرئيسية", ex);
             }
         }
 
@@ -75,7 +75,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while retrieving main consulting with ID {id}.", ex);
+                throw new ApplicationException($"{id} حدث خطأ أثناء استرداد الاستشارة الرئيسية بالمعرف", ex);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Mohamy.BusinessLayer.Services
             catch (Exception ex)
             {
                 // Log the error to understand it better
-                throw new ApplicationException("An error occurred while adding main consulting.", ex);
+                throw new ApplicationException("حدث خطأ أثناء إضافة الاستشارة الرئيسية", ex);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while updating main consulting with ID {dto.Id}.", ex);
+                throw new ApplicationException($"{dto.Id} حدث خطأ أثناء تحديث الاستشارة الرئيسية بالمعرف", ex);
             }
         }
 
@@ -165,7 +165,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while deleting main consulting with ID {id}.", ex);
+                throw new ApplicationException($"{id} حدث خطأ أثناء حذف الاستشارة الرئيسية بالمعرف", ex);
             }
         }
     }

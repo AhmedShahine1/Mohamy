@@ -133,7 +133,7 @@ namespace Mohamy.BusinessLayer.Services
 
             if (image == null)
             {
-                throw new FileNotFoundException("Image not found.");
+                throw new FileNotFoundException("لم يتم العثور على الصورة");
             }
 
             return Path.Combine($"/{image.path.Name}/{image.Name}");

@@ -52,7 +52,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("An error occurred while retrieving sub consultings.", ex);
+                throw new ApplicationException("حدث خطأ أثناء استرداد الاستشارات الفرعية", ex);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("An error occurred while retrieving sub consultings.", ex);
+                throw new ApplicationException("حدث خطأ أثناء استرداد الاستشارات الفرعية", ex);
             }
         }
 
@@ -91,7 +91,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             if (string.IsNullOrEmpty(mainConsultingId))
             {
-                throw new ArgumentException("mainConsultingId cannot be null or empty", nameof(mainConsultingId));
+                throw new ArgumentException("لا يمكن أن يكون فارغًا أو فارغًا mainConsultingId", nameof(mainConsultingId));
             }
 
             // Fetch experiences that match the given subConsultingId
@@ -118,7 +118,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             if (string.IsNullOrEmpty(UserId))
             {
-                throw new ArgumentException("UserId cannot be null or empty", nameof(UserId));
+                throw new ArgumentException("لا يمكن أن يكون فارغًا أو فارغًا UserId", nameof(UserId));
             }
 
             // Fetch experiences that match the given subConsultingId
@@ -177,7 +177,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while retrieving sub consulting with ID {id}.", ex);
+                throw new ApplicationException($"{id} حدث خطأ أثناء استرداد الاستشارة الفرعية بالمعرف", ex);
             }
         }
 
@@ -200,7 +200,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("An error occurred while adding sub consulting.", ex);
+                throw new ApplicationException("حدث خطأ أثناء إضافة الاستشارة الفرعية", ex);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while updating sub consulting with ID {dto.Id}.", ex);
+                throw new ApplicationException($"{dto.Id} حدث خطأ أثناء تحديث الاستشارة الفرعية بالمعرف", ex);
             }
         }
 
@@ -252,7 +252,7 @@ namespace Mohamy.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"An error occurred while deleting sub consulting with ID {id}.", ex);
+                throw new ApplicationException($"{id} حدث خطأ أثناء حذف الاستشارة الفرعية بالمعرف", ex);
             }
         }
     }

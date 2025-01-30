@@ -62,10 +62,10 @@ namespace Mohamy.BusinessLayer.Services
                 voiceConsulting = dto.voiceConsulting,
                 statusConsulting = Enum.TryParse<statusConsulting>(dto.StatusConsulting, out var status) ? status : statusConsulting.UserRequestedNotPaid
             };
-            if(dto.LaywerId != null)
+            if (dto.LaywerId != null)
             {
                 consulting.PriceService = (decimal)((consulting.voiceConsulting) ? 100 : consulting.Lawyer.PriceService);
-                    consulting.StartDate = DateTime.UtcNow;
+                consulting.StartDate = DateTime.UtcNow;
             }
             if (dto.Files != null && dto.Files.Any())
             {
@@ -84,7 +84,7 @@ namespace Mohamy.BusinessLayer.Services
 
         public async Task<IEnumerable<ConsultingDTO>> GetAllConsultingsAsync()
         {
-            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(q=>q.statusConsulting!=statusConsulting.Cancelled&&q.statusConsulting!=statusConsulting.UserRequestedNotPaid,include: q => q
+            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(q => q.statusConsulting != statusConsulting.Cancelled && q.statusConsulting != statusConsulting.UserRequestedNotPaid, include: q => q
                 .Include(c => c.subConsulting)
                 .Include(c => c.Lawyer)
                 .Include(c => c.Customer)
@@ -121,7 +121,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
             }
 
-            return consultingDTOs.OrderByDescending(q=>q.OrderNumber).ToList();
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber).ToList();
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetConsultingsByCustomerIdAsync(string customerId)
@@ -169,7 +169,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
             }
 
-            return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber);
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetConsultingsInprogress(string id, bool isLawyer = false)
@@ -187,7 +187,8 @@ namespace Mohamy.BusinessLayer.Services
                         .Include(c => c.Files)
                 );
             }
-            else {
+            else
+            {
                 // Retrieve consultings and related data from the database first
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
                     a => a.CustomerId == id && a.statusConsulting == statusConsulting.InProgress && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
@@ -232,7 +233,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
             }
 
-            return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber);
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetConsultingsCompleted(string id, bool isLawyer = false)
@@ -251,7 +252,8 @@ namespace Mohamy.BusinessLayer.Services
                         .Include(c => c.Reviews)
                 );
             }
-            else {
+            else
+            {
                 consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
                     a => a.CustomerId == id && a.statusConsulting == statusConsulting.Completed && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
                     include: q => q
@@ -296,9 +298,9 @@ namespace Mohamy.BusinessLayer.Services
                 }
             }
 
-            return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
+            return consultingDTOs.OrderByDescending(q => q.OrderNumber);
         }
-
+    
         public async Task<IEnumerable<ConsultingDTO>> GetConsultingsCancelled(string customerId)
         {
             // Retrieve consultings and related data from the database first
@@ -622,7 +624,7 @@ namespace Mohamy.BusinessLayer.Services
         public async Task UpdateConsultingStatusAsync(string id, statusConsulting status)
         {
             var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(id);
-            if (consulting == null) throw new ArgumentException("Consulting not found");
+            if (consulting == null) throw new ArgumentException("لم يتم العثور على الاستشارة");
             if (statusConsulting.InProgress == status) consulting.EndDate = DateTime.UtcNow;
             consulting.statusConsulting = status;
             consulting.IsUpdated = true; 
@@ -723,8 +725,8 @@ namespace Mohamy.BusinessLayer.Services
         {
             var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(consultationId);
             
-            if (consulting is null) throw new ArgumentException("Consulting not found");
-            if (consulting.LawyerId is not null) throw new ArgumentException("Consulting already accepted");
+            if (consulting is null) throw new ArgumentException("لم يتم العثور على الاستشارة");
+            if (consulting.LawyerId is not null) throw new ArgumentException("تم قبول الاستشارة بالفعل");
 
             consulting.LawyerId = lawyerId;
             consulting.Lawyer = await _accountService.GetUserById(lawyerId);

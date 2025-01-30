@@ -116,7 +116,7 @@ public class AccountService : IAccountService
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to update profile image", ex);
+                throw new InvalidOperationException("فشل تحديث صورة الملف الشخصي", ex);
             }
         }
     }
@@ -129,7 +129,7 @@ public class AccountService : IAccountService
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                throw new ArgumentException("User not found");
+                throw new ArgumentException("لم يتم العثور على المستخدم");
             }
             return user;
         }
@@ -141,40 +141,40 @@ public class AccountService : IAccountService
     //------------------------------------------------------------------------------------------------------------
     // Register methods
     public async Task<IdentityResult> RegisterSupportDeveloper(RegisterSupportDeveloper model)
-{
-    var user = mapper.Map<ApplicationUser>(model);
+    {
+        var user = mapper.Map<ApplicationUser>(model);
 
-    if (model.ImageProfile != null)
-    {
-        var path = await GetPathByName("ProfileImages");
-        user.ProfileId = await _fileHandling.UploadFile(model.ImageProfile, path);
-    }
-    else
-    {
-        var path = await GetPathByName("ProfileImages");
-        user.ProfileId = await _fileHandling.DefaultProfile(path);
-    }
-    user.PhoneNumberConfirmed = true;
-    var result = await _userManager.CreateAsync(user, model.Password);
+        if (model.ImageProfile != null)
+        {
+            var path = await GetPathByName("ProfileImages");
+            user.ProfileId = await _fileHandling.UploadFile(model.ImageProfile, path);
+        }
+        else
+        {
+            var path = await GetPathByName("ProfileImages");
+            user.ProfileId = await _fileHandling.DefaultProfile(path);
+        }
+        user.PhoneNumberConfirmed = true;
+        var result = await _userManager.CreateAsync(user, model.Password);
 
-    if (result.Succeeded)
-    {
-        await _userManager.AddToRoleAsync(user, "Support Developer");
-    }
-    else
-    {
-        // Handle potential errors by throwing an exception or logging details
-        throw new InvalidOperationException("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-    }
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "Support Developer");
+        }
+        else
+        {
+            // Handle potential errors by throwing an exception or logging details
+            throw new InvalidOperationException("فشل إنشاء المستخدم: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
 
-    return result;
-}
+        return result;
+    }
 
     public async Task<IdentityResult> RegisterCustomer(RegisterCustomer model)
     {
         if (await IsPhoneExistAsync(model.PhoneNumber))
         {
-            throw new ArgumentException("هذا الرقم لديه حساب بالفعل.");
+            throw new ArgumentException("هذا الرقم لديه حساب بالفعل");
         }
 
         var user = mapper.Map<ApplicationUser>(model);
@@ -189,7 +189,7 @@ public class AccountService : IAccountService
         }
         else
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل إنشاء المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -197,10 +197,9 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         await SetProfileImage(user, model.ImageProfile);
         user.Description = model.Description;
@@ -211,7 +210,7 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -219,13 +218,12 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyer(string lawyerId, UpdateLawyer model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         if (!await _userManager.CheckPasswordAsync(user, model.Password))
-            throw new ArgumentException("Invalid Password");
+            throw new ArgumentException("كلمة المرور غير صحيحة");
 
         user.FullName = model.FullName;
         user.Email = model.Email;
@@ -233,7 +231,7 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -241,17 +239,16 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> SetUserOnlineOfflineStatusAsync(string userId, bool online)
     {
-
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new ArgumentException("User not found");
+            throw new ArgumentException("لم يتم العثور على المستخدم");
 
         user.Online = online;
         var result = await _userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -261,14 +258,14 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new ArgumentException("User not found");
+            throw new ArgumentException("لم يتم العثور على المستخدم");
 
         user.Device = saveDeviceDTO.DeviceId;
         var result = await _userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         IEnumerable<ApplicationUser> userWithSameDevices = await _unitOfWork.UserRepository.FindAllAsync(u => u.Id != userId && u.Device == saveDeviceDTO.DeviceId);
@@ -287,18 +284,17 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerProfile(string lawyerId, UpdateLawyerProfile model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
-        user.Description= model.Description;
+        user.Description = model.Description;
         user.yearsExperience = model.YearsExperience;
         user.AcademicQualification = model.AcademicQualification;
         user.City = model.City;
         var result = await _userManager.UpdateAsync(user);
 
-        if (result.Succeeded) 
+        if (result.Succeeded)
         {
             var licenses = await GetAllLawyerLicensesAsync(lawyerId);
             if (licenses.Any())
@@ -308,7 +304,7 @@ public class AccountService : IAccountService
                 _unitOfWork.lawyerLicenseRepository.Update(primaryLicense);
                 await _unitOfWork.SaveChangesAsync();
             }
-            else 
+            else
             {
                 lawyerLicense license = new lawyerLicense()
                 {
@@ -320,7 +316,7 @@ public class AccountService : IAccountService
                 await _unitOfWork.SaveChangesAsync();
             }
 
-            if (model.Professions.Any()) 
+            if (model.Professions.Any())
             {
                 var oldProfessions = await _unitOfWork.ProfessionsRepository.FindAllAsync(s => s.LawyerId == lawyerId);
 
@@ -343,10 +339,10 @@ public class AccountService : IAccountService
             }
 
         }
-        
+
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer profile: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث ملف المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -354,18 +350,17 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerLanguages(string lawyerId, UpdateLanguages model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         user.Languages = model.Languages;
-        
+
         var result = await _userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer language: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث لغة المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -373,10 +368,9 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> ChangeLawyerAvailability(string lawyerId)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         user.Available = !user.Available;
 
@@ -384,7 +378,7 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer availability: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث حالة توفر المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -392,13 +386,12 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerPhone(string lawyerId, UpdatePhone model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         if (await IsPhoneExistAsync(model.PhoneNumber, null, true))
-            throw new ArgumentException("Phone number already exists.");
+            throw new ArgumentException("رقم الهاتف موجود بالفعل");
 
         user.PhoneNumber = model.PhoneNumber;
         user.UserName = $"{model.PhoneNumber}_lawyer";
@@ -407,7 +400,7 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -415,17 +408,16 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerPrice(string lawyerId, UpdatePrice model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         user.PriceService = model.PriceService;
         var result = await _userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -433,10 +425,9 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerSpecialities(string lawyerId, UpdateSpecialities model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         var oldSpecialities = await _unitOfWork.SpecialtiesRepository.FindAllAsync(s => s.LawyerId == lawyerId);
 
@@ -465,10 +456,9 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> UpdateLawyerBank(string lawyerId, UpdateBank model)
     {
-
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
-            throw new ArgumentException("Lawyer not found");
+            throw new ArgumentException("لم يتم العثور على المحامي");
 
         user.BankName = model.BankName;
         user.BeneficiaryName = model.BeneficiaryName;
@@ -477,7 +467,7 @@ public class AccountService : IAccountService
 
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Failed to update lawyer: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل تحديث المحامي: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -487,7 +477,7 @@ public class AccountService : IAccountService
     {
         if (await IsPhoneExistAsync(model.PhoneNumber))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("رقم الهاتف موجود بالفعل");
         }
 
         var user = mapper.Map<ApplicationUser>(model);
@@ -501,7 +491,7 @@ public class AccountService : IAccountService
         }
         else
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل إنشاء المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return result;
@@ -509,10 +499,9 @@ public class AccountService : IAccountService
 
     public async Task DeleteProfessionAsync(string professionId)
     {
-
         var profession = await _unitOfWork.ProfessionsRepository.FindAsync(p => p.Id == professionId);
         if (profession is null)
-            throw new ArgumentException("Profession not found");
+            throw new ArgumentException("لم يتم العثور على المهنة");
 
         _unitOfWork.ProfessionsRepository.Delete(profession);
         await _unitOfWork.SaveChangesAsync();
@@ -523,11 +512,11 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(adminId);
         if (user == null)
-            throw new ArgumentException("Admin not found");
+            throw new ArgumentException("لم يتم العثور على المسؤول");
 
         if (await IsPhoneExistAsync(model.PhoneNumber, adminId))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("رقم الهاتف موجود بالفعل");
         }
 
         user.FullName = model.FullName;
@@ -542,7 +531,7 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(SupportDeveloperId);
         if (user == null)
-            throw new ArgumentException("Admin not found");
+            throw new ArgumentException("لم يتم العثور على المسؤول");
 
         user.FullName = model.FullName;
 
@@ -557,8 +546,8 @@ public class AccountService : IAccountService
             catch (Exception ex)
             {
                 // Log the exception
-                Console.WriteLine($"Error updating file: {ex.Message}");
-                throw new InvalidOperationException("Failed to update profile image", ex);
+                Console.WriteLine($"خطأ في تحديث الملف: {ex.Message}");
+                throw new InvalidOperationException("فشل تحديث صورة الملف الشخصي", ex);
             }
         }
 
@@ -568,16 +557,16 @@ public class AccountService : IAccountService
             if (!result.Succeeded)
             {
                 // Log errors
-                Console.WriteLine($"Error updating user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                throw new InvalidOperationException($"Error updating user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"خطأ في تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                throw new InvalidOperationException($"خطأ في تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
             return result;
         }
         catch (Exception ex)
         {
             // Log the exception
-            Console.WriteLine($"Error updating user: {ex.Message}");
-            throw new InvalidOperationException("Failed to update admin", ex);
+            Console.WriteLine($"خطأ في تحديث المستخدم: {ex.Message}");
+            throw new InvalidOperationException("فشل تحديث المسؤول", ex);
         }
     }
 
@@ -585,11 +574,11 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(customerId);
         if (user == null)
-            throw new ArgumentException("Customer not found");
+            throw new ArgumentException("لم يتم العثور على العميل");
 
         if (await IsPhoneExistAsync(model.PhoneNumber, customerId))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("رقم الهاتف موجود بالفعل");
         }
 
         user.FullName = model.FullName;
@@ -608,11 +597,11 @@ public class AccountService : IAccountService
         // Validate user existence
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new InvalidOperationException("User not found");
+            throw new InvalidOperationException("لم يتم العثور على المستخدم");
 
         // Validate password and confirmation (already done by Data Annotations)
         if (updatePasswordModel.Password != updatePasswordModel.ConfirmPassword)
-            throw new ArgumentException("Password and Confirm Password do not match");
+            throw new ArgumentException("كلمة المرور وتأكيدها غير متطابقين");
 
         // Generate password reset token
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -630,18 +619,18 @@ public class AccountService : IAccountService
             var user = await _userManager.FindByNameAsync(model.PhoneNumber);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password) || user.IsDeleted)
             {
-                return (false, null, "Invalid login attempt.");
+                return (false, null, "محاولة تسجيل دخول غير صالحة");
             }
 
             // Check if user status is true and phone number is confirmed
             if (!user.Status)
             {
-                return (false, null, "Your account is deactivated. Please contact support.");
+                return (false, null, "حسابك معطل. يرجى الاتصال بالدعم");
             }
 
             if (!user.PhoneNumberConfirmed)
             {
-                return (false, null, "Phone number not confirmed. Please verify your phone number.");
+                return (false, null, "رقم الهاتف غير مؤكد. يرجى التحقق من رقم هاتفك");
             }
 
             // Proceed with login
@@ -679,14 +668,14 @@ public class AccountService : IAccountService
 
         // Prepare the parameters for the POST request
         var smsParameters = new Dictionary<string, string>
-    {
-        { "user", _smsSettings.sender },
-        { "secret_key", _smsSettings.SecretKey },
-        { "to", customerPhoneNumber },
-        { "message", $"OTP :{OTP} \n محام | للاستشارات القانونية"
-         },
-        { "sender", "TASIA-IT" }
-    };
+{
+    { "user", _smsSettings.sender },
+    { "secret_key", _smsSettings.SecretKey },
+    { "to", customerPhoneNumber },
+    { "message", $"OTP :{OTP} \n محام | للاستشارات القانونية"
+     },
+    { "sender", "TASIA-IT" }
+};
 
         try
         {
@@ -702,7 +691,7 @@ public class AccountService : IAccountService
                     if (smsResponseContent.Contains("-124"))
                     {
                         // Handle the response for failure cases based on the API response
-                        Console.WriteLine($"Failed to send SMS. Response: {smsResponseContent}");
+                        Console.WriteLine($"فشل إرسال الرسالة. الاستجابة: {smsResponseContent}");
                     }
                     else
                     {
@@ -711,13 +700,13 @@ public class AccountService : IAccountService
                 }
                 else
                 {
-                    Console.WriteLine($"SMS Request Failed: {smsResponse.StatusCode}");
+                    Console.WriteLine($"فشل طلب الرسالة: {smsResponse.StatusCode}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception occurred: {ex.Message}");
+            Console.WriteLine($"حدث استثناء: {ex.Message}");
         }
 
         return false; // Return false if SMS sending fails
@@ -745,7 +734,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception occurred during OTP validation: {ex.Message}");
+            Console.WriteLine($"حدث استثناء أثناء التحقق من OTP: {ex.Message}");
             return false;
         }
     }
@@ -755,7 +744,7 @@ public class AccountService : IAccountService
     public async Task<Paths> GetPathByName(string name)
     {
         var path = await _unitOfWork.PathsRepository.FindAsync(x => x.Name == name);
-        if (path == null) throw new ArgumentException("Path not found");
+        if (path == null) throw new ArgumentException("لم يتم العثور على المسار");
         return path;
     }
     //------------------------------------------------------------------------------------------------------------
@@ -763,7 +752,7 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(model.UserId);
         if (user is null)
-            return "Vendor not found!";
+            return "لم يتم العثور على البائع";
 
         if (model.RoleId != null && model.RoleId.Count() > 0)
         {
@@ -779,9 +768,9 @@ public class AccountService : IAccountService
             }
             var result = await _userManager.AddToRolesAsync(user, roles);
 
-            return result.Succeeded ? string.Empty : "Something went wrong";
+            return result.Succeeded ? string.Empty : "حدث خطأ ما";
         }
-        return " Role is empty";
+        return "الدور فارغ";
     }
 
     public Task<List<string>> GetRoles()
@@ -794,7 +783,7 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new ArgumentException("Admin not found");
+            throw new ArgumentException("لم يتم العثور على المسؤول");
 
         user.Status = true;
         return await _userManager.UpdateAsync(user);
@@ -802,19 +791,19 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> Suspend(string userId)
     {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                throw new ArgumentException("Admin not found");
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new ArgumentException("لم يتم العثور على المسؤول");
 
-            user.Status = false;
-            return await _userManager.UpdateAsync(user);       
+        user.Status = false;
+        return await _userManager.UpdateAsync(user);
     }
 
     public async Task<IdentityResult> DeleteAccountAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
-            throw new ArgumentException("User not found");
+            throw new ArgumentException("لم يتم العثور على المستخدم");
 
         var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         user.UserName += $"_deleted_{timestamp}";
@@ -823,7 +812,6 @@ public class AccountService : IAccountService
 
         return await _userManager.UpdateAsync(user);
     }
-
 
     public async Task<string> GetUserProfileImage(string profileId)
     {
@@ -966,14 +954,12 @@ public class AccountService : IAccountService
         return lawyerDtos;
     }
 
-
     public async Task<UserNotificationProfileDTO> GetUserNotificationProfileDataAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
 
         if (user is null)
-            throw new ArgumentException("User not found");
-
+            throw new ArgumentException("لم يتم العثور على المستخدم");
 
         UserNotificationProfileDTO userDTO = new UserNotificationProfileDTO()
         {
@@ -983,7 +969,6 @@ public class AccountService : IAccountService
             ProfileImage = await GetUserProfileImage(user.ProfileId)
         };
 
-        
         return userDTO;
     }
 
@@ -991,22 +976,22 @@ public class AccountService : IAccountService
     {
         if (await IsPhoneExistAsync(model.PhoneNumber, null, true))
         {
-            throw new ArgumentException("phone number already exists.");
+            throw new ArgumentException("رقم الهاتف موجود بالفعل");
         }
 
         if (model.Password != model.ConfirmPassword)
         {
-            throw new ArgumentException("Password and confirm password should match.");
+            throw new ArgumentException("كلمة المرور وتأكيدها غير متطابقين");
         }
 
         if (model.Licenses.Count() < 1 || model.Licenses.Count() > 5)
         {
-            throw new ArgumentException("License files should be between 1-5.");
+            throw new ArgumentException("يجب أن تكون ملفات الرخصة بين 1-5");
         }
 
         if (model.Certificates.Count() < 1 || model.Certificates.Count() > 5)
         {
-            throw new ArgumentException("Certificates should be between 1-5.");
+            throw new ArgumentException("يجب أن تكون الشهادات بين 1-5");
         }
 
         var user = mapper.Map<ApplicationUser>(model);
@@ -1048,14 +1033,11 @@ public class AccountService : IAccountService
         }
         else
         {
-            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException($"فشل إنشاء المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         return (result, user.Id);
     }
-
-
-
 
     public async Task<(bool IsSuccess, string Token, string ErrorMessage)> LawyerLogin(LoginModel model)
     {
@@ -1065,17 +1047,17 @@ public class AccountService : IAccountService
             var user = await _userManager.FindByNameAsync(model.PhoneNumber);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password) || user.IsDeleted)
             {
-                return (false, null, "Invalid login attempt.");
+                return (false, null, "محاولة تسجيل دخول غير صالحة");
             }
 
             if (!user.Status)
             {
-                return (false, null, "Your account is deactivated. Please contact support.");
+                return (false, null, "حسابك معطل. يرجى الاتصال بالدعم");
             }
 
             if (user.RegistrationStatus == LawyerRegistrationStatus.RequestReceived || user.RegistrationStatus == LawyerRegistrationStatus.DetailSibmitted)
             {
-                return (false, null, "Your account is not approved yet");
+                return (false, null, "حسابك غير معتمد بعد");
             }
 
             // Proceed with login
@@ -1091,7 +1073,6 @@ public class AccountService : IAccountService
         }
     }
 
-
     public async Task<(bool IsSuccess, string Message)> ChangeLawyerRegistrationStatus(string lawyerId)
     {
         try
@@ -1099,44 +1080,40 @@ public class AccountService : IAccountService
             var lawyer = await GetUserById(lawyerId);
             if (lawyer is null)
             {
-                return (false, "Lawyer not found");
+                return (false, "لم يتم العثور على المحامي");
             }
             else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.NotLawyer)
             {
-                return (false, "Customer account status cann't be changed");
+                return (false, "لا يمكن تغيير حالة حساب العميل");
             }
             else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.RequestReceived)
             {
                 lawyer.RegistrationStatus = LawyerRegistrationStatus.LicenseApproved;
                 await _userManager.UpdateAsync(lawyer);
 
-                //remove old user roles and add new one based on admin selection
-                //var currentRoles = await _userManager.GetRolesAsync(lawyer);
-                //var removeResult = await _userManager.RemoveFromRolesAsync(lawyer, currentRoles);
-                //await _userManager.AddToRoleAsync(lawyer, "Lawyer");
                 await _userManager.AddToRoleAsync(lawyer, "Notary");
 
-                return (true, "License approved.");
+                return (true, "تمت الموافقة على الرخصة");
             }
             else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.LicenseApproved)
             {
                 lawyer.RegistrationStatus = LawyerRegistrationStatus.DetailSibmitted;
                 await _userManager.UpdateAsync(lawyer);
-                return (true, "Detail submitted");
+                return (true, "تم تقديم التفاصيل");
             }
             else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.DetailSibmitted)
             {
                 lawyer.RegistrationStatus = LawyerRegistrationStatus.Approved;
                 await _userManager.UpdateAsync(lawyer);
-                return (true, "Account approved.");
+                return (true, "تمت الموافقة على الحساب");
             }
             else if (lawyer.RegistrationStatus == LawyerRegistrationStatus.Approved)
             {
-                return (true, "This lawyer account is already approved.");
+                return (true, "حساب المحامي معتمد بالفعل");
             }
             else
             {
-                return (false, "Invalid Status");
+                return (false, "حالة غير صالحة");
             }
         }
         catch (Exception ex)

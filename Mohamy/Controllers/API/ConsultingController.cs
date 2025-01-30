@@ -76,11 +76,13 @@ namespace Mohamy.Controllers.API
                 // Return a user-friendly error message
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = "An error occurred while adding consulting.";
-                response.Data = new { error=ex.Message,
-                    InnerException=ex.InnerException.Message
+                response.ErrorMessage = "حدث خطأ أثناء إضافة الاستشارة.";
+                response.Data = new
+                {
+                    error = ex.Message,
+                    InnerException = ex.InnerException.Message
                 };
-                return StatusCode(response.ErrorCode,response);
+                return StatusCode(response.ErrorCode, response);
             }
         }
 
@@ -102,7 +104,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -126,7 +128,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -150,7 +152,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -174,7 +176,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -198,7 +200,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -222,7 +224,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -246,7 +248,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -255,7 +257,7 @@ namespace Mohamy.Controllers.API
         [Authorize(Policy = "Customer")]
         [HttpGet]
         [Route("GetConsultingById")]
-        public async Task<ActionResult<BaseResponse>> GetConsultingById([FromQuery]string id)
+        public async Task<ActionResult<BaseResponse>> GetConsultingById([FromQuery] string id)
         {
             var response = new BaseResponse();
 
@@ -266,7 +268,7 @@ namespace Mohamy.Controllers.API
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "Consulting not found.";
+                    response.ErrorMessage = "الاستشارة غير موجودة";
                     return NotFound(response);
                 }
 
@@ -277,7 +279,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consulting: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -294,13 +296,13 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Cancelled);
                 response.status = true;
-                response.Data = "تم الغاء الاستشارة بنجاح";
+                response.Data = "تم إلغاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while canceling consulting: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء إلغاء الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -323,7 +325,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while payment consulting: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء دفع الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -339,13 +341,13 @@ namespace Mohamy.Controllers.API
             {
                 await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.Completed);
                 response.status = true;
-                response.Data = "تم انتهاء الاستشارة بنجاح";
+                response.Data = "تم إنهاء الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while Finish consulting: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء إنهاء الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -359,12 +361,12 @@ namespace Mohamy.Controllers.API
 
             try
             {
-                var Files =await _chatService.GetAllFiles(senderId, receiverId);
+                var Files = await _chatService.GetAllFiles(senderId, receiverId);
                 if (Files == null)
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "Files not found.";
+                    response.ErrorMessage = "الملفات غير موجودة";
                     return NotFound(response);
                 }
 
@@ -375,7 +377,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الملفات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -394,7 +396,7 @@ namespace Mohamy.Controllers.API
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "Files not found.";
+                    response.ErrorMessage = "الملفات غير موجودة.";
                     return NotFound(response);
                 }
 
@@ -405,7 +407,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving Files: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الملفات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -415,7 +417,7 @@ namespace Mohamy.Controllers.API
         public async Task<IActionResult> SendMessage([FromForm] ChatDTO chatDTO)
         {
             if (string.IsNullOrEmpty(chatDTO.SenderId) || string.IsNullOrEmpty(chatDTO.ReceiverId))
-                return BadRequest("SenderId and ReceiverId are required.");
+                return BadRequest("معرف المرسل والمستقبل مطلوب.");
 
             try
             {
@@ -425,7 +427,7 @@ namespace Mohamy.Controllers.API
             catch (Exception ex)
             {
                 // Log the exception if a logging system is in place
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(500, $"حدث خطأ: {ex.Message}");
             }
         }
 
@@ -447,7 +449,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -470,7 +472,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while accepting consultation: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء قبول الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -494,7 +496,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving services: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الخدمات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -518,7 +520,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -542,7 +544,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -565,7 +567,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -588,7 +590,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -611,7 +613,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -634,7 +636,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -650,18 +652,16 @@ namespace Mohamy.Controllers.API
                 await _consultingService.IgnoreConsultationAsync(CurrentUser.Id, consultingId);
                 response.status = true;
                 response.ErrorCode = 200;
-                response.Data = "Consulting ignored successfully";
+                response.Data = "تم تجاهل الاستشارة بنجاح";
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while ignoring consulting: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تجاهل الاستشارة: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
         }
-
-
     }
 }

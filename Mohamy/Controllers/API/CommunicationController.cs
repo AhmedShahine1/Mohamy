@@ -32,7 +32,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while generating token: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء إنشاء الرمز: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);

@@ -31,7 +31,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -75,7 +75,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "User registration failed.",
+                    ErrorMessage = "فشل تسجيل المستخدم",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -104,7 +104,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 404,
-                        ErrorMessage = "Customer not found"
+                        ErrorMessage = "لم يتم العثور على العميل"
                     });
                 }
 
@@ -145,7 +145,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -171,7 +171,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -192,7 +192,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Successfully logged out"
+                        Data = "تم تسجيل الخروج بنجاح"
                     });
                 }
 
@@ -200,7 +200,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Logout failed"
+                    ErrorMessage = "فشل تسجيل الخروج"
                 });
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -225,7 +225,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -240,7 +240,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "User updated successfully"
+                        Data = "تم تحديث المستخدم بنجاح"
                     });
                 }
 
@@ -248,7 +248,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "User update failed",
+                    ErrorMessage = "فشل تحديث المستخدم",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -267,7 +267,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -282,7 +282,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Customer Phone Number cannot be null or empty"
+                    ErrorMessage = "لا يمكن أن يكون رقم هاتف العميل خاليًا أو فارغًا"
                 });
             }
 
@@ -344,7 +344,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -359,7 +359,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Customer Phone Number cannot be null or empty"
+                    ErrorMessage = "لا يمكن أن يكون رقم هاتف العميل خاليًا أو فارغًا"
                 });
             }
 
@@ -372,7 +372,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = new { Message = "OTP send successfully." }
+                        Data = new { Message = "تم إرسال OTP بنجاح" }
                     });
                 }
 
@@ -380,7 +380,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Failed to send OTP to phone number.",
+                    ErrorMessage = "فشل الإرسال إلى رقم الهاتف",
                 });
             }
             catch (ArgumentException ex)
@@ -398,7 +398,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -418,7 +418,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 404,
-                        ErrorMessage = "Lawyer not found"
+                        ErrorMessage = "لم يتم العثور على المحامي"
                     });
                 }
 
@@ -485,7 +485,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -511,7 +511,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 404,
-                        ErrorMessage = "No lawyers found matching the criteria."
+                        ErrorMessage = "لم يتم العثور على محامين مطابقين للمعايير"
                     });
 
                 return Ok(new BaseResponse
@@ -526,7 +526,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -547,7 +547,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 404,
-                        ErrorMessage = "User not found"
+                        ErrorMessage = "لم يتم العثور على المستخدم"
                     });
                 }
 
@@ -558,7 +558,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "User account deleted successfully."
+                        Data = "تم حذف حساب المستخدم بنجاح"
                     });
                 }
 
@@ -566,7 +566,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Failed to delete account",
+                    ErrorMessage = "فشل في حذف الحساب",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -576,7 +576,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -594,7 +594,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 400,
-                        ErrorMessage = "Invalid model"
+                        ErrorMessage = "نموذج غير صالح"
                     });
                 }
 
@@ -613,7 +613,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer registration failed.",
+                    ErrorMessage = "فشل تسجيل المحامي",
                     Data = result.result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -639,7 +639,7 @@ namespace Mohamy.Controllers.API
                     {
                         status = false,
                         ErrorCode = 400,
-                        ErrorMessage = "Invalid model"
+                        ErrorMessage = "نموذج غير صالح"
                     });
                 }
                 
@@ -679,7 +679,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -714,7 +714,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -730,7 +730,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -745,7 +745,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -753,7 +753,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -772,7 +772,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -788,7 +788,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -803,7 +803,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -811,7 +811,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -830,7 +830,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -846,7 +846,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -861,7 +861,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -869,7 +869,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -888,7 +888,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -904,7 +904,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -946,7 +946,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -962,7 +962,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1004,7 +1004,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1020,7 +1020,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1062,7 +1062,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1078,7 +1078,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1093,7 +1093,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -1101,7 +1101,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1120,7 +1120,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1155,7 +1155,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1170,7 +1170,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -1178,7 +1178,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1197,7 +1197,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1213,7 +1213,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1228,7 +1228,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Lawyer updated successfully"
+                        Data = "تم تحديث المحامي بنجاح"
                     });
                 }
 
@@ -1236,7 +1236,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Lawyer update failed",
+                    ErrorMessage = "فشل تحديث المحامي",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1255,7 +1255,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1271,7 +1271,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 400,
-                    ErrorMessage = "Invalid model"
+                    ErrorMessage = "نموذج غير صالح"
                 });
             }
 
@@ -1286,7 +1286,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Specialities updated successfully"
+                        Data = "تم تحديث التخصصات بنجاح"
                     });
                 }
 
@@ -1294,7 +1294,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Specialities update failed",
+                    ErrorMessage = "فشل تحديث التخصصات",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1313,7 +1313,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1334,7 +1334,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "User updated successfully"
+                        Data = "تم تحديث المستخدم بنجاح"
                     });
                 }
 
@@ -1342,7 +1342,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "User update failed",
+                    ErrorMessage = "فشل تحديث المستخدم",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1361,7 +1361,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1382,7 +1382,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "User updated successfully"
+                        Data = "تم تحديث المستخدم بنجاح"
                     });
                 }
 
@@ -1390,7 +1390,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "User update failed",
+                    ErrorMessage = "فشل تحديث المستخدم",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1409,7 +1409,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1430,7 +1430,7 @@ namespace Mohamy.Controllers.API
                     return Ok(new BaseResponse
                     {
                         status = true,
-                        Data = "Device saved successfully"
+                        Data = "تم حفظ الجهاز بنجاح"
                     });
                 }
 
@@ -1438,7 +1438,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "Device save failed",
+                    ErrorMessage = "فشل حفظ الجهاز",
                     Data = result.Errors.Select(e => e.Description).ToArray()
                 });
             }
@@ -1457,7 +1457,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }
@@ -1482,7 +1482,7 @@ namespace Mohamy.Controllers.API
                 {
                     status = false,
                     ErrorCode = 500,
-                    ErrorMessage = "An unexpected error occurred.",
+                    ErrorMessage = "حدث خطأ غير متوقع",
                     Data = ex.Message
                 });
             }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO;
@@ -25,8 +24,11 @@ namespace Mohamy.Controllers.API
             if (string.IsNullOrEmpty(evaluatorId)) return Unauthorized();
 
             await _evaluationService.AddEvaluationAsync(evaluatorId, evaluation);
-            return Ok(new BaseResponse { status=true,
-                Data = "Evaluation added successfully" });
+            return Ok(new BaseResponse
+            {
+                status = true,
+                Data = "تمت إضافة التقييم بنجاح"
+            });
         }
 
         [HttpGet("{userId}")]
@@ -35,7 +37,7 @@ namespace Mohamy.Controllers.API
             var evaluations = await _evaluationService.GetEvaluationsAsync(userId);
             return Ok(new BaseResponse
             {
-                status=true,
+                status = true,
                 Data = evaluations
             });
         }

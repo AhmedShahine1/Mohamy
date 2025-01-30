@@ -36,7 +36,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving main consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات الرئيسية: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -44,7 +44,7 @@ namespace Mohamy.Controllers.API
 
         // GET: api/Consulting/MainConsultings
         [HttpGet("MainConsultingsById")]
-        public async Task<ActionResult<BaseResponse>> GetMainConsultingsID([FromQuery]string MainConsultingId)
+        public async Task<ActionResult<BaseResponse>> GetMainConsultingsID([FromQuery] string MainConsultingId)
         {
             var response = new BaseResponse();
 
@@ -58,7 +58,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving main consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات الرئيسية: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -80,7 +80,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving sub consultings: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات الفرعية: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -88,7 +88,6 @@ namespace Mohamy.Controllers.API
 
         [Authorize(Policy = "Customer")]
         [HttpGet("mainconsulting")]
-
         public async Task<ActionResult<BaseResponse>> GetUsersByMainConsulting([FromQuery] string mainConsultingId)
         {
             var response = new BaseResponse();
@@ -97,7 +96,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 400;
-                response.ErrorMessage = "MainConsultingId cannot be null or empty.";
+                response.ErrorMessage = "معرف الاستشارة الرئيسية لا يمكن أن يكون فارغًا";
                 return BadRequest(response);
             }
 
@@ -109,7 +108,7 @@ namespace Mohamy.Controllers.API
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "No users found for the specified subconsulting.";
+                    response.ErrorMessage = "لم يتم العثور على مستخدمين للاستشارة الفرعية المحددة";
                     return NotFound(response);
                 }
 
@@ -136,7 +135,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving users: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع المستخدمين: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -152,7 +151,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 400;
-                response.ErrorMessage = "UserId cannot be null or empty.";
+                response.ErrorMessage = "معرف المستخدم لا يمكن أن يكون فارغًا";
                 return BadRequest(response);
             }
 
@@ -164,7 +163,7 @@ namespace Mohamy.Controllers.API
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "Not found the specified mainconsulting to User.";
+                    response.ErrorMessage = "لم يتم العثور على استشارة رئيسية للمستخدم المحدد";
                     return NotFound(response);
                 }
                 response.status = true;
@@ -174,7 +173,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving users: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع المستخدمين: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -189,7 +188,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 400;
-                response.ErrorMessage = "SubConsultingId cannot be null or empty.";
+                response.ErrorMessage = "معرف الاستشارة الفرعية لا يمكن أن يكون فارغًا";
                 return BadRequest(response);
             }
 
@@ -201,7 +200,7 @@ namespace Mohamy.Controllers.API
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "No subConsulting found for the specified Main Consulting.";
+                    response.ErrorMessage = "لم يتم العثور على استشارات فرعية للاستشارة الرئيسية المحددة";
                     return NotFound(response);
                 }
 
@@ -212,11 +211,10 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while retrieving users: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع المستخدمين: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
-
     }
 }

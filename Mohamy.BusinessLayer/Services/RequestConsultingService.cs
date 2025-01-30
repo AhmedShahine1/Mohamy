@@ -68,7 +68,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             var request = await _unitOfWork.RequestConsultingRepository.GetByIdAsync(requestId);
             if (request == null)
-                throw new ArgumentException("Request not found");
+                throw new ArgumentException("لم يتم العثور على الطلب");
 
                 request.statusRequestConsulting = newStatus;
 
@@ -111,7 +111,7 @@ namespace Mohamy.BusinessLayer.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("An error occurred while updating request status: " + ex.InnerException?.Message, ex);
+                    throw new Exception("حدث خطأ أثناء تحديث حالة الطلب: " + ex.InnerException?.Message, ex);
                 }
         }
 
