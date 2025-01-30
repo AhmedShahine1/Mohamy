@@ -816,7 +816,8 @@ public class AccountService : IAccountService
         if (user == null)
             throw new ArgumentException("User not found");
 
-        user.UserName += "_deleted";
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        user.UserName += $"_deleted_{timestamp}";
         user.NormalizedUserName = _userManager.NormalizeName(user.UserName);
         user.IsDeleted = true;
 
