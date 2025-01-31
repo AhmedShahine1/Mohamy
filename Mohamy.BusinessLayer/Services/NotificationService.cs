@@ -139,7 +139,7 @@ namespace Mohamy.BusinessLayer.Services
         {
             var notification = await _unitOfWork.NotificationRepository.FindAsync(n => n.Id == notificationId);
 
-            if (notification is null) throw new ArgumentException("Notification not found");
+            if (notification is null) throw new ArgumentException("لم يتم العثور على الإخطار");
 
             notification.IsRead = true;
             notification.UpdatedAt = DateTime.Now;

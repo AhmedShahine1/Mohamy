@@ -64,7 +64,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -87,7 +87,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.ErrorCode, response);
@@ -107,14 +107,14 @@ namespace Mohamy.Controllers.API
                 if (!success)
                 {
                     response.ErrorCode = 400;
-                    response.ErrorMessage = "Unable to update the status for the request.";
+                    response.ErrorMessage = "تعذر تحديث حالة الطلب";
                 }
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -134,14 +134,14 @@ namespace Mohamy.Controllers.API
                 if (!success)
                 {
                     response.ErrorCode = 400;
-                    response.ErrorMessage = "Unable to update the status for the request.";
+                    response.ErrorMessage = "تعذر تحديث حالة الطلب";
                 }
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
@@ -161,14 +161,14 @@ namespace Mohamy.Controllers.API
                 if (!success)
                 {
                     response.ErrorCode = 400;
-                    response.ErrorMessage = "Unable to update the status for the request.";
+                    response.ErrorMessage = "تعذر تحديث حالة الطلب";
                 }
             }
             catch (Exception ex)
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while updating request status: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء تحديث حالة الطلب: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);

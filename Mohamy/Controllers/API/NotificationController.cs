@@ -16,8 +16,9 @@ namespace Mohamy.Controllers.API
         {
             _notificationService = notificationService;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetNotificationsAsync([FromQuery]string userId)
+        public async Task<IActionResult> GetNotificationsAsync([FromQuery] string userId)
         {
             var response = new BaseResponse();
             try
@@ -37,7 +38,6 @@ namespace Mohamy.Controllers.API
             }
         }
 
-        
         [HttpPost]
         [Route("Read")]
         public async Task<ActionResult<BaseResponse>> ReadNotificationAsync([FromQuery] string notificationId)
@@ -53,7 +53,7 @@ namespace Mohamy.Controllers.API
             {
                 response.status = false;
                 response.ErrorCode = 500;
-                response.ErrorMessage = $"An error occurred while reading notification: {ex.Message}";
+                response.ErrorMessage = $"حدث خطأ أثناء قراءة الإشعار: {ex.Message}";
             }
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);

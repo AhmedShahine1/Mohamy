@@ -25,7 +25,7 @@ namespace Mohamy.BusinessLayer.Services
         public async Task AddEvaluationAsync(string evaluatorId, EvaluationDTO evaluation)
         {
             var consulting = await _unitOfWork.ConsultingRepository.GetByIdAsync(evaluation.ConsultingId);
-            if (consulting == null) throw new ArgumentException("Consulting not found");
+            if (consulting == null) throw new ArgumentException("لم يتم العثور على الاستشارة");
 
 
             consulting.Reviews = new List<Evaluation>{
