@@ -2,12 +2,23 @@
 @{
     ViewData["Title"] = "جميع إدارة المستخدمين";
 }
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
 <table id="example1" class="table">
     <thead>
         <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>صورة الملف الشخصي</th>
             <th>الاسم الكامل</th>
             <th>رقم الهاتف</th>
+            <th>حالة الحساب</th>
+            <th>إجراءات</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +30,38 @@
                 </td>
                 <td>@user.FullName</td>
                 <td>@user.PhoneNumber</td>
+                <!-- Account Status -->
+                <td>
+                    <span class="badge @(user.Status ? "bg-success" : "bg-danger")">
+                        @(user.Status ? "نشط" : "معطل")
+                    </span>
+                </td>
+                <!-- More Options Dropdown -->
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: auto;">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form asp-action="@(user.Status ? "Suspend" : "Activate")" method="post">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="dropdown-item">
+                                        @(user.Status ? "تعطيل الحساب" : "تفعيل الحساب")
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form asp-action="DeleteAccountAsync" method="post" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف الحساب؟');">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        حذف الحساب
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
 
             </tr>
         }

@@ -1,9 +1,19 @@
 ﻿@model IEnumerable<AuthDTO>
+@using Mohamy.Core.Helpers
 @{
     ViewData["Title"] = "إدارة كافة المحامين";
 }
+@if (TempData["SuccessMessage"] != null)
+{
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
 <table class="table">
-    <thead >
+    <thead>
         <tr style="--bs-table-bg:#f7f7f7ff;">
             <th>صورة الملف الشخصي</th>
             <th>الاسم الكامل</th>
@@ -18,6 +28,9 @@
             <th>رقم الحساب</th>
             <th>اسم المستفيد</th>
             <th>رقم IBAN</th>
+            <th>حالة الحساب</th>
+            <th>حالة التسجيل</th>
+            <th>إجراءات</th> <!-- Moved actions into this column -->
         </tr>
     </thead>
     <tbody>
@@ -48,6 +61,53 @@
                     <td>@(string.IsNullOrEmpty(user.AccountNumber) ? "---" : user.AccountNumber)</td>
                     <td>@(string.IsNullOrEmpty(user.BeneficiaryName) ? "---" : user.BeneficiaryName)</td>
                     <td>@(string.IsNullOrEmpty(user.IBAN) ? "---" : user.IBAN)</td>
+
+                    <!-- Account Status -->
+                    <td>
+                        <span class="badge @(user.Status ? "bg-success" : "bg-danger")">
+                            @(user.Status ? "نشط" : "معطل")
+                        </span>
+                    </td>
+
+                    <!-- Registration Status -->
+                    <td>
+                        <span class="badge @(GetRegistrationStatusClass(user.RegistrationStatus))">
+                            @(GetRegistrationStatusText(user.RegistrationStatus))
+                        </span>
+                    </td>
+
+                    <!-- More Options Dropdown -->
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: auto;">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form asp-action="@(user.Status ? "Suspend" : "Activate")" method="post">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="dropdown-item">
+                                            @(user.Status ? "تعطيل الحساب" : "تفعيل الحساب")
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form asp-action="ChangeLawyerRegistrationStatus" method="post">
+                                        <input type="hidden" name="lawyerId" value="@user.Id" />
+                                        <button type="submit" class="dropdown-item">تغيير حالة التسجيل</button>
+                                    </form>
+                                </li>
+                                        <li>
+                        <form asp-action="DeleteAccountAsync" method="post" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف الحساب؟');">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="dropdown-item text-danger">
+                                حذف الحساب
+                            </button>
+                        </form>
+                    </li>
+                            </ul>
+                        </div>
+                    </td>
                 </tr>
             }
         }
@@ -59,3 +119,31 @@
         }
     </tbody>
 </table>
+
+@functions {
+    private string GetRegistrationStatusText(LawyerRegistrationStatus status)
+    {
+        return status switch
+        {
+            LawyerRegistrationStatus.NotLawyer => "ليس محاميًا",
+            LawyerRegistrationStatus.RequestReceived => "تم استلام الطلب",
+            LawyerRegistrationStatus.LicenseApproved => "تمت الموافقة على الرخصة",
+            LawyerRegistrationStatus.DetailSibmitted => "تمت إضافة التفاصيل",
+            LawyerRegistrationStatus.Approved => "تمت الموافقة على الحساب",
+            _ => "غير معروف"
+        };
+    }
+
+    private string GetRegistrationStatusClass(LawyerRegistrationStatus status)
+    {
+        return status switch
+        {
+            LawyerRegistrationStatus.NotLawyer => "bg-secondary text-white",
+            LawyerRegistrationStatus.RequestReceived => "bg-warning text-dark",
+            LawyerRegistrationStatus.LicenseApproved => "bg-primary text-white",
+            LawyerRegistrationStatus.DetailSibmitted => "bg-info text-white",
+            LawyerRegistrationStatus.Approved => "bg-success text-white",
+            _ => "bg-light text-dark"
+        };
+    }
+}

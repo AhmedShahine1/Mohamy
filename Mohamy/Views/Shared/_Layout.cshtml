@@ -202,24 +202,50 @@
 
 <script>
 
-    $(function () {
-        $("#example1").DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": true,
-            "responsive": true,
-        "language": {
-            "paginate": {
-                "next": "التالي",    // Custom text for the Next button
-                "previous": "السابق" // Custom text for the Previous button
-            }
-        }
-        }).buttons();
-    });
-
+    $(document).ready(function () {
+            $("#example1").DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true,
+                "responsive": true,
+                "language": {
+                    "paginate": {
+                        "next": "التالي",
+                        "previous": "السابق"
+                    }
+                },
+                "dom": 'Bfrtip', // Add buttons to DataTable
+                "buttons": [
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'PDF', // Arabic for "Export to PDF"
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: ':visible' // Export only visible columns
+                        }
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'طباعة',
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ]
+            });
+        });
     document.addEventListener("DOMContentLoaded", function (event) {
         const showNavbar = (toggleId, navId, bodyId, headerId) => {
             const toggle = document.getElementById(toggleId),

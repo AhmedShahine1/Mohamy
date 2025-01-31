@@ -51,5 +51,6 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string? AccountNumber { get; set; }
         public string? BeneficiaryName { get; set; }
         public string? IBAN { get; set; }
+        public bool Status { get; set; }
     }
 }
