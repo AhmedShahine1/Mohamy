@@ -22,7 +22,7 @@ public interface IAccountService
     Task<IdentityResult> UpdateSupportDeveloper(string SupportDeveloperId, RegisterSupportDeveloper model);
     Task<IdentityResult> RegisterCustomer(RegisterCustomer model);
     Task<IdentityResult> UpdateCustomer(string adminId, UpdateCustomer model);
-    Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model);
+    Task UpdateProfileImageAsync(string lawyerId, UpdateProfileImage model);
     Task<IdentityResult> UpdateLawyer(string lawyerId, UpdateLawyer model);
     Task<IdentityResult> UpdateLawyerProfile(string lawyerId, UpdateLawyerProfile model);
     Task<IdentityResult> UpdateLawyerLanguages(string lawyerId, UpdateLanguages model);

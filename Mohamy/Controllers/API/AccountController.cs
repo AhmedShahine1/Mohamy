@@ -582,6 +582,54 @@ namespace Mohamy.Controllers.API
             }
         }
 
+        [HttpPost("UpdateProfileImage")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateProfileImageAsync([FromForm] UpdateProfileImage model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 400,
+                    ErrorMessage = "نموذج غير صالح"
+                });
+            }
+
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+                var user = await _accountService.GetUserFromToken(token);
+                await _accountService.UpdateProfileImageAsync(user.Id, model);
+
+                return Ok(new BaseResponse
+                {
+                    status = true,
+                    Data = "تم تحديث الصورة الشخصية بنجاح"
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 404,
+                    ErrorMessage = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new BaseResponse
+                {
+                    status = false,
+                    ErrorCode = 500,
+                    ErrorMessage = "حدث خطأ غير متوقع",
+                    Data = ex.Message
+                });
+            }
+        }
+
+
 
         [HttpPost("RegisterLawyer")]
         public async Task<IActionResult> RegisterLawyer([FromForm] RegisterLawyer model)
@@ -720,64 +768,7 @@ namespace Mohamy.Controllers.API
             }
         }
 
-        [HttpPost("SetLawyerInitialDetail")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
-        public async Task<IActionResult> SetLawyerInitialDetail([FromForm] LawyerInitialDetail model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 400,
-                    ErrorMessage = "نموذج غير صالح"
-                });
-            }
-
-            try
-            {
-                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
-                var lawyer = await _accountService.GetUserFromToken(token);
-                var result = await _accountService.SetLawyerInitialDetail(lawyer.Id, model);
-
-                if (result.Succeeded)
-                {
-                    return Ok(new BaseResponse
-                    {
-                        status = true,
-                        Data = "تم تحديث المحامي بنجاح"
-                    });
-                }
-
-                return BadRequest(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 500,
-                    ErrorMessage = "فشل تحديث المحامي",
-                    Data = result.Errors.Select(e => e.Description).ToArray()
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 404,
-                    ErrorMessage = ex.Message
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new BaseResponse
-                {
-                    status = false,
-                    ErrorCode = 500,
-                    ErrorMessage = "حدث خطأ غير متوقع",
-                    Data = ex.Message
-                });
-            }
-        }
-
+       
         [HttpPost("UpdateLawyer")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Lawyer")]
         public async Task<IActionResult> UpdateLawyer([FromBody] UpdateLawyer model)

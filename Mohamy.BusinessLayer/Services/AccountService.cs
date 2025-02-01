@@ -191,25 +191,14 @@ public class AccountService : IAccountService
         return result;
     }
 
-    public async Task<IdentityResult> SetLawyerInitialDetail(string lawyerId, LawyerInitialDetail model)
+    public async Task UpdateProfileImageAsync(string lawyerId, UpdateProfileImage model)
     {
         var user = await _userManager.FindByIdAsync(lawyerId);
         if (user == null)
             throw new ArgumentException("لم يتم العثور على المحامي");
 
         await SetProfileImage(user, model.ImageProfile);
-        user.Description = model.Description;
-        user.PriceService = model.PriceService;
-        user.yearsExperience = model.YearsExperience;
-
-        var result = await _userManager.UpdateAsync(user);
-
-        if (!result.Succeeded)
-        {
-            throw new InvalidOperationException($"فشل تحديث المستخدم: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-        }
-
-        return result;
+        await _userManager.UpdateAsync(user);
     }
 
     public async Task<IdentityResult> UpdateLawyer(string lawyerId, UpdateLawyer model)
