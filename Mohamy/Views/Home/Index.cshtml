@@ -1,1 +1,94 @@
-﻿
+﻿@model Mohamy.Core.DTO.DashboardViewModel
+
+@{
+    ViewData["Title"] = "لوحة التحكم";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">عدد المحامين</h5>
+                    <p class="card-text display-4">@Model.TotalLawyers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">عدد العملاء</h5>
+                    <p class="card-text display-4">@Model.TotalCustomers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">عدد المسؤولين</h5>
+                    <p class="card-text display-4">@Model.TotalAdmins</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Chart Section -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">إحصائيات الاستشارات</h5>
+                    <canvas id="consultingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">تحليل الطلبات</h5>
+                    <canvas id="requestsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var consultingCtx = document.getElementById('consultingChart').getContext('2d');
+        var consultingChart = new Chart(consultingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['مكتمل', 'قيد التنفيذ', 'ملغي'],
+                datasets: [{
+                    label: 'الاستشارات',
+                    data: [@Model.CompletedConsultings, @Model.InProgressConsultings, @Model.CancelledConsultings],
+                    backgroundColor: ['green', 'blue', 'red']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        var requestsCtx = document.getElementById('requestsChart').getContext('2d');
+        var requestsChart = new Chart(requestsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['إجمالي الطلبات'],
+                datasets: [{
+                    label: 'الطلبات',
+                    data: [@Model.TotalRequests],
+                    backgroundColor: ['purple']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+</script>

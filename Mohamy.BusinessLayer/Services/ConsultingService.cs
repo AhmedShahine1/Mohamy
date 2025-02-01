@@ -348,6 +348,53 @@ namespace Mohamy.BusinessLayer.Services
 
             return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
         }
+        public async Task<IEnumerable<ConsultingDTO>> GetConsultingsbyStatus(statusConsulting statusConsulting)
+        {
+            // Retrieve consultings and related data from the database first
+            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(
+                a => a.statusConsulting == statusConsulting && !a.IsDeleted && !a.subConsulting.MainConsulting.service,
+                include: q => q
+                    .Include(c => c.subConsulting).ThenInclude(c => c.MainConsulting)
+                    .Include(c => c.Lawyer)
+                    .Include(c => c.Customer)
+                    .Include(c => c.Files)
+            );
+
+            // Map consulting entities to DTOs
+            var consultingDTOs = _mapper.Map<List<ConsultingDTO>>(consultings);
+
+            // After completing all database operations, fetch profile images asynchronously
+            foreach (var consulting in consultingDTOs)
+            {
+                if (consulting.Lawyer != null && !string.IsNullOrEmpty(consulting.Lawyer.ProfileImageId))
+                {
+                    consulting.Lawyer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Lawyer.ProfileImageId);
+                }
+
+                if (consulting.Customer != null && !string.IsNullOrEmpty(consulting.Customer.ProfileImageId))
+                {
+                    consulting.Customer.ProfileImage = await _accountService.GetUserProfileImage(consulting.Customer.ProfileImageId);
+                }
+                if (consulting.RequestConsultings != null)
+                {
+                    consulting.RequestConsultings = _mapper.Map<List<RequestConsultingDTO>>(_unitOfWork.RequestConsultingRepository.FindAllAsync(a => a.ConsultingId == consulting.Id).Result);
+                }
+                consulting.SubConsultingName = _unitOfWork.SubConsultingRepository.GetByIdAsync(consulting.SubConsultingId).Result.Name;
+                consulting.FilesUrl = new List<string>();
+                foreach (var consulting1 in consultings)
+                {
+                    if (consulting1.Id == consulting.Id)
+                    {
+                        foreach (var file in consulting1.Files)
+                        {
+                            consulting.FilesUrl.Add(await _fileHandling.GetFile(file.Id));
+                        }
+                    }
+                }
+            }
+
+            return consultingDTOs.OrderByDescending(q=>q.OrderNumber);
+        }
 
         public async Task<IEnumerable<ConsultingDTO>> GetServicesInprogress(string customerId)
         {

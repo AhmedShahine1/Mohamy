@@ -11,6 +11,7 @@ namespace Mohamy.BusinessLayer.Interfaces
         Task<IEnumerable<ConsultingDTO>> GetConsultingsInprogress(string customerId, bool isLawyer = false);
         Task<IEnumerable<ConsultingDTO>> GetConsultingsCompleted(string customerId, bool isLawyer = false);
         Task<IEnumerable<ConsultingDTO>> GetConsultingsCancelled(string customerId);
+        Task<IEnumerable<ConsultingDTO>> GetConsultingsbyStatus(statusConsulting statusConsulting);
         Task<IEnumerable<ConsultingDTO>> GetServicesInprogress(string customerId);
         Task<IEnumerable<ConsultingDTO>> GetServicesCompleted(string customerId);
         Task<IEnumerable<ConsultingDTO>> GetServicesCancelled(string customerId);

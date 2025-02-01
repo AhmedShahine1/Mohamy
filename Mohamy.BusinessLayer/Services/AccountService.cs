@@ -19,12 +19,8 @@ using Microsoft.AspNetCore.Http;
 using Mohamy.Core.DTO.AuthViewModel.UpdateModel;
 using Mohamy.Core.Entity.LawyerData;
 using System.Linq.Expressions;
-using System.IO;
-using Mohamy.Core.Entity.ConsultingData;
 using Mohamy.Core.DTO.CityViewModel;
 using Microsoft.CodeAnalysis;
-using System.ComponentModel.DataAnnotations.Schema;
-using Azure.Core;
 using Mohamy.Core.DTO.NotificationViewModel;
 
 namespace Mohamy.BusinessLayer.Services;

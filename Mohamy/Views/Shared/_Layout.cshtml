@@ -46,7 +46,7 @@
     <div class="l-navbar" id="nav-bar">
         <nav class="nav">
             <div>
-                <a href='@Url.Action("AllConsultings", "Manage", new { area = "Admin" })' class="nav_logo">
+                <a href='@Url.Action("Index", "Home", new { area = "" })' class="nav_logo">
                     <span class="nav_logo-name">
                         <img src="~/asset/white.png" alt="Logo" class="smallIcon" />
                     </span>
@@ -54,6 +54,12 @@
                 <div class="nav_list">
                     @if (User.IsInRole("Admin") || User.IsInRole("Support Developer"))
                     {
+                        <a href='@Url.Action("Index", "Home", new { area = "" })' class="nav_link">
+                            <img src="~/asset/Group, User.png" alt="icon" width="20" height="20" />
+                            <span class="nav_name hidden">
+                                الصفحة الرئيسية
+                            </span>
+                        </a>
                         <a href='@Url.Action("Register", "Admin", new { area = "Admin" })' class="nav_link">
                             <img src="~/asset/Group, User.png" alt="icon" width="20" height="20" />
                             <span class="nav_name hidden">
