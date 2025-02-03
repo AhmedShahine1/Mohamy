@@ -1455,7 +1455,6 @@ namespace Mohamy.Controllers.API
         }
 
         [HttpGet("GetCities")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetCities()
         {
             try
