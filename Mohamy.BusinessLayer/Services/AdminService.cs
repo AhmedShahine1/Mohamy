@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.AuthViewModel;
+using Mohamy.Core.DTO.AuthViewModel.LawyerDetailsModel;
 using Mohamy.RepositoryLayer.Interfaces;
 
 namespace Mohamy.BusinessLayer.Services
@@ -26,8 +27,6 @@ namespace Mohamy.BusinessLayer.Services
 
             var lawyers = from user in _unitOfWork.UserRepository.GetAll().AsQueryable()
                           .Include(a => a.Profile)
-                          .Include(a => a.lawyerLicense)
-                          .Include(a => a.graduationCertificates)
                           .ToList()
                           join userRole in _unitOfWork.UserRoleRepository.GetAll().AsQueryable()
                           on user.Id equals userRole.UserId into userRoles
@@ -40,6 +39,26 @@ namespace Mohamy.BusinessLayer.Services
             {
                 lawyer.ProfileImage = await _accountService.GetUserProfileImage(lawyer.ProfileImageId);
             }
+            return lawyerDTO;
+        }
+
+        public async Task<AuthDTO> GetLawyerByIdAsync(string lawyerId)
+        {
+            var lawyer = await _unitOfWork.UserRepository.FindAsync(q=>q.Id==lawyerId,include:q=>q.Include(a=>a.Profile));
+            if (lawyer == null)
+                return null;
+
+            var lawyerDTO = _mapper.Map<AuthDTO>(lawyer);
+            var lawyerLicense = await _unitOfWork.lawyerLicenseRepository.FindAsync(q => q.LawyerId == lawyer.Id);
+            var lawyerGraduationCertificate = await _unitOfWork.graduationCertificateRepository.FindAllAsync(q => q.LawyerId == lawyer.Id);
+            lawyerDTO.ProfileImage = await _accountService.GetUserProfileImage(lawyer.ProfileId);
+            lawyerDTO.lawyerLicenseId = lawyerLicense.Id;
+            lawyerDTO.lawyerLicenseStart = lawyerLicense.Start;
+            lawyerDTO.lawyerLicenseEnd = lawyerLicense.End;
+            lawyerDTO.lawyerLicenseNumber = lawyerLicense.LicenseNumber;
+            lawyerDTO.lawyerLicenseState = lawyerLicense.State;
+            lawyerDTO.GraduationCertificates = _mapper.Map<List<GraduationCertificateDTO>>(lawyerGraduationCertificate);
+
             return lawyerDTO;
         }
 

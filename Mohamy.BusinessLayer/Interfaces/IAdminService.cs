@@ -7,5 +7,6 @@ namespace Mohamy.BusinessLayer.Interfaces
         Task<IEnumerable<AuthDTO>> GetAllLawyersAsync();
         Task<IEnumerable<AuthDTO>> GetAllCustomersAsync();
         Task<IEnumerable<AuthDTO>> GetAllAdminsAsync(); // New method to get admins
+        Task<AuthDTO> GetLawyerByIdAsync(string lawyerId);
     }
 }

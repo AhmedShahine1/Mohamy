@@ -18,16 +18,9 @@
             <th>صورة الملف الشخصي</th>
             <th>الاسم الكامل</th>
             <th>رقم التليفون</th>
-            <th>الوصف</th>
             <th>سنوات من الخبرة</th>
             <th>مدينة</th>
-            <th>التخصص الأكاديمي</th>
-            <th>تعليم</th>
             <th>عدد الاستشارات</th>
-            <th>اسم البنك</th>
-            <th>رقم الحساب</th>
-            <th>اسم المستفيد</th>
-            <th>رقم IBAN</th>
             <th>حالة الحساب</th>
             <th>حالة التسجيل</th>
             <th>إجراءات</th> <!-- Moved actions into this column -->
@@ -51,17 +44,9 @@
                     </td>
                     <td>@(string.IsNullOrEmpty(user.FullName) ? "---" : user.FullName)</td>
                     <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "---" : user.PhoneNumber)</td>
-                    <td>@(string.IsNullOrEmpty(user.Description) ? "---" : user.Description)</td>
                     <td>@(user.yearsExperience.HasValue ? user.yearsExperience.Value.ToString() : "---")</td>
                     <td>@(string.IsNullOrEmpty(user.City) ? "---" : user.City)</td>
-                    <td>@(string.IsNullOrEmpty(user.academicSpecialization) ? "---" : user.academicSpecialization)</td>
-                    <td>@(string.IsNullOrEmpty(user.Education) ? "---" : user.Education)</td>
                     <td>@user.numberConsulting</td>
-                    <td>@(string.IsNullOrEmpty(user.BankName) ? "---" : user.BankName)</td>
-                    <td>@(string.IsNullOrEmpty(user.AccountNumber) ? "---" : user.AccountNumber)</td>
-                    <td>@(string.IsNullOrEmpty(user.BeneficiaryName) ? "---" : user.BeneficiaryName)</td>
-                    <td>@(string.IsNullOrEmpty(user.IBAN) ? "---" : user.IBAN)</td>
-
                     <!-- Account Status -->
                     <td>
                         <span class="badge @(user.Status ? "bg-success" : "bg-danger")">
@@ -83,6 +68,12 @@
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
+                                <li>
+                                    <a asp-action="LawyerDetails" asp-route-lawyerId="@user.Id" class="dropdown-item">
+                                        عرض التفاصيل
+                                    </a>
+                                </li>
+
                                 <li>
                                     <form asp-action="@(user.Status ? "Suspend" : "Activate")" method="post">
                                         <input type="hidden" name="userId" value="@user.Id" />

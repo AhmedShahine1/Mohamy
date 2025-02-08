@@ -29,6 +29,16 @@ namespace Mohamy.Areas.Admin.Controllers
             return View(lawyers);
         }
 
+        public async Task<IActionResult> LawyerDetails(string lawyerId)
+        {
+            var lawyer = await _adminService.GetLawyerByIdAsync(lawyerId);
+            if (lawyer == null)
+            {
+                return NotFound();
+            }
+            return View(lawyer);
+        }
+
         // Display all customers
         public async Task<IActionResult> AllCustomers()
         {
