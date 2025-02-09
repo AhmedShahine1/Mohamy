@@ -73,7 +73,7 @@
                     </tbody>
                 </table>
 
-                <!-- Lawyer License Details -->
+                <!-- Lawyer License Section -->
                 <h4 class="mt-4">تفاصيل الرخصة</h4>
                 <table class="table">
                     <tbody>
@@ -93,10 +93,26 @@
                             <th>تاريخ انتهاء الرخصة</th>
                             <td>@Model.lawyerLicenseEnd?.ToString("yyyy-MM-dd")</td>
                         </tr>
+                        <tr>
+                            <th>ملفات الرخصة</th>
+                            <td>
+                                @if (Model.lawyerLicenseURL != null && Model.lawyerLicenseURL.Any(url => url != "NotFound"))
+                                {
+                                    @foreach (var url in Model.lawyerLicenseURL)
+                                    {
+                                        <a href="@url" target="_blank" class="btn btn-primary">عرض الملف</a>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-danger">لم يتم العثور على الملف</span>
+                                }
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-                <!-- Graduation Certificates -->
+                <!-- Graduation Certificates Section -->
                 <h4 class="mt-4">الشهادات التعليمية</h4>
                 @if (Model.GraduationCertificates != null && Model.GraduationCertificates.Any())
                 {
@@ -109,6 +125,7 @@
                                 <th>تاريخ البدء</th>
                                 <th>تاريخ الانتهاء</th>
                                 <th>الوصف</th>
+                                <th>الملفات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,6 +138,19 @@
                                     <td>@cert.Start.ToString("yyyy-MM-dd")</td>
                                     <td>@cert.End?.ToString("yyyy-MM-dd")</td>
                                     <td>@cert.Description</td>
+                                    <td>
+                                        @if (Model.GraduationCertificatesURL != null && Model.GraduationCertificatesURL.Any(url => url != "NotFound"))
+                                        {
+                                            @foreach (var url in Model.GraduationCertificatesURL)
+                                            {
+                                                <a href="@url" target="_blank" class="btn btn-info">عرض الملف</a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">لم يتم العثور على الملف</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -128,7 +158,21 @@
                 }
                 else
                 {
-                    <p>لا توجد شهادات تعليمية مسجلة.</p>
+                    <!-- Display files even if GraduationCertificates is null -->
+                    <h5>الملفات</h5>
+                    <div>
+                        @if (Model.GraduationCertificatesURL != null && Model.GraduationCertificatesURL.Any(url => url != "NotFound"))
+                        {
+                            @foreach (var url in Model.GraduationCertificatesURL)
+                            {
+                                <a href="@url" target="_blank" class="btn btn-info">عرض الملف</a>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-danger">لم يتم العثور على الملف</p>
+                        }
+                    </div>
                 }
             </div>
         </div>

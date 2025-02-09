@@ -990,14 +990,14 @@ public class AccountService : IAccountService
         user.Documents = new List<Images>();
         foreach (var file in model.Licenses)
         {
-            string fileId = await _fileHandling.UploadFile(file, path);
+            string fileId = await _fileHandling.UploadFile(file, documentsPath);
             user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
         }
 
         documentsPath = await GetPathByName("graduationCertificate");
         foreach (var file in model.Certificates)
         {
-            string fileId = await _fileHandling.UploadFile(file, path);
+            string fileId = await _fileHandling.UploadFile(file, documentsPath);
             user.Documents.Add(await _unitOfWork.ImagesRepository.FindAsync(a => a.Id == fileId));
         }
 

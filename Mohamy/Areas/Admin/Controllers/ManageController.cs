@@ -114,7 +114,7 @@ namespace Mohamy.Areas.Admin.Controllers
 
         // Delete a lawyer's account
         [HttpPost]
-        public async Task<IActionResult> DeleteAccountAsync(string userId)
+        public async Task<IActionResult> DeleteAccount(string userId)
         {
             var result = await _accountService.DeleteAccountAsync(userId);
             if (result.Succeeded)

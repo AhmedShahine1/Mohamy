@@ -5,11 +5,11 @@
 }
 @if (TempData["SuccessMessage"] != null)
 {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
 <table class="table">
@@ -69,7 +69,7 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a asp-action="LawyerDetails" asp-route-lawyerId="@user.Id" class="dropdown-item">
+                                    <a asp-action="LawyerDetails" asp-route-lawyerId="@user.Id"  class="dropdown-item">
                                         عرض التفاصيل
                                     </a>
                                 </li>
@@ -88,14 +88,14 @@
                                         <button type="submit" class="dropdown-item">تغيير حالة التسجيل</button>
                                     </form>
                                 </li>
-                                        <li>
-                        <form asp-action="DeleteAccountAsync" method="post" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف الحساب؟');">
-                            <input type="hidden" name="userId" value="@user.Id" />
-                            <button type="submit" class="dropdown-item text-danger">
-                                حذف الحساب
-                            </button>
-                        </form>
-                    </li>
+                                <li>
+                                    <form method="post" asp-action="DeleteAccount">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="dropdown-item  text-danger">
+                                            حذف الحساب
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     </td>

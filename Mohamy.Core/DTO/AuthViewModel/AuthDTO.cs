@@ -32,9 +32,12 @@ namespace Mohamy.Core.DTO.AuthViewModel
         public string lawyerLicenseState { get; set; }
         public DateTime? lawyerLicenseStart { get; set; }
         public DateTime? lawyerLicenseEnd { get; set; }
+        public List<string> lawyerLicenseURL { get; set; } = new List<string>();
+
 
         // Graduation certificates
         public List<GraduationCertificateDTO> GraduationCertificates { get; set; } = new List<GraduationCertificateDTO>();
+        public List<string> GraduationCertificatesURL { get; set; } = new List<string>();
 
         // Specialties
         public List<SpecialtiesDTO> Specialties { get; set; } = new List<SpecialtiesDTO>();
