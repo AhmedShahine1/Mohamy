@@ -9,6 +9,7 @@ namespace Mohamy.Core.Entity.ChatData
         public ApplicationUser Sender { get; set; }
         public string ReceiverId { get; set; }
         public ApplicationUser Receiver { get; set; }
+        public string? ConsultingId { get; set; }
         public string Message { get; set; }
         public string? ImagesId { get; set; }
         public Images? Images { get; set; }

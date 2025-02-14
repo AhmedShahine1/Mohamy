@@ -14,25 +14,25 @@ namespace Mohamy.BusinessLayer.Hubs
         }
 
         // Method to join a chat room and get old messages
-        public async Task JoinChat(string senderId, string receiverId)
+        public async Task JoinChat(string senderId, string receiverId, string consultingId)
         {
-            string chatGroup = GetGroupName(senderId, receiverId);
+            string chatGroup = GetGroupName(senderId, receiverId, consultingId);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, chatGroup);
 
             // Retrieve chat history between the sender and receiver
-            var chatHistory = await _chatService.GetChatsAsync(senderId, receiverId);
+            var chatHistory = await _chatService.GetChatsAsync(senderId, receiverId, consultingId);
 
             // Send chat history to the joining user
             await Clients.Group(chatGroup).SendAsync("ChatHistory", chatHistory);
         }
 
-        public async Task ReadMessages(string senderId, string receiverId)
+        public async Task ReadMessages(string senderId, string receiverId, string consultingId)
         {
-            var messageIds = await _chatService.ReadMessages(senderId, receiverId);
+            var messageIds = await _chatService.ReadMessages(senderId, receiverId, consultingId);
             if (messageIds.Count > 0)
             {
-                string chatGroup = GetGroupName(senderId, receiverId);
+                string chatGroup = GetGroupName(senderId, receiverId, consultingId);
                 await Clients.Group(chatGroup).SendAsync("MessageReads", messageIds);
             }
         }
@@ -40,7 +40,7 @@ namespace Mohamy.BusinessLayer.Hubs
         // Method to send a message
         public async Task SendMessage(ChatDTO chatMessage)
         {
-            string chatGroup = GetGroupName(chatMessage.SenderId, chatMessage.ReceiverId);
+            string chatGroup = GetGroupName(chatMessage.SenderId, chatMessage.ReceiverId, chatMessage.ConsultingId);
 
             chatMessage.SentAt = DateTime.UtcNow;
 
@@ -52,9 +52,10 @@ namespace Mohamy.BusinessLayer.Hubs
         }
 
         // Utility method to create a consistent group name
-        private string GetGroupName(string user1, string user2)
+        private string GetGroupName(string user1, string user2, string consultingId)
         {
-            return string.CompareOrdinal(user1, user2) < 0 ? $"{user1}-{user2}" : $"{user2}-{user1}";
+            string groupName = string.CompareOrdinal(user1, user2) < 0 ? $"{user1}-{user2}" : $"{user2}-{user1}";
+            return $"{groupName}-{consultingId}";
         }
     }
 }
