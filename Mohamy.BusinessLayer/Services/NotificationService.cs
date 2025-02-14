@@ -37,6 +37,7 @@ namespace Mohamy.BusinessLayer.Services
             var notification = new Core.Entity.Notification.Notification
             {
                 UserId = saveNotificationDTO.UserId,
+                Title = saveNotificationDTO.Title,
                 Message = saveNotificationDTO.Message,
                 NotificationType = saveNotificationDTO.NotificationType,
                 ActionId = saveNotificationDTO.ActionId
@@ -127,6 +128,7 @@ namespace Mohamy.BusinessLayer.Services
             return notifications.OrderByDescending(n => n.CreatedAt).Select(n => new NotificationDTO
             {
                 Id = n.Id,
+                Title = n.Title,
                 Message = n.Message,
                 CreatedAt = n.CreatedAt,
                 IsRead = n.IsRead,
