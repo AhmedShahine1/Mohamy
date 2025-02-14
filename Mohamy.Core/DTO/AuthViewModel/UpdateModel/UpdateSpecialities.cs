@@ -2,6 +2,6 @@
 {
     public class UpdateSpecialities
     {
-        public List<String> mainConsultingId { get; set; }
+        public List<String> subConsultingId { get; set; }
     }
 }

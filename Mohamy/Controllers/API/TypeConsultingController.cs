@@ -86,23 +86,44 @@ namespace Mohamy.Controllers.API
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
 
-        [Authorize(Policy = "Customer")]
-        [HttpGet("mainconsulting")]
-        public async Task<ActionResult<BaseResponse>> GetUsersByMainConsulting([FromQuery] string mainConsultingId)
+        [HttpGet("AllSpecialities")]
+        public async Task<ActionResult<BaseResponse>> GetAllSpecialities()
         {
             var response = new BaseResponse();
 
-            if (string.IsNullOrEmpty(mainConsultingId))
+            try
+            {
+                var specialities = await _subConsultingService.GetAllSpecialitiesAsync();
+                response.status = true;
+                response.Data = specialities;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"حدث خطأ أثناء استرجاع الاستشارات الفرعية: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
+
+        [Authorize(Policy = "Customer")]
+        [HttpGet("subconsulting")]
+        public async Task<ActionResult<BaseResponse>> GetUsersBySubConsulting([FromQuery] string subConsultingId)
+        {
+            var response = new BaseResponse();
+
+            if (string.IsNullOrEmpty(subConsultingId))
             {
                 response.status = false;
                 response.ErrorCode = 400;
-                response.ErrorMessage = "معرف الاستشارة الرئيسية لا يمكن أن يكون فارغًا";
+                response.ErrorMessage = "لا يمكن أن يكون معرف الاستشارة الفرعية فارغًا";
                 return BadRequest(response);
             }
 
             try
             {
-                var users = await _subConsultingService.GetUsersByMainConsultingAsync(mainConsultingId);
+                var users = await _subConsultingService.GetUsersBySubConsultingAsync(subConsultingId);
 
                 if (users == null || !users.Any())
                 {
@@ -142,8 +163,8 @@ namespace Mohamy.Controllers.API
         }
 
         [Authorize(Policy = "Customer")]
-        [HttpGet("mainconsultingUser")]
-        public async Task<ActionResult<BaseResponse>> GetMainConsultingByUser([FromQuery] string UserId)
+        [HttpGet("subconsultingUser")]
+        public async Task<ActionResult<BaseResponse>> GetSubConsultingByUser([FromQuery] string UserId)
         {
             var response = new BaseResponse();
 
@@ -157,13 +178,13 @@ namespace Mohamy.Controllers.API
 
             try
             {
-                var SubConsultings = await _subConsultingService.GetMainConsultingByUsersAsync(UserId);
+                var SubConsultings = await _subConsultingService.GetSubConsultingByUsersAsync(UserId);
 
                 if (SubConsultings == null || !SubConsultings.Any())
                 {
                     response.status = false;
                     response.ErrorCode = 404;
-                    response.ErrorMessage = "لم يتم العثور على استشارة رئيسية للمستخدم المحدد";
+                    response.ErrorMessage = "لم يتم العثور على استشارة فرعية للمستخدم المحدد";
                     return NotFound(response);
                 }
                 response.status = true;

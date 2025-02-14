@@ -423,12 +423,12 @@ public class AccountService : IAccountService
             await _unitOfWork.SaveChangesAsync();
         }
 
-        if (model.mainConsultingId != null && model.mainConsultingId.Any())
+        if (model.subConsultingId != null && model.subConsultingId.Any())
         {
-            var newSpecialities = model.mainConsultingId.Select(id => new Specialties
+            var newSpecialities = model.subConsultingId.Select(id => new Specialties
             {
                 LawyerId = lawyerId,
-                mainConsultingId = id
+                subConsultingId = id
             }).ToList();
 
             await _unitOfWork.SpecialtiesRepository.AddRangeAsync(newSpecialities);
@@ -811,7 +811,7 @@ public class AccountService : IAccountService
 
     public async Task<IEnumerable<Specialties>> GetAllSpecialtiesAsync(string userId)
     {
-        return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.mainConsulting));
+        return await _unitOfWork.SpecialtiesRepository.FindAllAsync(q => q.LawyerId == userId, include: q => q.Include(a => a.subConsulting));
     }
 
     public async Task<IEnumerable<Profession>> GetAllProfessionsAsync(string userId)
@@ -874,7 +874,7 @@ public class AccountService : IAccountService
         if (!string.IsNullOrWhiteSpace(specialization))
         {
             var specializationFilter = (Expression<Func<ApplicationUser, bool>>)(u =>
-                u.Specialties.Any(s => s.mainConsulting.Name.Contains(specialization)));
+                u.Specialties.Any(s => s.subConsulting.Name.Contains(specialization)));
 
             filter = CombineExpressions(filter, specializationFilter);
         }
@@ -922,16 +922,24 @@ public class AccountService : IAccountService
 
         var profileImages = await _fileHandling.GetAllFiles(lawyers.Select(l => l.ProfileId).ToList());
 
+        var consultings = await _unitOfWork.ConsultingRepository
+         .FindAllAsync(c => lawyers.Select(l => l.Id).Contains(c.LawyerId) && c.statusConsulting == statusConsulting.Completed);
+
+        var consultingCounts = consultings
+            .GroupBy(c => c.LawyerId) 
+            .ToDictionary(g => g.Key, g => g.Count());
+
+
         foreach (var lawyer in lawyers)
         {
             var lawyerDto = mapper.Map<LawyerDTO>(lawyer);
 
-            lawyerDto.ProfileImage = profileImages.TryGetValue(lawyer.ProfileId, out var imagePath)
-                ? imagePath : null;
+            lawyerDto.ProfileImage = profileImages.TryGetValue(lawyer.ProfileId, out var imagePath) ? imagePath : null;
 
-            lawyerDto.Rating = evaluationsGrouped.TryGetValue(lawyer.Id, out var averageRating)
-                ? Math.Round(averageRating, 1)
-                : 0;
+            lawyerDto.Rating = evaluationsGrouped.TryGetValue(lawyer.Id, out var averageRating) ? Math.Round(averageRating, 1) : 0;
+
+            lawyerDto.NumberConsulting = consultingCounts.TryGetValue(lawyer.Id, out var count) ? count : 0;
+
 
             lawyerDtos.Add(lawyerDto);
         }

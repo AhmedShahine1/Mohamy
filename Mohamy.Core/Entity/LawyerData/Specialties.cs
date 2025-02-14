@@ -13,9 +13,9 @@ namespace Mohamy.Core.Entity.LawyerData
         public ApplicationUser Lawyer { get; set; }
 
         [Required]
-        [ForeignKey(nameof(mainConsulting))]
-        public string mainConsultingId { get; set; }
+        [ForeignKey(nameof(subConsulting))]
+        public string subConsultingId { get; set; }
 
-        public mainConsulting mainConsulting { get; set; }
+        public subConsulting subConsulting { get; set; }
     }
 }
