@@ -514,7 +514,7 @@ namespace Mohamy.Controllers.API
             try
             {
                 var lawyers = await _accountService.GetLawyersAsync(
-                    keyword, city, specialization, minYearsExperience, maxYearsExperience, sortBy);
+                    keyword, city, specialization, minYearsExperience, maxYearsExperience, minPrice, maxPrice, sortBy);
 
                 if (!lawyers.Any())
                     return NotFound(new BaseResponse
