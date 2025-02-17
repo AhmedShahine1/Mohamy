@@ -436,6 +436,14 @@ namespace Mohamy.Controllers.API
                     subConsultingName = s.subConsulting.Name
                 }).ToList();
 
+                var professions = await _accountService.GetAllProfessionsAsync(authDto.Id);
+                authDto.Professions = professions.Select(p => new ProfessionDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description
+                }).ToList();
+
                 // Populate experiences
                 var experiences = await _accountService.GetAllExperiencesAsync(LawyerId);
                 authDto.Experiences = experiences.Select(e => new ExperienceDTO
@@ -499,6 +507,8 @@ namespace Mohamy.Controllers.API
        [FromQuery] string? specialization,
        [FromQuery] int? minYearsExperience,
        [FromQuery] int? maxYearsExperience,
+       [FromQuery] int? minPrice,
+       [FromQuery] int? maxPrice,
        [FromQuery] string? sortBy)
         {
             try

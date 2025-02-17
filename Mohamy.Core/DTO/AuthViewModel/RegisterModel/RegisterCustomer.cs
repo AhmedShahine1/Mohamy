@@ -1,12 +1,6 @@
-﻿using Mohamy.Core.Helpers;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mohamy.Core.DTO.AuthViewModel.RegisterModel
 {
@@ -20,6 +14,10 @@ namespace Mohamy.Core.DTO.AuthViewModel.RegisterModel
         [DataType(DataType.PhoneNumber)]
         [Required(ErrorMessage = "You should enter the Phone Number"), StringLength(15)]
         public string PhoneNumber { get; set; }
+
+        [DisplayName("City")]
+        [Required(ErrorMessage = "You should select city")]
+        public string City { get; set; }
 
         [DisplayName("Email")]
         [DataType(DataType.EmailAddress)]

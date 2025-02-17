@@ -176,7 +176,7 @@ public class AccountService : IAccountService
         var user = mapper.Map<ApplicationUser>(model);
         await SetProfileImage(user, model.ImageProfile);
         user.PhoneNumberConfirmed = true;
-
+        
         var result = await _userManager.CreateAsync(user, "Ahmed@123");
 
         if (result.Succeeded)
@@ -568,6 +568,7 @@ public class AccountService : IAccountService
 
         user.FullName = model.FullName;
         user.PhoneNumber = model.PhoneNumber;
+        user.Email = model.Email;
 
         await UpdateProfileImage(user, model.ImageProfile);
 
@@ -840,6 +841,8 @@ public class AccountService : IAccountService
         string? specialization,
         int? minYearsExperience,
         int? maxYearsExperience,
+        int? minPrice,
+        int? maxPrice,
         string? sortBy)
     {
         // Get the "Lawyer" role
@@ -891,6 +894,18 @@ public class AccountService : IAccountService
             filter = CombineExpressions(filter, maxExperienceFilter);
         }
 
+        if (minPrice.HasValue)
+        {
+            var minPriceFilter = (Expression<Func<ApplicationUser, bool>>)(u => u.PriceService>= minPrice);
+            filter = CombineExpressions(filter, minPriceFilter);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            var maxPriceFilter = (Expression<Func<ApplicationUser, bool>>)(u => u.PriceService <= maxPrice);
+            filter = CombineExpressions(filter, maxPriceFilter);
+        }
+
         // Sorting logic
         Func<IQueryable<ApplicationUser>, IOrderedQueryable<ApplicationUser>> userOrderBy = query => query.OrderBy(u => u.Id);
 
@@ -901,6 +916,7 @@ public class AccountService : IAccountService
                 "name" => u => u.OrderBy(u => u.FullName),
                 "experience" => u => u.OrderByDescending(u => u.yearsExperience),
                 "city" => u => u.OrderBy(u => u.City),
+                "price"=> u => u.OrderBy(u => u.PriceService),
                 _ => userOrderBy
             };
         }
