@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Transactions;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Mohamy.BusinessLayer.Interfaces;
 using Mohamy.Core.DTO.ConsultingViewModel;
@@ -722,6 +723,23 @@ namespace Mohamy.BusinessLayer.Services
                     });
                 }
             }
+        }
+
+        public async Task PaymentConsulting(TransactionDTO transactionDTO)
+        {
+            if (transactionDTO == null) throw new ArgumentNullException(nameof(transactionDTO));
+
+            var transaction = new Core.Entity.ConsultingData.Transaction
+            {
+                ConsultingId = transactionDTO.ConsultingId,
+                PaymentId = transactionDTO.PaymentId,
+                Amount = transactionDTO.Amount,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+           
+            _unitOfWork.TransactionRepository.Add(transaction);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations(string lawyerId)

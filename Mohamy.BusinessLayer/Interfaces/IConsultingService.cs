@@ -18,6 +18,7 @@ namespace Mohamy.BusinessLayer.Interfaces
         Task<IEnumerable<ConsultingDTO>> GetServices(string customerId);
         public Task<IEnumerable<ConsultingDTO>> GetConsultingsByLawyerIdAsync(string lawyerId, statusConsulting status);
         public Task<ConsultingDTO> GetConsultingByIdAsync(string id);
+        Task PaymentConsulting(TransactionDTO transactionDTO);
         public Task UpdateConsultingStatusAsync(string id, statusConsulting status);
         public Task<IEnumerable<ConsultingDTO>> GetAvailableConsultations(string lawyerId);
         public Task AcceptConsultation(string lawyerId, string consultationId);
