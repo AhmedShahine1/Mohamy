@@ -171,7 +171,7 @@ namespace Mohamy.BusinessLayer.AutoMapper
             CreateMap<graduationCertificate, GraduationCertificateDTO>();
             //--------------------------------------------------------------------------------------------------------
             CreateMap<Specialties, SpecialtiesDTO>()
-                .ForMember(dest => dest.mainConsultingName, opt => opt.MapFrom(src => src.mainConsulting.Name));
+                .ForMember(dest => dest.subConsultingName, opt => opt.MapFrom(src => src.subConsulting.Name));
             //--------------------------------------------------------------------------------------------------------
             CreateMap<Experience, Core.DTO.AuthViewModel.LawyerDetailsModel.ExperienceDTO>()
                 .ForMember(dest => dest.subConsultingName, opt => opt.MapFrom(src => src.subConsulting.Name));

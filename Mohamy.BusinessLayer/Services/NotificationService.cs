@@ -37,6 +37,7 @@ namespace Mohamy.BusinessLayer.Services
             var notification = new Core.Entity.Notification.Notification
             {
                 UserId = saveNotificationDTO.UserId,
+                Title = saveNotificationDTO.Title,
                 Message = saveNotificationDTO.Message,
                 NotificationType = saveNotificationDTO.NotificationType,
                 ActionId = saveNotificationDTO.ActionId
@@ -95,14 +96,14 @@ namespace Mohamy.BusinessLayer.Services
         {
             return notificationType switch
             {
-                NotificationType.Message => "New Message Received",
-                NotificationType.OfferReceived => "Offer Received",
-                NotificationType.OfferApproved => "Offer Approved",
-                NotificationType.OfferRejected => "Offer Rejected",
-                NotificationType.ConsultationStarted => "Consultation Started",
-                NotificationType.ConsultationCompleted => "Consultation Completed",
-                NotificationType.NewRating => "New Rating Added",
-                _ => "Notification",
+                NotificationType.Message => "تم استلام رسالة جديدة",
+                NotificationType.OfferReceived => "تم استلام عرض",
+                NotificationType.OfferApproved => "تمت الموافقة على العرض",
+                NotificationType.OfferRejected => "تم رفض العرض",
+                NotificationType.ConsultationStarted => "بدأت الاستشارة",
+                NotificationType.ConsultationCompleted => "تمت الاستشارة",
+                NotificationType.NewRating => "تمت إضافة تقييم جديد",
+                _ => "إشعار",
             };
         }
 
@@ -110,14 +111,14 @@ namespace Mohamy.BusinessLayer.Services
         {
             return notificationType switch
             {
-                NotificationType.Message => "You have received a new message. Check your inbox.",
-                NotificationType.OfferReceived => "An offer has been received. Review it now.",
-                NotificationType.OfferApproved => "Your offer has been approved. Congratulations!",
-                NotificationType.OfferRejected => "Unfortunately, your offer was rejected. Try again!",
-                NotificationType.ConsultationStarted => "A consultation has started. Join now.",
-                NotificationType.ConsultationCompleted => "The consultation has been successfully completed.",
-                NotificationType.NewRating => "You have received a new rating. See how you did.",
-                _ => "You have a new notification.",
+                NotificationType.Message => "لقد تلقيت رسالة جديدة. تحقق من صندوق الوارد الخاص بك.",
+                NotificationType.OfferReceived => "تم استلام عرض. قم بمراجعته الآن.",
+                NotificationType.OfferApproved => "تمت الموافقة على عرضك. تهانينا!",
+                NotificationType.OfferRejected => "للأسف، تم رفض عرضك. حاول مرة أخرى!",
+                NotificationType.ConsultationStarted => "بدأت الاستشارة. انضم الآن.",
+                NotificationType.ConsultationCompleted => "تمت الاستشارة بنجاح.",
+                NotificationType.NewRating => "لقد تلقيت تقييمًا جديدًا. اكتشف كيف كان أداؤك.",
+                _ => "لديك إشعار جديد.",
             };
         }
 
@@ -127,6 +128,7 @@ namespace Mohamy.BusinessLayer.Services
             return notifications.OrderByDescending(n => n.CreatedAt).Select(n => new NotificationDTO
             {
                 Id = n.Id,
+                Title = n.Title,
                 Message = n.Message,
                 CreatedAt = n.CreatedAt,
                 IsRead = n.IsRead,

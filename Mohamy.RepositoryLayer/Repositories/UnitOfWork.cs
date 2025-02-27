@@ -25,6 +25,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IBaseRepository<subConsulting> SubConsultingRepository { get; set; }
     public IBaseRepository<mainConsulting> MainConsultingRepository { get; set; }
+    public IBaseRepository<Transaction> TransactionRepository { get; set; }
     public IBaseRepository<Consulting> ConsultingRepository { get; set; }
     public IBaseRepository<RequestConsulting> RequestConsultingRepository { get; set; }
     public IBaseRepository<Notification> NotificationRepository { get; set; }
@@ -49,6 +50,7 @@ public class UnitOfWork : IUnitOfWork
         PathsRepository = new BaseRepository<Paths>(context);
         ImagesRepository = new BaseRepository<Images>(context);
         SubConsultingRepository = new BaseRepository<subConsulting>(context);
+        TransactionRepository = new BaseRepository<Transaction>(context);
         MainConsultingRepository = new BaseRepository<mainConsulting>(context);
         ConsultingRepository = new BaseRepository<Consulting>(context);
         RequestConsultingRepository = new BaseRepository<RequestConsulting>(context);

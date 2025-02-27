@@ -27,11 +27,11 @@ namespace Mohamy.BusinessLayer.Services
             _notificationService = notificationService;
         }
 
-        public async Task<IEnumerable<ChatDTO>> GetChatsAsync(string senderId, string receiverId)
+        public async Task<IEnumerable<ChatDTO>> GetChatsAsync(string senderId, string receiverId, string consultingId)
         {
             var messages = await _unitOfWork.ChatRepository.FindAllAsync(
-                m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
-                (m.SenderId == receiverId && m.ReceiverId == senderId),
+                m => m.ConsultingId == consultingId && ((m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                (m.SenderId == receiverId && m.ReceiverId == senderId)),
                 include: q => q.Include(i => i.Sender)
                    .Include(i => i.Receiver)
                    .Include(i => i.Images),
@@ -49,12 +49,12 @@ namespace Mohamy.BusinessLayer.Services
             });
         }
 
-        public async Task<IList<MessageIdDTO>> ReadMessages(string senderId, string receiverId)
+        public async Task<IList<MessageIdDTO>> ReadMessages(string senderId, string receiverId, string consultingId)
         {
             IList<MessageIdDTO> messageIds = new List<MessageIdDTO>();
 
             var messages = await _unitOfWork.ChatRepository.FindAllAsync(
-                m => m.SenderId == receiverId && m.ReceiverId == senderId && m.IsRead == false);
+                m => m.SenderId == receiverId && m.ReceiverId == senderId && m.ConsultingId == consultingId && m.IsRead == false);
 
             if (messages.Any()) {
                 foreach (var message in messages)
@@ -78,6 +78,7 @@ namespace Mohamy.BusinessLayer.Services
                 SenderId = messageDTO.SenderId,
                 ReceiverId = messageDTO.ReceiverId,
                 Message = messageDTO.Message,
+                ConsultingId = messageDTO.ConsultingId,
                 CreatedAt = DateTime.UtcNow
             };
             // Handle file if it exists

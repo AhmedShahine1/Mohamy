@@ -311,13 +311,14 @@ namespace Mohamy.Controllers.API
         [Authorize(Policy = "Customer")]
         [HttpPost]
         [Route("PaymentConsulting")]
-        public async Task<ActionResult<BaseResponse>> PaymentConsulting([FromQuery] string id)
+        public async Task<ActionResult<BaseResponse>> PaymentConsulting([FromBody] TransactionDTO transactionDTO)
         {
             var response = new BaseResponse();
 
             try
             {
-                await _consultingService.UpdateConsultingStatusAsync(id, statusConsulting.InProgress);
+                await _consultingService.PaymentConsulting(transactionDTO);
+                await _consultingService.UpdateConsultingStatusAsync(transactionDTO.ConsultingId, statusConsulting.InProgress);
                 response.status = true;
                 response.Data = "تم دفع الاستشارة بنجاح";
             }

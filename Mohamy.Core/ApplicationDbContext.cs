@@ -46,6 +46,8 @@ namespace Mohamy.Core
 
         public virtual DbSet<City> Cities { get; set; }
 
+        public virtual DbSet<Transaction> Transactions { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -92,9 +94,9 @@ namespace Mohamy.Core
 
             // Specialties to SubConsulting relationship
             modelBuilder.Entity<Specialties>()
-                .HasOne(s => s.mainConsulting)
+                .HasOne(s => s.subConsulting)
                 .WithMany()
-                .HasForeignKey(s => s.mainConsultingId)
+                .HasForeignKey(s => s.subConsultingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Specialties to SubConsulting relationship

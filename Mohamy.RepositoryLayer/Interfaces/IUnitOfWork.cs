@@ -26,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     public IBaseRepository<RequestConsulting> RequestConsultingRepository { get; }
     public IBaseRepository<Notification> NotificationRepository { get; }
     public IBaseRepository<Chat> ChatRepository { get; }
+    public IBaseRepository<Transaction> TransactionRepository { get; }
     public IBaseRepository<Evaluation> EvaluationRepository { get; }
     public IBaseRepository<City> CityRepository { get; }
     public IBaseRepository<lawyerLicense> lawyerLicenseRepository { get; }

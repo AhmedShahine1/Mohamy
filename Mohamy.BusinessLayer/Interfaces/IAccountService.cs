@@ -42,7 +42,7 @@ public interface IAccountService
     Task<IEnumerable<Experience>> GetAllExperiencesAsync(string userId);
     Task<IEnumerable<lawyerLicense>> GetAllLawyerLicensesAsync(string userId);
     Task<IEnumerable<graduationCertificate>> GetAllGraduationCertificatesAsync(string userId);
-    Task<List<LawyerDTO>> GetLawyersAsync(string? keyword, string? city, string? specialization, int? minYearsExperience, int? maxYearsExperience, string? sortBy);
+    Task<List<LawyerDTO>> GetLawyersAsync(string? keyword, string? city, string? specialization, int? minYearsExperience, int? maxYearsExperience, int? minPrice, int? maxPrice, string? sortBy);
     Task<UserNotificationProfileDTO> GetUserNotificationProfileDataAsync(string userId);
     Task<IEnumerable<CityDTO>> GetCitiesAsync();
     Task<bool> SendOTP(string customerEmail);

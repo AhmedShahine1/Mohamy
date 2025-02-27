@@ -56,6 +56,32 @@ namespace Mohamy.BusinessLayer.Services
             }
         }
 
+        public async Task<List<SpecialityDTO>> GetAllSpecialitiesAsync()
+        {
+            try
+            {
+                var entities = await _unitOfWork.SubConsultingRepository.FindAllAsync(e => !e.IsDeleted && !e.MainConsulting.service);
+                var dtos = new List<SpecialityDTO>();
+
+                foreach (var entity in entities)
+                {
+                    var dto = new SpecialityDTO
+                    {
+                        Id = entity.Id,
+                        Name = entity.Name,
+                    };
+
+                    dtos.Add(dto);
+                }
+
+                return dtos;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("حدث خطأ أثناء استرداد الاستشارات الفرعية", ex);
+            }
+        }
+
         public async Task<List<SubConsultingDTO>> GetSubConsultingByMainAsync(string mainConsulting)
         {
             try
@@ -87,16 +113,16 @@ namespace Mohamy.BusinessLayer.Services
             }
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetUsersByMainConsultingAsync(string mainConsultingId)
+        public async Task<IEnumerable<ApplicationUser>> GetUsersBySubConsultingAsync(string subConsultingId)
         {
-            if (string.IsNullOrEmpty(mainConsultingId))
+            if (string.IsNullOrEmpty(subConsultingId))
             {
-                throw new ArgumentException("لا يمكن أن يكون فارغًا أو فارغًا mainConsultingId", nameof(mainConsultingId));
+                throw new ArgumentException("لا يمكن أن يكون فارغًا أو فارغًا subConsultingId", nameof(subConsultingId));
             }
 
             // Fetch experiences that match the given subConsultingId
             var Specialties = await _unitOfWork.SpecialtiesRepository
-                .FindAllAsync(e => e.mainConsultingId == mainConsultingId, isNoTracking: true);
+                .FindAllAsync(e => e.subConsultingId == subConsultingId, isNoTracking: true);
 
             if (!Specialties.Any())
             {
@@ -114,7 +140,7 @@ namespace Mohamy.BusinessLayer.Services
             return users;
         }
 
-        public async Task<IEnumerable<MainConsultingDTO>> GetMainConsultingByUsersAsync(string UserId)
+        public async Task<IEnumerable<SubConsultingDTO>> GetSubConsultingByUsersAsync(string UserId)
         {
             if (string.IsNullOrEmpty(UserId))
             {
@@ -127,21 +153,21 @@ namespace Mohamy.BusinessLayer.Services
 
             if (!Specialties.Any())
             {
-                return Enumerable.Empty<MainConsultingDTO>();
+                return Enumerable.Empty<SubConsultingDTO>();
             }
 
             // Extract Lawyer IDs from the experiences
-            var MainConsultingIds = Specialties.Select(e => e.mainConsultingId).Distinct().ToList();
+            var subConsultingIds = Specialties.Select(e => e.subConsultingId).Distinct().ToList();
 
             // Fetch users by Lawyer IDs
-            var entities = await _unitOfWork.MainConsultingRepository
-                .FindAllAsync(u => MainConsultingIds.Contains(u.Id));
+            var entities = await _unitOfWork.SubConsultingRepository
+                .FindAllAsync(u => subConsultingIds.Contains(u.Id));
 
-            var dtos = new List<MainConsultingDTO>();
+            var dtos = new List<SubConsultingDTO>();
 
             foreach (var entity in entities)
             {
-                var dto = new MainConsultingDTO
+                var dto = new SubConsultingDTO
                 {
                     Id = entity.Id,
                     Name = entity.Name,
