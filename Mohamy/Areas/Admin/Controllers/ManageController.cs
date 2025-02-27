@@ -31,12 +31,28 @@ namespace Mohamy.Areas.Admin.Controllers
 
         public async Task<IActionResult> LawyerDetails(string lawyerId)
         {
-            var lawyer = await _adminService.GetLawyerByIdAsync(lawyerId);
-            if (lawyer == null)
+            try
             {
-                return NotFound();
+                if (string.IsNullOrEmpty(lawyerId))
+                {
+                    Console.WriteLine("Lawyer ID is null or empty.");
+                    return BadRequest("Invalid Lawyer ID");
+                }
+
+                var lawyer = await _adminService.GetLawyerByIdAsync(lawyerId);
+                if (lawyer == null)
+                {
+                    Console.WriteLine($"Lawyer with ID {lawyerId} not found.");
+                    return NotFound();
+                }
+
+                return View(lawyer);
             }
-            return View(lawyer);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex+ $"Error fetching lawyer details for ID: {lawyerId}");
+                return StatusCode(500, "An internal error occurred.");
+            }
         }
 
         // Display all customers

@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Error";
+}
+
+<div class="container text-center mt-5">
+    <h1 class="text-danger">Oops! Something went wrong.</h1>
+    <h3>Error Code: @ViewBag.ErrorCode</h3>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <p class="text-danger"><strong>Details:</strong> @ViewBag.ErrorMessage</p>
+    }
+
+    <p class="lead">We apologize for the inconvenience. Please try again later.</p>
+    <a href="/" class="btn btn-primary">Go to Home</a>
+</div>

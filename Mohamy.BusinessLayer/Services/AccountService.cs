@@ -854,7 +854,7 @@ public class AccountService : IAccountService
             .Select(ur => ur.UserId);
 
         // Start building the filter expression
-        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && !u.IsDeleted && u.RegistrationStatus.Equals(LawyerRegistrationStatus.Approved) && u.Available;
+        Expression<Func<ApplicationUser, bool>> filter = u => lawyerUserIds.Contains(u.Id) && !u.IsDeleted && u.Status && u.RegistrationStatus.Equals(LawyerRegistrationStatus.Approved) && u.Available;
 
         // Apply filters dynamically
         if (!string.IsNullOrWhiteSpace(keyword))

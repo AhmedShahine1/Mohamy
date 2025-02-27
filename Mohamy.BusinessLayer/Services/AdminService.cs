@@ -29,6 +29,7 @@ namespace Mohamy.BusinessLayer.Services
 
             var lawyers = from user in _unitOfWork.UserRepository.GetAll().AsQueryable()
                           .Include(a => a.Profile)
+                          .Where(q=>!q.IsDeleted)
                           .ToList()
                           join userRole in _unitOfWork.UserRoleRepository.GetAll().AsQueryable()
                           on user.Id equals userRole.UserId into userRoles
@@ -46,17 +47,30 @@ namespace Mohamy.BusinessLayer.Services
 
         public async Task<AuthDTO> GetLawyerByIdAsync(string lawyerId)
         {
+            if (string.IsNullOrEmpty(lawyerId))
+            {
+                Console.WriteLine("Lawyer ID is null or empty.");
+                return null;
+            }
+
             var lawyer = await _unitOfWork.UserRepository.FindAsync(
                 q => q.Id == lawyerId,
                 include: q => q.Include(a => a.Profile).Include(a => a.Documents)
             );
 
             if (lawyer == null)
+            {
+                Console.WriteLine($"Lawyer with ID {lawyerId} not found.");
                 return null;
+            }
 
             var lawyerDTO = _mapper.Map<AuthDTO>(lawyer);
 
-            // Fetch Lawyer License details
+            // Ensure Lists Are Initialized
+            lawyerDTO.lawyerLicenseURL = new List<string>();
+            lawyerDTO.GraduationCertificatesURL = new List<string>();
+
+            // Lawyer License
             var lawyerLicense = await _unitOfWork.lawyerLicenseRepository.FindAsync(q => q.LawyerId == lawyer.Id);
             lawyerDTO.lawyerLicenseId = lawyerLicense?.Id;
             lawyerDTO.lawyerLicenseStart = lawyerLicense?.Start;
@@ -64,26 +78,37 @@ namespace Mohamy.BusinessLayer.Services
             lawyerDTO.lawyerLicenseNumber = lawyerLicense?.LicenseNumber;
             lawyerDTO.lawyerLicenseState = lawyerLicense?.State;
 
-            // Fetch Graduation Certificates
+            // Graduation Certificates
             var lawyerGraduationCertificate = await _unitOfWork.graduationCertificateRepository.FindAllAsync(q => q.LawyerId == lawyer.Id);
-            lawyerDTO.GraduationCertificates = _mapper.Map<List<GraduationCertificateDTO>>(lawyerGraduationCertificate);
+            lawyerDTO.GraduationCertificates = lawyerGraduationCertificate != null
+                ? _mapper.Map<List<GraduationCertificateDTO>>(lawyerGraduationCertificate)
+                : new List<GraduationCertificateDTO>();
 
-            // Set Profile Image
-            lawyerDTO.ProfileImage = await _accountService.GetUserProfileImage(lawyer.ProfileId);
+            // Profile Image
+            lawyerDTO.ProfileImage = lawyer.ProfileId != null ? await _accountService.GetUserProfileImage(lawyer.ProfileId) : "No Image";
 
-            // Get Document URLs
+            // Document URLs
             if (lawyer.Documents != null)
             {
+                var pathLawyerLicense = await _unitOfWork.PathsRepository.FindAsync(q => q.Name == "lawyerLicense");
+                var pathGraduationCertificate = await _unitOfWork.PathsRepository.FindAsync(q => q.Name == "graduationCertificate");
+
                 foreach (var doc in lawyer.Documents)
                 {
-                    var fileUrl = await _fileHandling.GetFile(doc.Id);
-                    if (doc.path?.Name == "lawyerLicense")
+                    if (doc?.path != null)
                     {
-                        lawyerDTO.lawyerLicenseURL.Add(fileUrl);
-                    }
-                    else if (doc.path?.Name == "graduationCertificate")
-                    {
-                        lawyerDTO.GraduationCertificatesURL.Add(fileUrl);
+                        var fileUrl = await _fileHandling.GetFile(doc.Id);
+
+                        switch (doc.pathId)
+                        {
+                            case var pathId when pathId == pathLawyerLicense?.Id:
+                                lawyerDTO.lawyerLicenseURL.Add(fileUrl);
+                                break;
+
+                            case var pathId when pathId == pathGraduationCertificate?.Id:
+                                lawyerDTO.GraduationCertificatesURL.Add(fileUrl);
+                                break;
+                        }
                     }
                 }
             }
@@ -143,5 +168,45 @@ namespace Mohamy.BusinessLayer.Services
 
             return adminDTO;
         }
+
+        public async Task<int> GetCountLawyersAsync()
+        {
+            var lawyerRole = await _unitOfWork.RoleRepository
+                .FindAsync(r => r.Name == "Lawyer");
+
+            if (lawyerRole == null) return 0;
+
+            var lawyerCount = _unitOfWork.UserRoleRepository.GetAll()
+                .Count(ur => ur.RoleId == lawyerRole.Id);
+
+            return lawyerCount;
+        }
+
+        public async Task<int> GetCountCustomersAsync()
+        {
+            var customerRole = await _unitOfWork.RoleRepository
+                .FindAsync(r => r.Name == "Customer");
+
+            if (customerRole == null) return 0;
+
+            var customerCount = _unitOfWork.UserRoleRepository.GetAll()
+                .Count(ur => ur.RoleId == customerRole.Id);
+
+            return customerCount;
+        }
+
+        public async Task<int> GetCountAdminsAsync()
+        {
+            var adminRole = await _unitOfWork.RoleRepository
+                .FindAsync(r => r.Name == "Admin");
+
+            if (adminRole == null) return 0;
+
+            var adminCount = _unitOfWork.UserRoleRepository.GetAll()
+                .Count(ur => ur.RoleId == adminRole.Id);
+
+            return adminCount;
+        }
+
     }
 }

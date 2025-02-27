@@ -66,7 +66,6 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 // Global exception logging middleware
 app.Use(async (context, next) =>
 {

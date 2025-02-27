@@ -2,7 +2,6 @@ using System.Net;
 using System.Text.Json;
 using Mohamy.Core.DTO;
 
-
 namespace Mohamy.Middleware;
 
 public class ExceptionMiddleware
@@ -10,6 +9,7 @@ public class ExceptionMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
     private readonly IHostEnvironment _env;
+
     public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
     {
         _env = env;
@@ -19,83 +19,55 @@ public class ExceptionMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // var endpoint = context.GetEndpoint(); // endpoint != null && 
-        bool isApi = context.Request.Path.StartsWithSegments("/api");
-        if (isApi)
+        try
         {
-            try
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            if (context.Request.Path.StartsWithSegments("/api"))
             {
-                await _next(context);
+                await HandleApiExceptionAsync(context, ex);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, ex.Message);
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-                var response = _env.IsDevelopment()
-                    ? new BaseResponse()
-                    {
-                        ErrorCode = (int)HttpStatusCode.InternalServerError,
-                        ErrorMessage = ex.Message,
-                        Data = ex.StackTrace
-                    }
-                    : new BaseResponse()
-                    {
-                        ErrorCode = (int)HttpStatusCode.InternalServerError,
-                        ErrorMessage = "Internal Server Error"
-                    };
-
-
-                var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-                var json = JsonSerializer.Serialize(response, options);
-
-                await context.Response.WriteAsync(json);
+                await HandleMvcExceptionAsync(context, ex);
             }
         }
-        else
+    }
+
+    private async Task HandleApiExceptionAsync(HttpContext context, Exception ex)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var response = new BaseResponse
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
+            ErrorCode = (int)HttpStatusCode.InternalServerError,
+            ErrorMessage = _env.IsDevelopment() ? ex.Message : "Internal Server Error",
+            Data = _env.IsDevelopment() ? ex.StackTrace : null
+        };
 
-                if (_env.IsDevelopment())
-                {
-                    _logger.LogError(ex, ex.Message);
-                    context.Response.ContentType = "application/json";
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        var json = JsonSerializer.Serialize(response, options);
 
-                    var response = _env.IsDevelopment()
-                        ? new BaseResponse()
-                        {
-                            ErrorCode = (int)HttpStatusCode.InternalServerError,
-                            ErrorMessage = ex.Message,
-                            Data = ex.StackTrace
-                        }
-                        : new BaseResponse()
-                        {
-                            ErrorCode = (int)HttpStatusCode.InternalServerError,
-                            ErrorMessage = "Internal Server Error"
-                        };
+        await context.Response.WriteAsync(json);
+    }
 
-
-                    var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-                    var json = JsonSerializer.Serialize(response, options);
-
-                    await context.Response.WriteAsync(json);
-                }
-                else
-                {
-                    context.Response.Redirect("/ErrorsMvc/Index?code=500");
-                }
-
-            }
+    private async Task HandleMvcExceptionAsync(HttpContext context, Exception ex)
+    {
+        if (context.Request.Path.StartsWithSegments("/ErrorsMvc"))
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            return;
         }
+
+        _logger.LogError(ex, "An error occurred: {Message}", ex.Message);
+
+        string errorMessage = _env.IsDevelopment() ? ex.Message : "Internal Server Error";
+
+        context.Response.Redirect($"/ErrorsMvc/Index?code=500&message={Uri.EscapeDataString(errorMessage)}");
     }
 }

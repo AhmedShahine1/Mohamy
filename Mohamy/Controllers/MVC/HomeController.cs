@@ -23,9 +23,9 @@ namespace Mohamy.Controllers.MVC
 
         public async Task<IActionResult> Index()
         {
-            var lawyers = await _adminService.GetAllLawyersAsync();
-            var customers = await _adminService.GetAllCustomersAsync();
-            var admins = await _adminService.GetAllAdminsAsync();
+            var lawyers = await _adminService.GetCountLawyersAsync();
+            var customers = await _adminService.GetCountCustomersAsync();
+            var admins = await _adminService.GetCountAdminsAsync();
             var requests = await _requestConsultingService.GetAllRequestsAsync();
             var completedConsultings = await _consultingService.GetConsultingsbyStatus(statusConsulting.Completed);
             var inProgressConsultings = await _consultingService.GetConsultingsbyStatus(statusConsulting.InProgress);
@@ -33,9 +33,9 @@ namespace Mohamy.Controllers.MVC
 
             var model = new DashboardViewModel
             {
-                TotalLawyers = lawyers.Count(),
-                TotalCustomers = customers.Count(),
-                TotalAdmins = admins.Count(),
+                TotalLawyers = lawyers,
+                TotalCustomers = customers,
+                TotalAdmins = admins,
                 TotalRequests = requests.Count(),
                 CompletedConsultings = completedConsultings.Count(),
                 InProgressConsultings = inProgressConsultings.Count(),
