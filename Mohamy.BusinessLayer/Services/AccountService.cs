@@ -787,17 +787,122 @@ public class AccountService : IAccountService
 
     public async Task<IdentityResult> DeleteAccountAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            throw new ArgumentException("لم يتم العثور على المستخدم");
+        try
+        {
+            var user = await _unitOfWork.UserRepository.FindAsync(a=>a.Id==userId,
+                include:q=>q.Include(w=>w.Documents));
+            if (user == null)
+                throw new ArgumentException("لم يتم العثور على المستخدم");
+            var certificates = await _unitOfWork.graduationCertificateRepository.FindAllAsync(c => c.LawyerId == userId);
+            if (certificates.Any())
+            {
+                _unitOfWork.graduationCertificateRepository.DeleteRange(certificates);
+                await _unitOfWork.SaveChangesAsync();
+            }
 
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        user.UserName += $"_deleted_{timestamp}";
-        user.NormalizedUserName = _userManager.NormalizeName(user.UserName);
-        user.IsDeleted = true;
+            var professions = await _unitOfWork.ProfessionsRepository.FindAllAsync(p => p.LawyerId == userId);
+            if (professions.Any())
+            {
+                _unitOfWork.ProfessionsRepository.DeleteRange(professions);
+                await _unitOfWork.SaveChangesAsync();
+            }
 
-        return await _userManager.UpdateAsync(user);
+            var experiences = await _unitOfWork.ExperienceRepository.FindAllAsync(e => e.LawyerId == userId);
+            if (experiences.Any())
+            {
+                _unitOfWork.ExperienceRepository.DeleteRange(experiences);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            var specialties = await _unitOfWork.SpecialtiesRepository.FindAllAsync(s => s.LawyerId == userId);
+            if (specialties.Any())
+            {
+                _unitOfWork.SpecialtiesRepository.DeleteRange(specialties);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            var evaluations = await _unitOfWork.EvaluationRepository.FindAllAsync(e => e.EvaluatorId == userId);
+            if (evaluations.Any())
+            {
+                _unitOfWork.EvaluationRepository.DeleteRange(evaluations);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            var Requestconsultings = await _unitOfWork.RequestConsultingRepository.FindAllAsync(rc => rc.LawyerId == userId);
+            if (Requestconsultings.Any())
+            {
+                _unitOfWork.RequestConsultingRepository.DeleteRange(Requestconsultings);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            var consultings = await _unitOfWork.ConsultingRepository.FindAllAsync(rc => rc.LawyerId == userId || rc.CustomerId == userId,
+                include: q => q.Include(a => a.Reviews));
+            if (consultings.Any())
+            {
+                foreach (var consulting in consultings)
+                {
+                    // Delete all related RequestConsulting records
+                    var requestConsultings = await _unitOfWork.RequestConsultingRepository.FindAllAsync(rc => rc.ConsultingId == consulting.Id);
+                    if (requestConsultings.Any())
+                    {
+                        _unitOfWork.RequestConsultingRepository.DeleteRange(requestConsultings);
+                    }
+
+                    foreach(var review in consulting.Reviews)
+                    {
+                        _unitOfWork.EvaluationRepository.Delete(review);
+                    }
+
+                    // If there are files, delete them as well
+                    if (consulting.Files != null && consulting.Files.Any())
+                    {
+                        _unitOfWork.ImagesRepository.DeleteRange(consulting.Files);
+                    }
+
+                    // Handle Consulting deletion
+                    if (consulting.CustomerId == userId)
+                    {
+                        // If the user is a Customer, delete the consulting
+                        _unitOfWork.ConsultingRepository.Delete(consulting);
+                    }
+                    else if (consulting.LawyerId == userId)
+                    {
+                        // If the user is a Lawyer, set LawyerId to NULL (to preserve consulting record)
+                        consulting.LawyerId = null;
+                        _unitOfWork.ConsultingRepository.Update(consulting);
+                    }
+                }
+
+                // Save all changes at once
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            // Remove related records first
+            var Chats = await _unitOfWork.ChatRepository.FindAllAsync(i => i.ReceiverId == userId || i.SenderId == userId);
+            if (Chats.Any())
+            {
+                _unitOfWork.ChatRepository.DeleteRange(Chats);
+                await _unitOfWork.SaveChangesAsync(); 
+            }
+            
+
+            if (user.Documents.Any())
+            {
+                _unitOfWork.ImagesRepository.DeleteRange(user.Documents);
+                await _unitOfWork.SaveChangesAsync();
+
+            }
+            user = await _userManager.FindByIdAsync(userId);
+            var result = await _userManager.DeleteAsync(user);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            // Log the error for debugging
+            Console.WriteLine($"Error deleting user {userId}: {ex.Message}");
+            throw;
+        }
     }
+
 
     public async Task<string> GetUserProfileImage(string profileId)
     {

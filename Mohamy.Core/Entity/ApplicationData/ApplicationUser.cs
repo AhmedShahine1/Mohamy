@@ -43,9 +43,8 @@ namespace Mohamy.Core.Entity.ApplicationData
         public string? Device { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        [ForeignKey(nameof(Profile))]
         public string ProfileId { get; set; }
-
+        [ForeignKey(nameof(ProfileId))]
         public Images Profile { get; set; } // صورة الملف الشخصي للمستخدم.
 
         public LawyerRegistrationStatus RegistrationStatus { get; set; } = LawyerRegistrationStatus.NotLawyer;

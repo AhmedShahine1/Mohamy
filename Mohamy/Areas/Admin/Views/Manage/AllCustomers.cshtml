@@ -52,9 +52,9 @@
                                 </form>
                             </li>
                             <li>
-                                <form asp-action="DeleteAccountAsync" method="post" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف الحساب؟');">
+                                <form method="post" asp-action="DeleteAccount">
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="submit" class="dropdown-item text-danger">
+                                    <button type="submit" class="dropdown-item  text-danger">
                                         حذف الحساب
                                     </button>
                                 </form>

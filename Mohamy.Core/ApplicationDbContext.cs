@@ -75,16 +75,6 @@ namespace Mohamy.Core
                 entity.Property(e => e.HttpMethod).IsRequired().HasMaxLength(10);
                 entity.Property(e => e.Timestamp).IsRequired();
             });
-            // Configure ApplicationUser
-            modelBuilder.Entity<ApplicationUser>(entity =>
-            {
-                // One-to-One relationship with Images (Profile)
-                entity.HasOne(u => u.Profile)
-                    .WithMany() // No reverse navigation
-                    .HasForeignKey(u => u.ProfileId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
             // Experience to SubConsulting relationship
             modelBuilder.Entity<Experience>()
                 .HasOne(e => e.subConsulting)
@@ -221,7 +211,6 @@ namespace Mohamy.Core
                       .OnDelete(DeleteBehavior.Restrict);
 
             });
-
         }
     }
 }
