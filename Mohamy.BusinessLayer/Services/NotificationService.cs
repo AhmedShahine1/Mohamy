@@ -20,13 +20,13 @@ namespace Mohamy.BusinessLayer.Services
         {
             _unitOfWork = unitOfWork;
 
-            //if (FirebaseApp.DefaultInstance is null)
-            //{
-            //    FirebaseApp.Create(new AppOptions()
-            //    {
-            //        Credential = GoogleCredential.FromFile("FirebaseKeys/muham.json")
-            //    });
-            //}
+            if (FirebaseApp.DefaultInstance is null)
+            {
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.FromFile("FirebaseKeys/muham-app.json")
+                });
+            }
         }
 
         public async Task SaveNotificationAsync(SaveNotificationDTO saveNotificationDTO)
@@ -49,7 +49,7 @@ namespace Mohamy.BusinessLayer.Services
             var user = await _unitOfWork.UserRepository.FindAsync(u => u.Id == saveNotificationDTO.UserId);
             if (user == null) throw new ArgumentException("User not found");
             saveNotificationDTO.DeviceId = user.Device;
-            //await SendNotificationAsync(saveNotificationDTO);
+            await SendNotificationAsync(saveNotificationDTO);
         }
 
         private async Task<ActionResult<BaseResponse>> SendNotificationAsync(SaveNotificationDTO saveNotificationDTO)
@@ -103,6 +103,7 @@ namespace Mohamy.BusinessLayer.Services
                 NotificationType.ConsultationStarted => "بدأت الاستشارة",
                 NotificationType.ConsultationCompleted => "تمت الاستشارة",
                 NotificationType.NewRating => "تمت إضافة تقييم جديد",
+                NotificationType.Call => "لديك مكالمة واردة",
                 _ => "إشعار",
             };
         }
@@ -111,14 +112,15 @@ namespace Mohamy.BusinessLayer.Services
         {
             return notificationType switch
             {
-                NotificationType.Message => "لقد تلقيت رسالة جديدة. تحقق من صندوق الوارد الخاص بك.",
-                NotificationType.OfferReceived => "تم استلام عرض. قم بمراجعته الآن.",
+                NotificationType.Message => "لقد تلقيت رسالة جديدة. تحقق من صندوق الوارد الخاص بك",
+                NotificationType.OfferReceived => "تم استلام عرض. قم بمراجعته الآن",
                 NotificationType.OfferApproved => "تمت الموافقة على عرضك. تهانينا!",
                 NotificationType.OfferRejected => "للأسف، تم رفض عرضك. حاول مرة أخرى!",
-                NotificationType.ConsultationStarted => "بدأت الاستشارة. انضم الآن.",
-                NotificationType.ConsultationCompleted => "تمت الاستشارة بنجاح.",
-                NotificationType.NewRating => "لقد تلقيت تقييمًا جديدًا. اكتشف كيف كان أداؤك.",
-                _ => "لديك إشعار جديد.",
+                NotificationType.ConsultationStarted => "بدأت الاستشارة. انضم الآن",
+                NotificationType.ConsultationCompleted => "تمت الاستشارة بنجاح",
+                NotificationType.NewRating => "لقد تلقيت تقييمًا جديدًا. اكتشف كيف كان أداؤك",
+                NotificationType.Call => "شخص ما يدعو لك. انقر للإجابة",
+                _ => "لديك إشعار جديد",
             };
         }
 

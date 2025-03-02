@@ -11,5 +11,6 @@
         ConsultationStarted = 6,
         ConsultationCompleted = 7,
         ConsultationCancelled = 8,
+        Call = 9,
     }
 }

@@ -37,5 +37,26 @@ namespace Mohamy.Controllers.API
 
             return StatusCode(response.status ? 200 : response.ErrorCode, response);
         }
+
+        [HttpPost("send-call-notification")]
+        public async Task<IActionResult> SendCallNotificationAsync([FromBody] TokenRequestDTO tokenRequest)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                await _communicationService.SendCallNotificationAsync(tokenRequest);
+
+                response.status = true;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.ErrorCode = 500;
+                response.ErrorMessage = $"حدث خطأ أثناء إرسال الإشعار: {ex.Message}";
+            }
+
+            return StatusCode(response.status ? 200 : response.ErrorCode, response);
+        }
     }
 }

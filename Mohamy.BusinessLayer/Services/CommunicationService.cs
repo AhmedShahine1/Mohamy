@@ -3,14 +3,19 @@ using Mohamy.Core.DTO.CommunicationViewModel;
 using Agora;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
+using Mohamy.Core.DTO.NotificationViewModel;
+using Mohamy.Core.Helpers;
 
 namespace Mohamy.BusinessLayer.Services
 {
     public class CommunicationSerivce : ICommunicationService
     {
         private readonly AgoraConfigurations _agoraConfig;
-        public CommunicationSerivce(IOptions<AgoraConfigurations> agoraConfig) {
+        private readonly INotificationService _notificationService;
+
+        public CommunicationSerivce(IOptions<AgoraConfigurations> agoraConfig, INotificationService notificationService) {
             _agoraConfig = agoraConfig.Value;
+            _notificationService = notificationService;
         }
 
         public TokenResponseDTO GenerateToken(TokenRequestDTO tokenRequest) 
@@ -28,6 +33,17 @@ namespace Mohamy.BusinessLayer.Services
 
             return response;
         }
+
+        public async Task SendCallNotificationAsync(TokenRequestDTO tokenRequest)
+        {
+            await _notificationService.SaveNotificationAsync(new SaveNotificationDTO
+            {
+                UserId = tokenRequest.receiverId,
+                NotificationType = NotificationType.Call,
+                ActionId = tokenRequest.senderId
+            });
+        }
+
 
         private string GetChannelName(string user1, string user2)
         {
