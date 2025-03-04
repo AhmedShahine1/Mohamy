@@ -59,22 +59,19 @@ namespace Mohamy.BusinessLayer.Services
             {
                 if (saveNotificationDTO.DeviceId is not null)
                 {
-                    FirebaseAdmin.Messaging.Notification notification = new FirebaseAdmin.Messaging.Notification();
-                    
-                    notification = new FirebaseAdmin.Messaging.Notification()
+                    Message message = new Message()
                     {
-                        Title = saveNotificationDTO.Title,
-                        Body = saveNotificationDTO.Message
-                    };
-                    
-                    Message message = new()
-                    {
-                        Data = new Dictionary<string, string>
-                        {
-                            { "title", notification.Title },
-                            { "body", notification.Body },
-                        },
                         Token = saveNotificationDTO.DeviceId,
+                        Notification = new Notification()
+                        {
+                            Title = saveNotificationDTO.Title,
+                            Body = saveNotificationDTO.Message
+                        },
+                        Data = new Dictionary<string, string>()
+                        {
+                            { "type", ((int)saveNotificationDTO.NotificationType).ToString() },
+                            { "actionId", saveNotificationDTO.ActionId }
+                        }
                     };
 
                     await FirebaseMessaging.DefaultInstance.SendAsync(message);

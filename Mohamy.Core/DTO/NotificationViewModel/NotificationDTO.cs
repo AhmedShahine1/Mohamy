@@ -21,5 +21,6 @@ namespace Mohamy.Core.DTO.NotificationViewModel
             public string DeviceId { get; set; }
             public NotificationType NotificationType { get; set; }
             public string? ActionId { get; set; }
+            
         }
 }
